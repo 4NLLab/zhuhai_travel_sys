@@ -6,15 +6,37 @@ import (
 	"zhuhai_travel_backend/database"
 	"zhuhai_travel_backend/dto"
 	"zhuhai_travel_backend/models"
+	"zhuhai_travel_backend/security"
 
 	"github.com/gin-gonic/gin"
 )
 
 // DriverList 司机列表
 func DriverList(c *gin.Context) {
+	status := c.Query("status")
+	q := database.DB.Model(&models.Driver{})
+	if status != "" {
+		q = q.Where("status = ?", status)
+	}
+
 	var drivers []models.Driver
-	database.DB.Find(&drivers)
+	q.Order("created_at DESC").Find(&drivers)
+	for i := range drivers {
+		drivers[i].Phone = security.MaskPhone(drivers[i].Phone)
+		if drivers[i].IdCardNo != nil {
+			masked := maskIDCard(*drivers[i].IdCardNo)
+			drivers[i].IdCardNo = &masked
+		}
+	}
+
 	c.JSON(http.StatusOK, dto.Success(drivers))
+}
+
+func maskIDCard(id string) string {
+	if len(id) < 8 {
+		return id
+	}
+	return id[:4] + "**********" + id[len(id)-4:]
 }
 
 // DriverCommissionList 司机佣金列表

@@ -66,8 +66,14 @@ CREATE TABLE drivers (
   driver_no VARCHAR(40) NOT NULL,
   name VARCHAR(80) NOT NULL,
   phone VARCHAR(32) NOT NULL,
+  password_hash VARCHAR(255) NOT NULL DEFAULT '',
   id_card_no VARBINARY(255) NULL,
   status VARCHAR(24) NOT NULL DEFAULT 'active',
+  id_card_front_url VARCHAR(500) NOT NULL DEFAULT '',
+  driver_license_url VARCHAR(500) NOT NULL DEFAULT '',
+  vehicle_license_url VARCHAR(500) NOT NULL DEFAULT '',
+  vehicle_photo_url VARCHAR(500) NOT NULL DEFAULT '',
+  review_remark VARCHAR(255) NOT NULL DEFAULT '',
   commission_rate DECIMAL(6,4) NOT NULL DEFAULT 0.0800,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -360,6 +366,7 @@ CREATE TABLE driver_commissions (
   driver_id BIGINT UNSIGNED NOT NULL,
   order_id BIGINT UNSIGNED NOT NULL,
   order_item_id BIGINT UNSIGNED NOT NULL,
+  ticket_id BIGINT UNSIGNED NULL,
   commission_no VARCHAR(64) NOT NULL,
   base_amount DECIMAL(10,2) NOT NULL,
   rate DECIMAL(6,4) NOT NULL,
@@ -370,11 +377,13 @@ CREATE TABLE driver_commissions (
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   UNIQUE KEY uk_commissions_no (commission_no),
+  UNIQUE KEY uk_commissions_ticket (ticket_id),
   KEY idx_commissions_driver_status (driver_id, status),
   KEY idx_commissions_order (order_id),
   CONSTRAINT fk_commissions_driver FOREIGN KEY (driver_id) REFERENCES drivers (id),
   CONSTRAINT fk_commissions_order FOREIGN KEY (order_id) REFERENCES orders (id),
-  CONSTRAINT fk_commissions_order_item FOREIGN KEY (order_item_id) REFERENCES order_items (id)
+  CONSTRAINT fk_commissions_order_item FOREIGN KEY (order_item_id) REFERENCES order_items (id),
+  CONSTRAINT fk_commissions_ticket FOREIGN KEY (ticket_id) REFERENCES tickets (id)
 ) ENGINE=InnoDB;
 
 CREATE TABLE support_tickets (
@@ -447,9 +456,13 @@ CREATE TABLE audit_logs (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   actor_type VARCHAR(24) NOT NULL,
   actor_id BIGINT UNSIGNED NULL,
+  actor_name VARCHAR(120) NULL,
   action VARCHAR(80) NOT NULL,
   target_type VARCHAR(80) NULL,
   target_id BIGINT UNSIGNED NULL,
+  method VARCHAR(12) NOT NULL DEFAULT '',
+  path VARCHAR(255) NOT NULL DEFAULT '',
+  status_code INT NOT NULL DEFAULT 0,
   ip VARCHAR(64) NULL,
   user_agent VARCHAR(500) NULL,
   payload JSON NULL,
@@ -458,4 +471,18 @@ CREATE TABLE audit_logs (
   KEY idx_audit_actor (actor_type, actor_id),
   KEY idx_audit_target (target_type, target_id),
   KEY idx_audit_created (created_at)
+) ENGINE=InnoDB;
+
+CREATE TABLE jzg_callback_logs (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  event_type VARCHAR(40) NOT NULL,
+  order_no VARCHAR(64) NULL,
+  verified TINYINT(1) NOT NULL DEFAULT 0,
+  request_ip VARCHAR(64) NULL,
+  payload JSON NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_jzg_callback_event_time (event_type, created_at),
+  KEY idx_jzg_callback_order (order_no),
+  KEY idx_jzg_callback_verified (verified)
 ) ENGINE=InnoDB;

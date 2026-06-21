@@ -2242,7 +2242,7 @@
         </header>
         <div class="content ticket-content">
           <section class="card ticket-search-card">
-            <div class="service-status">接口已测通：九洲港 3069 → 蛇口港 3070 可查真实班次，并完成 lockOrderForNet 锁票与 unLockOrderForNet 解锁</div>
+            <div class="service-status">接口接入：页面只请求本站后端，由服务器签名后访问九洲港分销接口。</div>
             <div class="route-line" aria-label="航线选择">
               <div class="route-point">
                 <span>上船港口</span>
@@ -2273,7 +2273,7 @@
             <div class="search-meta-grid">
               <div class="search-meta"><span>出行人数</span><strong data-field="people-num">1 人</strong></div>
               <div class="search-meta"><span>票种筛选</span><strong data-field="filter-mode">仅看有票</strong></div>
-              <div class="search-meta"><span>接口验证</span><strong>searchVoyage 已通</strong></div>
+              <div class="search-meta"><span>接口来源</span><strong data-cruise-status>后端转发 searchVoyage</strong></div>
             </div>
             <div class="passenger-panel" aria-label="选择出行人数">
               <div class="passenger-row">
@@ -2495,7 +2495,7 @@
           </section>
 
           <section class="card">
-            <div class="section-head"><h2>接口提交预览</h2><span class="muted-link">lockOrderForNet</span></div>
+            <div class="section-head"><h2>下单信息确认</h2><span class="muted-link">后端锁票</span></div>
             <div class="api-flow">
               <div class="api-step">
                 <i data-lucide="ship"></i>
@@ -2509,7 +2509,7 @@
               </div>
               <div class="api-step pending">
                 <i data-lucide="lock-keyhole"></i>
-                <span><strong>锁定票源</strong><span>点击确认后模拟调用锁票接口，成功后进入 10 分钟支付窗口</span></span>
+                <span><strong>锁定票源</strong><span>正式下单由后端调用 lockOrderForNet，成功后进入支付窗口</span></span>
                 <em>下一步</em>
               </div>
             </div>
@@ -2532,11 +2532,11 @@
         <div class="content">
           <section class="card lock-card">
             <div class="section-head">
-              <h2>锁票成功</h2>
+              <h2>待支付</h2>
               <span class="lock-badge"><i data-lucide="lock-keyhole"></i>待支付</span>
             </div>
             <div style="color: var(--danger); font-size: 34px; font-weight: 850" data-field="pay-total">¥140</div>
-            <p style="margin: 8px 0 0; color: var(--muted); font-size: 13px">已模拟调用 lockOrderForNet，暂未调用 saleOrderForNet。</p>
+            <p style="margin: 8px 0 0; color: var(--muted); font-size: 13px">正式支付链路需要微信支付回调成功后，由后端调用 saleOrderForNet 完成出票。</p>
             <div class="lock-meta">
               <div class="summary-row"><span>锁票订单号</span><strong data-field="order-no">ZH20260715001028</strong></div>
               <div class="summary-row"><span>锁票票号</span><strong data-field="ticket-no">P20260715001028</strong></div>
@@ -2554,8 +2554,8 @@
               </div>
               <div class="api-step locked">
                 <i data-lucide="lock-keyhole"></i>
-                <span><strong>lockOrderForNet</strong><span>已锁定当前票源，返回 orderNo / ticketNo</span></span>
-                <em>完成</em>
+                <span><strong>lockOrderForNet</strong><span>后端接口已接入；生产下单时以九洲港返回 orderNo / ticketNo 为准</span></span>
+                <em>后端接入</em>
               </div>
               <div class="api-step pending">
                 <i data-lucide="wallet"></i>
@@ -2904,6 +2904,7 @@
         window.lucide.createIcons();
       }
 
+      const API_BASE = "/api/v1";
       const toast = document.querySelector(".toast");
       let toastTimer;
       const bookingState = {
@@ -2953,6 +2954,24 @@
         toast.classList.add("show");
         clearTimeout(toastTimer);
         toastTimer = setTimeout(() => toast.classList.remove("show"), 1400);
+      }
+
+      async function apiPost(path, body = {}) {
+        const response = await fetch(`${API_BASE}${path}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok || payload.code !== 200) {
+          throw new Error(payload.message || "接口请求失败");
+        }
+        return payload.data;
+      }
+
+      function setCruiseStatus(message) {
+        const node = document.querySelector("[data-cruise-status]");
+        if (node) node.textContent = message;
       }
 
       function go(screenName) {
@@ -3139,6 +3158,11 @@
         return `¥${Number.isInteger(number) ? number : number.toFixed(2)}`;
       }
 
+      function numberValue(value, fallback = 0) {
+        const number = Number(value);
+        return Number.isFinite(number) ? number : fallback;
+      }
+
       function pad(value) {
         return String(value).padStart(2, "0");
       }
@@ -3165,6 +3189,88 @@
         bookingState.locked = false;
         bookingState.paid = false;
         bookingState.lockExpire = "待锁票";
+      }
+
+      function fareByName(fares, matchers) {
+        return fares.find((fare) => {
+          const name = String(fare.fareTypeName || fare.fareType || "");
+          return matchers.some((matcher) => name.includes(matcher));
+        }) || fares[0] || {};
+      }
+
+      function renderVoyages(voyages) {
+        const list = document.querySelector(".sailing-list");
+        if (!list) return;
+
+        const usableVoyages = Array.isArray(voyages) ? voyages : [];
+        list.innerHTML = usableVoyages
+          .map((voyage, index) => {
+            const cabin = Array.isArray(voyage.cabinPriceList) ? voyage.cabinPriceList[0] || {} : {};
+            const fares = Array.isArray(cabin.fareTypeList) ? cabin.fareTypeList : [];
+            const adult = fareByName(fares, ["成人"]);
+            const child = fareByName(fares, ["小童", "儿童"]);
+            const elder = fareByName(fares, ["长者", "老人"]);
+            const stock = numberValue(cabin.count, 0);
+            const cabinClassId = cabin.cabinClassId || "";
+            const cabinTypeCode = cabin.cabinTypeCode || "S";
+            const time = voyage.upTime || voyage.departureTime || "--:--";
+            const sailTime = voyage.sailTime || "约60";
+            const state = voyage.voyageState || "未知";
+            const adultPrice = numberValue(adult.price, 0);
+            const childPrice = numberValue(child.price, adultPrice);
+            const elderPrice = numberValue(elder.price, adultPrice);
+            const active = index === 0 ? " active" : "";
+
+            return `
+              <article class="sailing-card${active}" data-voyage-id="${escapeAttr(voyage.voyageId)}" data-voyage-no="${escapeAttr(voyage.voyageNo)}" data-time="${escapeAttr(time)}" data-ship="${escapeAttr(voyage.shipName || "")}" data-adult-price="${adultPrice}" data-child-price="${childPrice}" data-elder-price="${elderPrice}" data-adult-stock="${stock}" data-child-stock="${stock}" data-elder-stock="${stock}">
+                <div class="sailing-main">
+                  <div class="time-block"><strong>${escapeAttr(time)}</strong><span>开航</span></div>
+                  <div class="sailing-body">
+                    <strong>${escapeAttr(voyage.lineName || voyage.voyageName || "九洲蛇口线")} · ${escapeAttr(voyage.upPortName || voyage.departurePortName || "九洲港")}上船</strong>
+                    <span>航班号 ${escapeAttr(voyage.voyageNo || "-")} · ${escapeAttr(voyage.shipName || "-")} · 航行${escapeAttr(sailTime)}分钟</span>
+                    <div class="sailing-tags"><span>${escapeAttr(state)}</span><span>${escapeAttr(cabin.cabinClassName || "普通舱")}余${stock}</span><span>实名购票</span></div>
+                  </div>
+                  <div class="sailing-action">
+                    <strong>${adultPrice > 0 ? yuan(adultPrice) + "起" : "待确认"}</strong>
+                    <span>${stock > 0 ? "有票" : "无票"}</span>
+                    <button class="select-sailing" type="button">选择</button>
+                  </div>
+                </div>
+                <div class="fare-options" aria-label="${escapeAttr(time)} 班次票种">
+                  <button class="fare-option active" type="button" data-ticket-type="adult" data-fare-name="${escapeAttr(cabin.cabinClassName || "普通舱")} · 成人票" data-price="${adultPrice}" data-stock="${stock}" data-fare-type="${escapeAttr(adult.fareTypeId)}" data-cabin-class-id="${escapeAttr(cabinClassId)}" data-cabin-type-code="${escapeAttr(cabinTypeCode)}">
+                    <strong>${escapeAttr(cabin.cabinClassName || "普通舱")} 成人</strong><span>${yuan(adultPrice)}</span><small>余${stock} · fareType ${escapeAttr(adult.fareTypeId || "-")}</small>
+                  </button>
+                  <button class="fare-option" type="button" data-ticket-type="child" data-fare-name="${escapeAttr(cabin.cabinClassName || "普通舱")} · 小童票" data-price="${childPrice}" data-stock="${stock}" data-fare-type="${escapeAttr(child.fareTypeId)}" data-cabin-class-id="${escapeAttr(cabinClassId)}" data-cabin-type-code="${escapeAttr(cabinTypeCode)}">
+                    <strong>${escapeAttr(cabin.cabinClassName || "普通舱")} 小童</strong><span>${yuan(childPrice)}</span><small>余${stock} · fareType ${escapeAttr(child.fareTypeId || "-")}</small>
+                  </button>
+                  <button class="fare-option" type="button" data-ticket-type="elder" data-fare-name="${escapeAttr(cabin.cabinClassName || "普通舱")} · 长者票" data-price="${elderPrice}" data-stock="${stock}" data-fare-type="${escapeAttr(elder.fareTypeId)}" data-cabin-class-id="${escapeAttr(cabinClassId)}" data-cabin-type-code="${escapeAttr(cabinTypeCode)}">
+                    <strong>${escapeAttr(cabin.cabinClassName || "普通舱")} 长者</strong><span>${yuan(elderPrice)}</span><small>余${stock} · fareType ${escapeAttr(elder.fareTypeId || "-")}</small>
+                  </button>
+                </div>
+              </article>
+            `;
+          })
+          .join("");
+        list.insertAdjacentHTML(
+          "beforeend",
+          '<div class="result-empty">暂无满足当前人数的可售船次。可以减少人数，或打开“包含无票船次”查看售罄班次。</div>',
+        );
+
+        bindSailingCards();
+        refreshSailingList();
+      }
+
+      async function queryVoyages() {
+        setCruiseStatus("正在查询...");
+        const data = await apiPost("/cruise/voyages", {
+          departureDate: bookingState.date,
+          upPortId: Number(bookingState.upPort),
+          downPortId: Number(bookingState.downPort),
+          peopleNum: totalPassengers(),
+        });
+        renderVoyages(data || []);
+        setCruiseStatus(`searchVoyage 已返回 ${Array.isArray(data) ? data.length : 0} 个班次`);
+        showToast(`已按 ${passengerSummary()} 查询真实班次`);
       }
 
       function refundAmount() {
@@ -3397,19 +3503,22 @@
         });
       });
 
-      document.querySelectorAll(".sailing-card").forEach((card) => {
-        card.addEventListener("click", () => {
-          selectSailing(card);
+      function bindSailingCards() {
+        document.querySelectorAll(".sailing-card").forEach((card) => {
+          card.addEventListener("click", () => {
+            selectSailing(card);
+          });
         });
-      });
 
-      document.querySelectorAll(".fare-option").forEach((fare) => {
-        fare.addEventListener("click", (event) => {
-          event.stopPropagation();
-          const card = fare.closest(".sailing-card");
-          selectSailing(card);
+        document.querySelectorAll(".fare-option").forEach((fare) => {
+          fare.addEventListener("click", (event) => {
+            event.stopPropagation();
+            const card = fare.closest(".sailing-card");
+            selectSailing(card);
+          });
         });
-      });
+      }
+      bindSailingCards();
 
       document.querySelectorAll("[data-passenger-action]").forEach((button) => {
         button.addEventListener("click", () => {
@@ -3441,9 +3550,16 @@
       });
 
       document.querySelectorAll("[data-query-action]").forEach((button) => {
-        button.addEventListener("click", () => {
-          refreshSailingList();
-          showToast(`已按 ${passengerSummary()} 查询`);
+        button.addEventListener("click", async () => {
+          button.disabled = true;
+          try {
+            await queryVoyages();
+          } catch (error) {
+            setCruiseStatus("searchVoyage 查询失败");
+            showToast(error.message || "查询船票失败");
+          } finally {
+            button.disabled = false;
+          }
         });
       });
 

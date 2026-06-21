@@ -4,22 +4,23 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>超级管理员控制台</title>
+    <meta name="app-version" content="admin-audit-log-20260621-1921" />
     <link rel="icon" href="data:," />
     <style>
       :root {
-        --primary: #0f8dad;
-        --primary-dark: #086d89;
-        --blue: #246fb2;
-        --green: #1f9661;
-        --orange: #f15a2b;
-        --gold: #f4b23f;
-        --ink: #14202a;
-        --muted: #697783;
-        --line: #e6edf1;
-        --page: #edf5f7;
+        --primary: #0071e3;
+        --primary-dark: #005bbd;
+        --blue: #147ce5;
+        --green: #248a3d;
+        --orange: #ff9f0a;
+        --gold: #bf8c1d;
+        --ink: #1d1d1f;
+        --muted: #6e6e73;
+        --line: #d2d2d7;
+        --page: #f5f5f7;
         --card: #fff;
-        --panel: #f7fbfc;
-        --shadow: 0 8px 22px rgba(18, 35, 45, 0.08);
+        --panel: #f9f9fb;
+        --shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
       }
 
       * {
@@ -30,7 +31,7 @@
         margin: 0;
         min-height: 100vh;
         color: var(--ink);
-        background: #eaf2f4;
+        background: var(--page);
         font-family:
           -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB",
           "Microsoft YaHei", sans-serif;
@@ -52,23 +53,29 @@
         min-height: 100vh;
         margin: 0 auto;
         background: var(--page);
-        overflow-x: hidden;
-        box-shadow: 0 0 0 1px rgba(20, 35, 45, 0.05), 0 24px 80px rgba(8, 45, 64, 0.18);
+        overflow-x: clip;
+        box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 18px 60px rgba(0, 0, 0, 0.08);
+      }
+
+      body.auth-checking .phone {
+        visibility: hidden;
       }
 
       .top {
         position: sticky;
         top: 0;
-        z-index: 20;
-        padding: calc(10px + env(safe-area-inset-top, 0)) 14px 10px;
-        background: rgba(237, 245, 247, 0.94);
-        backdrop-filter: blur(12px);
+        z-index: 40;
+        padding: calc(8px + env(safe-area-inset-top, 0)) 14px 8px;
+        background: rgba(245, 245, 247, 0.82);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        backdrop-filter: saturate(180%) blur(18px);
       }
 
       .nav {
-        height: 42px;
+        position: relative;
+        height: 44px;
         display: grid;
-        grid-template-columns: 42px minmax(0, 1fr) 42px;
+        grid-template-columns: 44px minmax(0, 1fr) 44px;
         align-items: center;
         gap: 8px;
       }
@@ -80,11 +87,62 @@
         place-items: center;
         color: var(--ink);
         background: transparent;
+        border-radius: 999px;
+      }
+
+      .icon-btn:active {
+        background: rgba(0, 0, 0, 0.06);
       }
 
       .icon-btn svg {
         width: 22px;
         height: 22px;
+      }
+
+      .menu-glyph {
+        width: 20px;
+        height: 14px;
+        position: relative;
+        display: block;
+      }
+
+      .menu-glyph::before,
+      .menu-glyph::after,
+      .menu-glyph span {
+        position: absolute;
+        left: 0;
+        width: 20px;
+        height: 2px;
+        border-radius: 2px;
+        background: currentColor;
+        transition: transform 0.16s ease, opacity 0.16s ease, top 0.16s ease;
+        content: "";
+      }
+
+      .menu-glyph::before {
+        top: 0;
+      }
+
+      .menu-glyph span {
+        top: 6px;
+      }
+
+      .menu-glyph::after {
+        top: 12px;
+      }
+
+      .icon-btn.open .menu-glyph::before {
+        top: 6px;
+        transform: rotate(45deg);
+      }
+
+      .icon-btn.open .menu-glyph span {
+        opacity: 0;
+      }
+
+      .icon-btn.open .menu-glyph::after {
+        top: 6px;
+        transform: rotate(-45deg);
       }
 
       .title {
@@ -93,32 +151,33 @@
         text-overflow: ellipsis;
         white-space: nowrap;
         font-size: 18px;
-        font-weight: 850;
+        font-weight: 700;
       }
 
       .content {
-        padding: 0 14px calc(22px + env(safe-area-inset-bottom, 0));
+        padding: 14px 14px calc(22px + env(safe-area-inset-bottom, 0));
       }
 
       .hero {
-        margin-bottom: 10px;
-        padding: 16px;
-        border-radius: 8px;
-        color: #fff;
-        background: linear-gradient(135deg, #0f8dad, #246fb2);
-        box-shadow: var(--shadow);
+        margin-bottom: 12px;
+        padding: 2px 2px 8px;
+        color: var(--ink);
+        background: transparent;
+        box-shadow: none;
       }
 
       .hero h1 {
         margin: 0;
-        font-size: 23px;
-        line-height: 1.2;
+        font-size: 30px;
+        line-height: 1.1;
+        letter-spacing: 0;
+        font-weight: 780;
       }
 
       .hero p {
         margin: 8px 0 0;
-        color: rgba(255, 255, 255, 0.88);
-        font-size: 13px;
+        color: var(--muted);
+        font-size: 14px;
         line-height: 1.45;
       }
 
@@ -135,11 +194,11 @@
         align-items: center;
         gap: 6px;
         padding: 6px 9px;
-        border-radius: 8px;
-        color: #704800;
-        background: #fff1d1;
+        border-radius: 999px;
+        color: var(--primary);
+        background: rgba(0, 113, 227, 0.1);
         font-size: 12px;
-        font-weight: 850;
+        font-weight: 700;
       }
 
       .role svg {
@@ -148,44 +207,109 @@
       }
 
       .sync-time {
-        color: rgba(255, 255, 255, 0.82);
+        color: var(--muted);
         font-size: 12px;
       }
 
       .tabs {
-        position: sticky;
-        top: 62px;
-        z-index: 15;
-        display: flex;
-        gap: 8px;
-        margin: 0 -14px 10px;
-        padding: 10px 14px;
-        overflow-x: auto;
-        background: rgba(237, 245, 247, 0.94);
-        backdrop-filter: blur(10px);
-        scrollbar-width: none;
-      }
-
-      .tabs::-webkit-scrollbar {
         display: none;
       }
 
+      .menu-popover .tabs {
+        display: grid;
+        gap: 2px;
+      }
+
       .tab {
-        flex: 0 0 auto;
-        height: 34px;
-        padding: 0 13px;
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        color: var(--muted);
-        background: #fff;
-        font-size: 14px;
+        width: 100%;
+        height: 44px;
+        display: grid;
+        grid-template-columns: 24px minmax(0, 1fr) 18px;
+        align-items: center;
+        gap: 12px;
+        padding: 0 12px;
+        border-radius: 10px;
+        color: var(--ink);
+        background: transparent;
+        font-size: 15px;
+        text-align: left;
       }
 
       .tab.active {
-        color: #fff;
-        background: var(--primary-dark);
-        border-color: var(--primary-dark);
-        font-weight: 850;
+        color: var(--primary);
+        background: rgba(0, 113, 227, 0.1);
+        font-weight: 700;
+      }
+
+      .tab svg {
+        width: 19px;
+        height: 19px;
+      }
+
+      .tab .tab-check {
+        width: 17px;
+        height: 17px;
+        opacity: 0;
+      }
+
+      .tab.active .tab-check {
+        opacity: 1;
+      }
+
+      .menu-popover {
+        position: absolute;
+        top: 50px;
+        right: 0;
+        z-index: 50;
+        width: min(296px, calc(100vw - 28px));
+        padding: 8px;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: 0 18px 50px rgba(0, 0, 0, 0.14);
+        backdrop-filter: saturate(180%) blur(22px);
+        transform: translateY(-6px);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.16s ease, transform 0.16s ease;
+      }
+
+      .menu-popover.open {
+        transform: translateY(0);
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .menu-title {
+        padding: 9px 12px 8px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .menu-divider {
+        height: 1px;
+        margin: 6px 4px;
+        background: rgba(0, 0, 0, 0.08);
+      }
+
+      .menu-logout {
+        width: 100%;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0 12px;
+        border-radius: 10px;
+        color: #d70015;
+        background: transparent;
+        font-size: 15px;
+        text-align: left;
+      }
+
+      .menu-logout svg {
+        width: 19px;
+        height: 19px;
       }
 
       .section {
@@ -197,9 +321,10 @@
       }
 
       .card {
-        margin-bottom: 10px;
-        padding: 14px;
-        border-radius: 8px;
+        margin-bottom: 12px;
+        padding: 16px;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        border-radius: 18px;
         background: var(--card);
         box-shadow: var(--shadow);
       }
@@ -214,8 +339,9 @@
 
       .section-head h2 {
         margin: 0;
-        font-size: 19px;
+        font-size: 20px;
         line-height: 1.2;
+        font-weight: 760;
       }
 
       .section-head a,
@@ -234,7 +360,7 @@
       .kpi {
         min-height: 96px;
         padding: 12px;
-        border-radius: 8px;
+        border-radius: 14px;
         background: var(--panel);
       }
 
@@ -250,7 +376,7 @@
       .kpi svg {
         width: 18px;
         height: 18px;
-        color: var(--primary-dark);
+        color: var(--muted);
       }
 
       .kpi strong {
@@ -263,21 +389,30 @@
       .kpi span {
         display: block;
         margin-top: 8px;
-        color: var(--green);
+        color: var(--muted);
         font-size: 12px;
       }
 
       .chart-panel {
         margin-top: 10px;
-        padding: 12px;
-        border-radius: 8px;
-        color: #fff;
-        background: #172d3a;
+        padding: 14px;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        border-radius: 16px;
+        color: var(--ink);
+        background: #fff;
       }
 
       .chart-panel h3 {
         margin: 0 0 12px;
         font-size: 16px;
+      }
+
+      .chart-panel .bar-row {
+        color: var(--muted);
+      }
+
+      .chart-panel .bar-row b {
+        color: var(--ink);
       }
 
       .bar-row {
@@ -293,13 +428,13 @@
         height: 9px;
         overflow: hidden;
         border-radius: 9px;
-        background: rgba(255, 255, 255, 0.16);
+        background: #e8e8ed;
       }
 
       .bar-fill {
         height: 100%;
         border-radius: inherit;
-        background: linear-gradient(90deg, #28c2c8, #ffd071);
+        background: var(--primary);
       }
 
       .line-chart {
@@ -309,7 +444,7 @@
       }
 
       .line-chart text {
-        fill: rgba(255, 255, 255, 0.68);
+        fill: var(--muted);
         font-size: 11px;
       }
 
@@ -321,8 +456,8 @@
       .config-item {
         padding: 12px;
         border: 1px solid var(--line);
-        border-radius: 8px;
-        background: #fbfdfe;
+        border-radius: 14px;
+        background: #fff;
       }
 
       .config-title {
@@ -338,11 +473,11 @@
 
       .value-pill {
         padding: 4px 7px;
-        border-radius: 8px;
-        color: var(--primary-dark);
-        background: #e9f7fa;
+        border-radius: 999px;
+        color: var(--primary);
+        background: rgba(0, 113, 227, 0.1);
         font-size: 12px;
-        font-weight: 850;
+        font-weight: 700;
       }
 
       .range-row {
@@ -362,11 +497,11 @@
         width: 100%;
         height: 34px;
         border: 1px solid var(--line);
-        border-radius: 8px;
+        border-radius: 10px;
         color: var(--ink);
         background: #fff;
         text-align: center;
-        font-weight: 850;
+        font-weight: 700;
       }
 
       .form-grid {
@@ -397,7 +532,7 @@
         width: 100%;
         height: 36px;
         border: 1px solid var(--line);
-        border-radius: 8px;
+        border-radius: 10px;
         padding: 0 10px;
         color: var(--ink);
         background: #fff;
@@ -414,16 +549,16 @@
         gap: 12px;
         padding: 10px;
         border: 1px solid var(--line);
-        border-radius: 8px;
-        background: #fbfdfe;
+        border-radius: 14px;
+        background: #fff;
       }
 
       .banner-img {
         width: 118px;
         min-height: 76px;
         overflow: hidden;
-        border-radius: 8px;
-        background: #d9ebee;
+        border-radius: 12px;
+        background: #e8e8ed;
       }
 
       .banner-img img {
@@ -456,15 +591,15 @@
         height: 30px;
         padding: 0 10px;
         border-radius: 8px;
-        color: var(--primary-dark);
-        background: #e9f7fa;
+        color: var(--primary);
+        background: rgba(0, 113, 227, 0.1);
         font-size: 12px;
-        font-weight: 850;
+        font-weight: 700;
       }
 
       .mini-btn.dark {
         color: #fff;
-        background: var(--primary-dark);
+        background: var(--primary);
       }
 
       .upload-box {
@@ -473,9 +608,9 @@
         align-items: center;
         gap: 10px;
         padding: 12px;
-        border: 1px dashed #b9d7df;
-        border-radius: 8px;
-        background: #f7fcfd;
+        border: 1px dashed var(--line);
+        border-radius: 14px;
+        background: #fff;
       }
 
       .upload-icon {
@@ -483,9 +618,292 @@
         height: 42px;
         display: grid;
         place-items: center;
+        border-radius: 12px;
+        color: #fff;
+        background: var(--primary);
+      }
+
+      .admin-auth {
+        display: grid;
+        gap: 10px;
+      }
+
+      .auth-note {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.45;
+      }
+
+      .admin-auth .solid {
+        width: 100%;
+        height: 42px;
         border-radius: 8px;
         color: #fff;
-        background: linear-gradient(135deg, var(--primary), var(--blue));
+        background: var(--primary-dark);
+        font-weight: 850;
+      }
+
+      .driver-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+
+      .driver-toolbar strong {
+        font-size: 14px;
+      }
+
+      .driver-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .driver-card {
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-left: 4px solid var(--orange);
+        border-radius: 14px;
+        background: #fff;
+      }
+
+      .driver-card.active {
+        border-left-color: var(--green);
+      }
+
+      .driver-card.rejected {
+        border-left-color: #d94b3d;
+      }
+
+      .driver-card header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .driver-card h3 {
+        margin: 0;
+        font-size: 16px;
+        line-height: 1.25;
+      }
+
+      .driver-card p {
+        margin: 5px 0 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.35;
+      }
+
+      .driver-meta {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-top: 11px;
+      }
+
+      .driver-meta span {
+        min-width: 0;
+        padding: 8px;
+        border-radius: 12px;
+        background: var(--panel);
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .driver-meta b {
+        display: block;
+        margin-top: 4px;
+        overflow: hidden;
+        color: var(--ink);
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .driver-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 9px;
+        margin-top: 12px;
+      }
+
+      .driver-actions button {
+        height: 38px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .approve-btn {
+        color: #fff;
+        background: var(--green);
+      }
+
+      .reject-btn {
+        color: #d70015;
+        background: rgba(215, 0, 21, 0.08);
+      }
+
+      .detail-btn {
+        color: var(--primary);
+        background: rgba(0, 113, 227, 0.1);
+      }
+
+      .modal-mask {
+        position: fixed;
+        inset: 0;
+        z-index: 70;
+        display: none;
+        align-items: flex-end;
+        justify-content: center;
+        padding: 14px;
+        background: rgba(0, 0, 0, 0.28);
+      }
+
+      .modal-mask.show {
+        display: flex;
+      }
+
+      .modal {
+        width: min(100%, 430px);
+        max-height: min(86vh, 760px);
+        overflow: auto;
+        border-radius: 18px;
+        background: #fff;
+        box-shadow: 0 20px 70px rgba(0, 0, 0, 0.22);
+      }
+
+      .modal-head {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 14px 16px;
+        background: rgba(255, 255, 255, 0.92);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        backdrop-filter: saturate(180%) blur(18px);
+      }
+
+      .modal-head h3 {
+        margin: 0;
+        font-size: 17px;
+      }
+
+      .modal-close {
+        width: 34px;
+        height: 34px;
+        border-radius: 999px;
+        color: var(--ink);
+        background: var(--panel);
+      }
+
+      .modal-body {
+        padding: 14px 16px 16px;
+      }
+
+      .review-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      .review-image {
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--panel);
+      }
+
+      .review-image button {
+        width: 100%;
+        display: block;
+        background: transparent;
+        padding: 0;
+      }
+
+      .review-image img {
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        display: block;
+        object-fit: cover;
+      }
+
+      .review-image span {
+        display: block;
+        padding: 8px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .review-missing {
+        height: 100%;
+        min-height: 116px;
+        display: grid;
+        place-items: center;
+        padding: 10px;
+        color: var(--muted);
+        font-size: 12px;
+        text-align: center;
+      }
+
+      .reject-options {
+        display: grid;
+        gap: 8px;
+      }
+
+      .reject-option {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 38px;
+        padding: 8px 10px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        font-size: 14px;
+      }
+
+      .reject-option input {
+        accent-color: var(--primary);
+      }
+
+      .reject-textarea {
+        width: 100%;
+        min-height: 86px;
+        margin-top: 10px;
+        padding: 10px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        resize: vertical;
+        font: inherit;
+      }
+
+      .modal-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 14px;
+      }
+
+      .modal-actions button {
+        height: 40px;
+        border-radius: 10px;
+        font-weight: 700;
+      }
+
+      .empty-state {
+        padding: 18px 12px;
+        border: 1px dashed var(--line);
+        border-radius: 14px;
+        color: var(--muted);
+        background: #fff;
+        text-align: center;
+        font-size: 13px;
       }
 
       .order-list {
@@ -493,11 +911,63 @@
         gap: 9px;
       }
 
+      .audit-list {
+        display: grid;
+        gap: 9px;
+      }
+
+      .audit-item {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: #fff;
+        text-align: left;
+      }
+
+      .audit-item header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .audit-item strong {
+        display: block;
+        font-size: 15px;
+        line-height: 1.25;
+      }
+
+      .audit-item p {
+        margin: 7px 0 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      .audit-detail {
+        display: grid;
+        gap: 10px;
+      }
+
+      .json-box {
+        max-height: 320px;
+        overflow: auto;
+        margin: 0;
+        padding: 12px;
+        border-radius: 12px;
+        background: #1d1d1f;
+        color: #f5f5f7;
+        font-size: 12px;
+        line-height: 1.5;
+        white-space: pre-wrap;
+      }
+
       .order {
         padding: 12px;
         border: 1px solid var(--line);
-        border-radius: 8px;
-        background: #fbfdfe;
+        border-radius: 14px;
+        background: #fff;
       }
 
       .order-head {
@@ -516,11 +986,11 @@
       .status {
         flex: 0 0 auto;
         padding: 4px 7px;
-        border-radius: 8px;
+        border-radius: 999px;
         color: var(--green);
-        background: #e4f8ee;
+        background: rgba(36, 138, 61, 0.1);
         font-size: 11px;
-        font-weight: 850;
+        font-weight: 700;
       }
 
       .order-meta {
@@ -550,9 +1020,9 @@
       }
 
       .amount {
-        color: var(--orange);
+        color: var(--ink);
         font-size: 16px;
-        font-weight: 850;
+        font-weight: 760;
       }
 
       .payout-summary {
@@ -565,7 +1035,7 @@
       .payout-stat {
         min-height: 78px;
         padding: 12px;
-        border-radius: 8px;
+        border-radius: 14px;
         background: var(--panel);
       }
 
@@ -590,8 +1060,8 @@
       .batch {
         padding: 12px;
         border: 1px solid var(--line);
-        border-radius: 8px;
-        background: #fbfdfe;
+        border-radius: 14px;
+        background: #fff;
       }
 
       .batch-head {
@@ -615,13 +1085,13 @@
       }
 
       .status.warn {
-        color: #8a5a00;
-        background: #fff1d1;
+        color: #946200;
+        background: rgba(255, 159, 10, 0.14);
       }
 
       .status.error {
-        color: #9b3b47;
-        background: #ffe8ec;
+        color: #d70015;
+        background: rgba(215, 0, 21, 0.08);
       }
 
       .batch-grid {
@@ -633,8 +1103,8 @@
 
       .batch-cell {
         padding: 8px;
-        border-radius: 8px;
-        background: #f2f8fa;
+        border-radius: 12px;
+        background: var(--panel);
       }
 
       .batch-cell span {
@@ -653,11 +1123,11 @@
         width: 100%;
         height: 34px;
         margin-top: 10px;
-        border-radius: 8px;
-        color: var(--primary-dark);
-        background: #e9f7fa;
+        border-radius: 10px;
+        color: var(--primary);
+        background: rgba(0, 113, 227, 0.1);
         font-size: 13px;
-        font-weight: 850;
+        font-weight: 700;
       }
 
       .payout-details {
@@ -674,7 +1144,7 @@
 
       .driver-payout {
         padding: 10px;
-        border-radius: 8px;
+        border-radius: 14px;
         background: #fff;
         border: 1px solid var(--line);
       }
@@ -716,30 +1186,30 @@
         gap: 10px;
         margin: 12px -14px 0;
         padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0));
-        background: rgba(255, 255, 255, 0.96);
+        background: rgba(245, 245, 247, 0.88);
         border-top: 1px solid rgba(10, 26, 35, 0.08);
-        backdrop-filter: blur(12px);
+        backdrop-filter: saturate(180%) blur(18px);
       }
 
       .save-bar button {
         height: 42px;
-        border-radius: 8px;
-        font-weight: 850;
+        border-radius: 10px;
+        font-weight: 700;
       }
 
       .save-bar .ghost {
-        color: var(--primary-dark);
-        background: #e9f7fa;
+        color: var(--primary);
+        background: rgba(0, 113, 227, 0.1);
       }
 
       .save-bar .solid {
         color: #fff;
-        background: var(--orange);
+        background: var(--primary);
       }
 
       .toast {
         position: fixed;
-        z-index: 30;
+        z-index: 80;
         left: 50%;
         bottom: calc(84px + env(safe-area-inset-bottom, 0));
         width: max-content;
@@ -782,17 +1252,50 @@
         .phone {
           min-height: 860px;
           border-radius: 26px;
+          overflow: hidden;
         }
       }
     </style>
   </head>
-  <body>
+  <body class="auth-checking">
     <main class="phone">
       <header class="top">
         <nav class="nav">
-          <button class="icon-btn" type="button" aria-label="返回"><i data-lucide="chevron-left"></i></button>
+          <span></span>
           <div class="title">超级管理员控制台</div>
-          <button class="icon-btn" type="button" aria-label="通知"><i data-lucide="bell"></i></button>
+          <button class="icon-btn" type="button" id="module-menu-toggle" aria-label="打开模块菜单" aria-expanded="false">
+            <span class="menu-glyph" aria-hidden="true"><span></span></span>
+          </button>
+          <div class="menu-popover" id="module-menu" aria-label="后台模块菜单">
+            <div class="menu-title">模块</div>
+            <nav class="tabs" aria-label="后台模块">
+              <button class="tab active" type="button" data-target="dashboard">
+                <i data-lucide="layout-dashboard"></i><span>看板</span><i class="tab-check" data-lucide="check"></i>
+              </button>
+              <button class="tab" type="button" data-target="params">
+                <i data-lucide="sliders-horizontal"></i><span>参数</span><i class="tab-check" data-lucide="check"></i>
+              </button>
+              <button class="tab" type="button" data-target="banners">
+                <i data-lucide="image"></i><span>页面配置</span><i class="tab-check" data-lucide="check"></i>
+              </button>
+              <button class="tab" type="button" data-target="drivers">
+                <i data-lucide="badge-check"></i><span>司机审核</span><i class="tab-check" data-lucide="check"></i>
+              </button>
+              <button class="tab" type="button" data-target="payouts">
+                <i data-lucide="wallet-cards"></i><span>提成</span><i class="tab-check" data-lucide="check"></i>
+              </button>
+              <button class="tab" type="button" data-target="orders">
+                <i data-lucide="receipt-text"></i><span>订单</span><i class="tab-check" data-lucide="check"></i>
+              </button>
+              <button class="tab" type="button" data-target="audit">
+                <i data-lucide="history"></i><span>操作日志</span><i class="tab-check" data-lucide="check"></i>
+              </button>
+            </nav>
+            <div class="menu-divider"></div>
+            <button class="menu-logout" type="button" id="admin-logout">
+              <i data-lucide="log-out"></i><span>退出登录</span>
+            </button>
+          </div>
         </nav>
       </header>
 
@@ -805,14 +1308,6 @@
             <span class="sync-time">今日 14:30 更新</span>
           </div>
         </section>
-
-        <nav class="tabs" aria-label="后台模块">
-          <button class="tab active" type="button" data-target="dashboard">看板</button>
-          <button class="tab" type="button" data-target="params">参数</button>
-          <button class="tab" type="button" data-target="banners">页面配置</button>
-          <button class="tab" type="button" data-target="payouts">提成</button>
-          <button class="tab" type="button" data-target="orders">订单</button>
-        </nav>
 
         <section class="section active" data-section="dashboard">
           <section class="card">
@@ -1025,6 +1520,22 @@
           </section>
         </section>
 
+        <section class="section" data-section="drivers">
+          <section class="card">
+            <div class="section-head">
+              <h2>司机注册审核</h2>
+              <button class="mini-btn dark" type="button" id="refresh-drivers">刷新</button>
+            </div>
+            <div class="driver-toolbar">
+              <strong id="driver-review-summary">待审核 0 人</strong>
+              <span class="hint">通过后司机可登录并生成车座码</span>
+            </div>
+            <div class="driver-list" id="driver-review-list">
+              <div class="empty-state">登录后查看待审核司机</div>
+            </div>
+          </section>
+        </section>
+
         <section class="section" data-section="payouts">
           <section class="card">
             <div class="section-head">
@@ -1208,6 +1719,76 @@
             </div>
           </section>
         </section>
+
+        <section class="section" data-section="audit">
+          <section class="card">
+            <div class="section-head">
+              <h2>操作日志</h2>
+              <button class="mini-btn dark" type="button" id="refresh-audit-logs">刷新</button>
+            </div>
+            <div class="form-row" style="padding-top:0">
+              <label for="audit-action-filter">分类</label>
+              <select id="audit-action-filter">
+                <option value="">全部类别</option>
+                <option value="admin.login">管理员登录</option>
+                <option value="admin.driver.review">司机审核</option>
+                <option value="admin.order.refund">订单退款</option>
+                <option value="admin.withdrawal.process">提现处理</option>
+                <option value="admin.commission.settle">佣金结算</option>
+                <option value="admin.ticket.verify">票券核销</option>
+                <option value="admin.banner.post">新增轮播图</option>
+                <option value="admin.banner.put">编辑轮播图</option>
+                <option value="admin.banner.delete">删除轮播图</option>
+                <option value="admin.get">查看后台数据</option>
+                <option value="admin.post">提交后台操作</option>
+              </select>
+            </div>
+            <div class="driver-toolbar">
+              <strong id="audit-log-summary">最近操作 0 条</strong>
+              <span class="hint">只读记录，用于后期维护追踪</span>
+            </div>
+            <div class="audit-list" id="audit-log-list">
+              <div class="empty-state">打开后加载操作日志</div>
+            </div>
+          </section>
+        </section>
+      </div>
+
+      <div class="modal-mask" id="driver-detail-modal">
+        <section class="modal" role="dialog" aria-modal="true" aria-labelledby="driver-detail-title">
+          <header class="modal-head">
+            <h3 id="driver-detail-title">司机资料详情</h3>
+            <button class="modal-close" type="button" data-close-modal>×</button>
+          </header>
+          <div class="modal-body" id="driver-detail-body"></div>
+        </section>
+      </div>
+
+      <div class="modal-mask" id="driver-reject-modal">
+        <section class="modal" role="dialog" aria-modal="true" aria-labelledby="driver-reject-title">
+          <header class="modal-head">
+            <h3 id="driver-reject-title">拒绝理由</h3>
+            <button class="modal-close" type="button" data-close-modal>×</button>
+          </header>
+          <div class="modal-body">
+            <div class="reject-options" id="reject-options"></div>
+            <textarea class="reject-textarea" id="reject-custom-reason" placeholder="选择“自己填写理由”后填写"></textarea>
+            <div class="modal-actions">
+              <button class="detail-btn" type="button" data-close-modal>取消</button>
+              <button class="reject-btn" type="button" id="confirm-reject">确认拒绝</button>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="modal-mask" id="audit-detail-modal">
+        <section class="modal" role="dialog" aria-modal="true" aria-labelledby="audit-detail-title">
+          <header class="modal-head">
+            <h3 id="audit-detail-title">操作日志详情</h3>
+            <button class="modal-close" type="button" data-close-modal>×</button>
+          </header>
+          <div class="modal-body" id="audit-detail-body"></div>
+        </section>
       </div>
 
       <div class="toast" role="status" aria-live="polite"></div>
@@ -1221,6 +1802,30 @@
 
       const toast = document.querySelector(".toast");
       let toastTimer;
+      const API_BASE = "/api/v1";
+      const moduleMenu = document.querySelector("#module-menu");
+      const moduleMenuToggle = document.querySelector("#module-menu-toggle");
+      const adminLogoutButton = document.querySelector("#admin-logout");
+      const driverReviewList = document.querySelector("#driver-review-list");
+      const driverReviewSummary = document.querySelector("#driver-review-summary");
+      const refreshDriversButton = document.querySelector("#refresh-drivers");
+      const driverDetailModal = document.querySelector("#driver-detail-modal");
+      const driverDetailBody = document.querySelector("#driver-detail-body");
+      const driverRejectModal = document.querySelector("#driver-reject-modal");
+      const rejectOptions = document.querySelector("#reject-options");
+      const rejectCustomReason = document.querySelector("#reject-custom-reason");
+      const confirmRejectButton = document.querySelector("#confirm-reject");
+      const auditLogList = document.querySelector("#audit-log-list");
+      const auditLogSummary = document.querySelector("#audit-log-summary");
+      const refreshAuditLogsButton = document.querySelector("#refresh-audit-logs");
+      const auditActionFilter = document.querySelector("#audit-action-filter");
+      const auditDetailModal = document.querySelector("#audit-detail-modal");
+      const auditDetailBody = document.querySelector("#audit-detail-body");
+      const rejectReasons = ["证照照片不清晰", "身份证信息与填写信息不一致", "驾驶证或行驶证信息异常", "车辆照片不符合要求", "自己填写理由"];
+      let pendingDrivers = [];
+      let auditLogs = [];
+      let rejectingDriverID = null;
+      let adminToken = localStorage.getItem("zh_admin_token") || "";
 
       function showToast(message) {
         toast.textContent = message;
@@ -1229,14 +1834,416 @@
         toastTimer = setTimeout(() => toast.classList.remove("show"), 1400);
       }
 
+      function redirectToLogin() {
+        localStorage.removeItem("zh_admin_token");
+        localStorage.removeItem("zh_admin_name");
+        const redirect = encodeURIComponent(`${location.pathname.split("/").pop() || "admin.html"}${location.search || ""}`);
+        location.replace(`admin-login.html?redirect=${redirect}`);
+      }
+
+      async function api(path, options = {}) {
+        const headers = { "Content-Type": "application/json", ...(options.headers || {}) };
+        if (adminToken) {
+          headers.Authorization = `Bearer ${adminToken}`;
+        }
+        const response = await fetch(`${API_BASE}${path}`, { ...options, headers });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || data.code >= 400) {
+          throw new Error(data.message || "请求失败");
+        }
+        return data.data;
+      }
+
+      async function requireAdminAuth() {
+        if (!adminToken) {
+          redirectToLogin();
+          return false;
+        }
+        try {
+          await api("/admin/params");
+          document.body.classList.remove("auth-checking");
+          return true;
+        } catch (error) {
+          redirectToLogin();
+          return false;
+        }
+      }
+
+      function statusText(status) {
+        return {
+          pending_review: "待审核",
+          active: "已通过",
+          rejected: "已拒绝",
+        }[status] || status || "未知";
+      }
+
+      function imageURL(url) {
+        if (!url) return "";
+        return url.startsWith("http") ? url : url;
+      }
+
+      function escapeHTML(value) {
+        return String(value ?? "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function escapeAttr(value) {
+        return escapeHTML(value);
+      }
+
+      function driverByID(driverID) {
+        return pendingDrivers.find((driver) => String(driver.id) === String(driverID));
+      }
+
+      function formatDate(value) {
+        if (!value) return "-";
+        return new Date(value).toLocaleDateString("zh-CN");
+      }
+
+      function formatDateTime(value) {
+        if (!value) return "-";
+        return new Date(value).toLocaleString("zh-CN", {
+          year: "numeric",
+          month: "numeric",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        });
+      }
+
+      function actionText(action) {
+        return {
+          "admin.login": "管理员登录",
+          "admin.driver.review": "审核司机注册",
+          "admin.order.refund": "处理订单退款",
+          "admin.withdrawal.process": "处理司机提现",
+          "admin.commission.settle": "结算司机佣金",
+          "admin.ticket.verify": "核销票券",
+          "admin.banner.post": "新增轮播图",
+          "admin.banner.put": "编辑轮播图",
+          "admin.banner.delete": "删除轮播图",
+          "admin.get": "查看后台数据",
+          "admin.post": "提交后台操作",
+        }[action] || action || "后台操作";
+      }
+
+      function parsePayload(payload) {
+        if (!payload) return {};
+        try {
+          return typeof payload === "string" ? JSON.parse(payload) : payload;
+        } catch (error) {
+          return { raw: payload };
+        }
+      }
+
+      function renderDrivers(drivers) {
+        const pending = drivers.filter((driver) => driver.status === "pending_review");
+        pendingDrivers = pending;
+        driverReviewSummary.textContent = `待审核 ${pending.length} 人`;
+        if (!pending.length) {
+          driverReviewList.innerHTML = '<div class="empty-state">当前没有待审核司机</div>';
+          return;
+        }
+        driverReviewList.innerHTML = pending
+          .map(
+            (driver) => `
+              <article class="driver-card ${driver.status === "active" ? "active" : driver.status === "rejected" ? "rejected" : ""}">
+                <header>
+                  <div>
+                    <h3>${escapeHTML(driver.name || "未填写姓名")}</h3>
+                    <p>${escapeHTML(driver.driver_no || "-")} · ${escapeHTML(statusText(driver.status))}</p>
+                  </div>
+                  <span class="status warn">${escapeHTML(statusText(driver.status))}</span>
+                </header>
+                <div class="driver-meta">
+                  <span>手机号<b>${escapeHTML(driver.phone || "-")}</b></span>
+                  <span>身份证<b>${escapeHTML(driver.id_card_no || "-")}</b></span>
+                  <span>状态更新时间<b>${escapeHTML(formatDateTime(driver.updated_at || driver.created_at))}</b></span>
+                  <span>提交时间<b>${escapeHTML(formatDate(driver.created_at))}</b></span>
+                </div>
+                <div class="driver-actions">
+                  <button class="detail-btn driver-detail" type="button" data-driver-id="${driver.id}">详情</button>
+                  <button class="approve-btn driver-action" type="button" data-driver-id="${driver.id}" data-action="approved">通过</button>
+                  <button class="reject-btn driver-reject" type="button" data-driver-id="${driver.id}">拒绝</button>
+                </div>
+              </article>
+            `,
+          )
+          .join("");
+        if (window.lucide) {
+          window.lucide.createIcons();
+        }
+      }
+
+      async function loadPendingDrivers() {
+        if (!adminToken) {
+          redirectToLogin();
+          return;
+        }
+        try {
+          const drivers = await api("/drivers?status=pending_review");
+          renderDrivers(Array.isArray(drivers) ? drivers : []);
+        } catch (error) {
+          redirectToLogin();
+        }
+      }
+
+      function renderAuditLogs(logs) {
+        auditLogs = logs;
+        auditLogSummary.textContent = `最近操作 ${logs.length} 条`;
+        if (!logs.length) {
+          auditLogList.innerHTML = '<div class="empty-state">暂无操作日志</div>';
+          return;
+        }
+        auditLogList.innerHTML = logs
+          .map((log) => {
+            const ok = Number(log.status_code || 0) >= 200 && Number(log.status_code || 0) < 400;
+            return `
+              <button class="audit-item" type="button" data-audit-id="${log.id}">
+                <header>
+                  <div>
+                    <strong>${escapeHTML(actionText(log.action))}</strong>
+                    <p>${escapeHTML(log.actor_name || "管理员")} · ${escapeHTML(log.method || "-")} ${escapeHTML(log.path || "-")}</p>
+                  </div>
+                  <span class="status ${ok ? "" : "error"}">${escapeHTML(String(log.status_code || "-"))}</span>
+                </header>
+                <p>${escapeHTML(formatDateTime(log.created_at))} · IP ${escapeHTML(log.ip || "-")}</p>
+              </button>
+            `;
+          })
+          .join("");
+      }
+
+      async function loadAuditLogs() {
+        try {
+          const action = auditActionFilter.value;
+          const query = action ? `?size=50&action=${encodeURIComponent(action)}` : "?size=50";
+          const data = await api(`/admin/audit-logs${query}`);
+          renderAuditLogs(Array.isArray(data) ? data : []);
+        } catch (error) {
+          showToast(error.message);
+        }
+      }
+
+      async function openAuditDetail(logID) {
+        const log = await api(`/admin/audit-logs/${logID}`);
+        const payload = parsePayload(log.payload);
+        auditDetailBody.innerHTML = `
+          <div class="audit-detail">
+            <div class="driver-meta" style="margin-top:0">
+              <span>操作<b>${escapeHTML(actionText(log.action))}</b></span>
+              <span>管理员<b>${escapeHTML(log.actor_name || "-")}</b></span>
+              <span>时间<b>${escapeHTML(formatDateTime(log.created_at))}</b></span>
+              <span>状态码<b>${escapeHTML(String(log.status_code || "-"))}</b></span>
+              <span>请求方法<b>${escapeHTML(log.method || "-")}</b></span>
+              <span>请求路径<b>${escapeHTML(log.path || "-")}</b></span>
+              <span>目标类型<b>${escapeHTML(log.target_type || "-")}</b></span>
+              <span>目标ID<b>${escapeHTML(log.target_id || "-")}</b></span>
+              <span>来源IP<b>${escapeHTML(log.ip || "-")}</b></span>
+              <span>浏览器<b>${escapeHTML(log.user_agent || "-")}</b></span>
+            </div>
+            <pre class="json-box">${escapeHTML(JSON.stringify(payload, null, 2))}</pre>
+          </div>
+        `;
+        openModal(auditDetailModal);
+      }
+
+      function openModal(modal) {
+        modal.classList.add("show");
+      }
+
+      function closeModals() {
+        document.querySelectorAll(".modal-mask").forEach((modal) => modal.classList.remove("show"));
+        rejectingDriverID = null;
+      }
+
+      function renderImage(label, url) {
+        if (!url) {
+          return `<article class="review-image"><div class="review-missing">${escapeHTML(label)}<br />未上传</div><span>${escapeHTML(label)}</span></article>`;
+        }
+        const safeURL = escapeAttr(imageURL(url));
+        const safeLabel = escapeHTML(label);
+        return `
+          <article class="review-image">
+            <button type="button" data-preview-url="${safeURL}">
+              <img src="${safeURL}" alt="${safeLabel}" />
+            </button>
+            <span>${safeLabel}</span>
+          </article>
+        `;
+      }
+
+      function openDriverDetail(driverID) {
+        const driver = driverByID(driverID);
+        if (!driver) return;
+        driverDetailBody.innerHTML = `
+          <div class="driver-meta" style="margin-top:0">
+            <span>姓名<b>${escapeHTML(driver.name || "-")}</b></span>
+            <span>手机号<b>${escapeHTML(driver.phone || "-")}</b></span>
+            <span>司机编号<b>${escapeHTML(driver.driver_no || "-")}</b></span>
+            <span>身份证<b>${escapeHTML(driver.id_card_no || "-")}</b></span>
+          </div>
+          <div class="review-grid">
+            ${renderImage("身份证正面", driver.id_card_front_url)}
+            ${renderImage("驾驶证", driver.driver_license_url)}
+            ${renderImage("行驶证", driver.vehicle_license_url)}
+            ${renderImage("车辆照片", driver.vehicle_photo_url)}
+          </div>
+          <div class="modal-actions">
+            <button class="reject-btn driver-reject" type="button" data-driver-id="${driver.id}">拒绝</button>
+            <button class="approve-btn driver-action" type="button" data-driver-id="${driver.id}" data-action="approved">通过</button>
+          </div>
+        `;
+        openModal(driverDetailModal);
+      }
+
+      function openRejectModal(driverID) {
+        rejectingDriverID = driverID;
+        rejectCustomReason.value = "";
+        rejectCustomReason.disabled = true;
+        rejectOptions.innerHTML = rejectReasons
+          .map(
+            (reason, index) => `
+              <label class="reject-option">
+                <input type="radio" name="reject-reason" value="${escapeAttr(reason)}" ${index === 0 ? "checked" : ""} />
+                <span>${escapeHTML(reason)}</span>
+              </label>
+            `,
+          )
+          .join("");
+        openModal(driverRejectModal);
+      }
+
+      async function reviewDriver(driverID, action, remark = "") {
+        const text = action === "approved" ? "通过" : "拒绝";
+        try {
+          const result = await api("/admin/drivers/review", {
+            method: "POST",
+            body: JSON.stringify({ driver_id: Number(driverID), action, remark }),
+          });
+          showToast(result && result.qr_code ? `${text}成功，已生成车座码` : `${text}成功`);
+          closeModals();
+          await loadPendingDrivers();
+        } catch (error) {
+          showToast(error.message);
+        }
+      }
+
+      function setMenuOpen(open) {
+        moduleMenu.classList.toggle("open", open);
+        moduleMenuToggle.classList.toggle("open", open);
+        moduleMenuToggle.setAttribute("aria-expanded", open ? "true" : "false");
+      }
+
+      moduleMenuToggle.addEventListener("click", (event) => {
+        event.stopPropagation();
+        setMenuOpen(!moduleMenu.classList.contains("open"));
+      });
+
+      document.addEventListener("click", (event) => {
+        if (!moduleMenu.contains(event.target) && !moduleMenuToggle.contains(event.target)) {
+          setMenuOpen(false);
+        }
+      });
+
       document.querySelectorAll(".tab").forEach((tab) => {
         tab.addEventListener("click", () => {
           document.querySelectorAll(".tab").forEach((item) => item.classList.remove("active"));
           document.querySelectorAll(".section").forEach((section) => section.classList.remove("active"));
           tab.classList.add("active");
           document.querySelector(`[data-section="${tab.dataset.target}"]`).classList.add("active");
+          setMenuOpen(false);
           window.scrollTo({ top: 0, behavior: "smooth" });
+          if (tab.dataset.target === "drivers") {
+            loadPendingDrivers();
+          }
+          if (tab.dataset.target === "audit") {
+            loadAuditLogs();
+          }
         });
+      });
+
+      refreshDriversButton.addEventListener("click", loadPendingDrivers);
+      refreshAuditLogsButton.addEventListener("click", loadAuditLogs);
+      auditActionFilter.addEventListener("change", loadAuditLogs);
+
+      adminLogoutButton.addEventListener("click", () => {
+        redirectToLogin();
+      });
+
+      driverReviewList.addEventListener("click", (event) => {
+        const detailButton = event.target.closest(".driver-detail");
+        if (detailButton) {
+          openDriverDetail(detailButton.dataset.driverId);
+          return;
+        }
+        const rejectButton = event.target.closest(".driver-reject");
+        if (rejectButton) {
+          openRejectModal(rejectButton.dataset.driverId);
+          return;
+        }
+        const actionButton = event.target.closest(".driver-action");
+        if (actionButton) {
+          reviewDriver(actionButton.dataset.driverId, actionButton.dataset.action);
+        }
+      });
+
+      driverDetailBody.addEventListener("click", (event) => {
+        const previewButton = event.target.closest("[data-preview-url]");
+        if (previewButton) {
+          window.open(previewButton.dataset.previewUrl, "_blank");
+          return;
+        }
+        const rejectButton = event.target.closest(".driver-reject");
+        if (rejectButton) {
+          openRejectModal(rejectButton.dataset.driverId);
+          return;
+        }
+        const actionButton = event.target.closest(".driver-action");
+        if (actionButton) {
+          reviewDriver(actionButton.dataset.driverId, actionButton.dataset.action);
+        }
+      });
+
+      rejectOptions.addEventListener("change", () => {
+        const selected = document.querySelector('input[name="reject-reason"]:checked')?.value || "";
+        rejectCustomReason.disabled = selected !== "自己填写理由";
+        if (rejectCustomReason.disabled) {
+          rejectCustomReason.value = "";
+        } else {
+          rejectCustomReason.focus();
+        }
+      });
+
+      confirmRejectButton.addEventListener("click", () => {
+        const selected = document.querySelector('input[name="reject-reason"]:checked')?.value || "";
+        const remark = selected === "自己填写理由" ? rejectCustomReason.value.trim() : selected;
+        if (!remark) {
+          showToast("请填写拒绝理由");
+          return;
+        }
+        reviewDriver(rejectingDriverID, "rejected", remark);
+      });
+
+      document.querySelectorAll("[data-close-modal]").forEach((button) => {
+        button.addEventListener("click", closeModals);
+      });
+
+      document.querySelectorAll(".modal-mask").forEach((modal) => {
+        modal.addEventListener("click", (event) => {
+          if (event.target === modal) closeModals();
+        });
+      });
+
+      auditLogList.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-audit-id]");
+        if (!button) return;
+        openAuditDetail(button.dataset.auditId).catch((error) => showToast(error.message));
       });
 
       document.querySelectorAll(".detail-toggle").forEach((button) => {
@@ -1249,10 +2256,26 @@
 
       document.querySelectorAll("button:not(.tab):not(.detail-toggle)").forEach((button) => {
         button.addEventListener("click", () => {
+          if (
+            button.classList.contains("driver-action") ||
+            button.classList.contains("driver-detail") ||
+            button.classList.contains("driver-reject") ||
+            button.id === "refresh-drivers" ||
+            button.id === "admin-logout" ||
+            button.id === "module-menu-toggle" ||
+            button.id === "refresh-audit-logs" ||
+            button.id === "confirm-reject" ||
+            button.classList.contains("audit-item") ||
+            button.closest(".modal-mask")
+          ) {
+            return;
+          }
           const text = button.textContent.trim() || button.getAttribute("aria-label") || "操作";
           showToast(`${text}功能预留`);
         });
       });
+
+      requireAdminAuth();
     </script>
   </body>
 </html>

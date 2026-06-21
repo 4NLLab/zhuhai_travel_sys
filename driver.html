@@ -246,11 +246,53 @@
         font-size: 15px;
       }
 
-      .field input:focus,
-      .field select:focus {
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(15, 141, 173, 0.1);
-      }
+	      .field input:focus,
+	      .field select:focus {
+	        border-color: var(--primary);
+	        box-shadow: 0 0 0 3px rgba(15, 141, 173, 0.1);
+	      }
+
+	      .field.is-valid input,
+	      .field.is-valid select {
+	        border-color: rgba(31, 150, 97, 0.82);
+	        box-shadow: inset 4px 0 0 rgba(31, 150, 97, 0.84);
+	      }
+
+	      .field.is-invalid input,
+	      .field.is-invalid select {
+	        border-color: rgba(217, 75, 61, 0.82);
+	        box-shadow: inset 4px 0 0 rgba(217, 75, 61, 0.84);
+	      }
+
+	      .label-row {
+	        display: flex;
+	        align-items: center;
+	        justify-content: space-between;
+	        gap: 8px;
+	      }
+
+	      .field-status {
+	        width: 18px;
+	        height: 18px;
+	        border-radius: 999px;
+	        display: inline-grid;
+	        place-items: center;
+	        color: #fff;
+	        background: #c7d3d8;
+	      }
+
+	      .field-status svg {
+	        width: 13px;
+	        height: 13px;
+	      }
+
+	      .field.is-valid .field-status {
+	        background: var(--green);
+	      }
+
+	      .field.is-invalid .field-status {
+	        background: var(--danger);
+	      }
 
       .field small {
         color: var(--muted);
@@ -264,31 +306,174 @@
         gap: 10px;
       }
 
-      .upload-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 9px;
-      }
+	      .upload-grid {
+	        display: grid;
+	        grid-template-columns: repeat(2, minmax(0, 1fr));
+	        gap: 9px;
+	      }
 
-      .upload-card {
-        min-height: 98px;
-        display: grid;
-        place-items: center;
-        gap: 8px;
-        padding: 12px;
-        border: 1px dashed #bfd0d8;
-        border-radius: 8px;
-        color: var(--primary-dark);
-        background: #f7fcfd;
-        text-align: center;
-        font-size: 12px;
-        font-weight: 800;
-      }
+	      .upload-card {
+	        min-height: 132px;
+	        display: grid;
+	        grid-template-rows: 54px auto auto;
+	        align-items: center;
+	        justify-items: center;
+	        gap: 8px;
+	        padding: 12px 10px;
+	        border: 1px solid #bfd0d8;
+	        border-radius: 8px;
+	        color: var(--primary-dark);
+	        background: #fbfdfe;
+	        font-size: 12px;
+	        font-weight: 800;
+	        box-shadow: inset 3px 0 0 #c7d3d8;
+	        cursor: pointer;
+	      }
 
-      .upload-card svg {
-        width: 24px;
-        height: 24px;
-      }
+	      .upload-card.is-valid {
+	        border-color: rgba(31, 150, 97, 0.58);
+	        box-shadow: inset 4px 0 0 rgba(31, 150, 97, 0.84);
+	      }
+
+	      .upload-card.is-invalid {
+	        border-color: rgba(217, 75, 61, 0.58);
+	        box-shadow: inset 4px 0 0 rgba(217, 75, 61, 0.84);
+	      }
+
+	      .upload-head {
+	        min-width: 0;
+	        width: 100%;
+	      }
+
+	      .upload-title {
+	        display: block;
+	        color: var(--ink);
+	        font-size: 13px;
+	        font-weight: 900;
+	        text-align: center;
+	      }
+
+	      .upload-title svg {
+	        display: none;
+	      }
+
+	      .upload-preview {
+	        width: 54px;
+	        height: 54px;
+	        border-radius: 8px;
+	        display: grid;
+	        place-items: center;
+	        overflow: hidden;
+	        color: #7b8d96;
+	        background: #edf6f8;
+	        font-size: 11px;
+	        text-align: center;
+	      }
+
+	      .upload-preview img {
+	        width: 100%;
+	        height: 100%;
+	        object-fit: cover;
+	      }
+
+	      .upload-actions {
+	        display: none;
+	      }
+
+	      .upload-action {
+	        height: 30px;
+	        min-width: 42px;
+	        border-radius: 7px;
+	        color: var(--primary-dark);
+	        background: #e8f7fb;
+	        font-size: 11px;
+	        font-weight: 900;
+	      }
+
+	      .upload-file {
+	        color: var(--muted);
+	        font-size: 11px;
+	        line-height: 1.3;
+	        word-break: break-all;
+	        margin-top: 4px;
+	      }
+
+	      .upload-state {
+	        display: inline-flex;
+	        align-items: center;
+	        justify-content: center;
+	        gap: 5px;
+	        width: 100%;
+	        color: var(--muted);
+	        font-size: 11px;
+	        font-weight: 800;
+	      }
+
+	      .upload-card.is-valid .upload-state {
+	        color: var(--green);
+	      }
+
+	      .upload-card.is-invalid .upload-state {
+	        color: var(--danger);
+	      }
+
+	      .sheet-mask {
+	        position: fixed;
+	        inset: 0;
+	        z-index: 80;
+	        display: none;
+	        align-items: end;
+	        justify-content: center;
+	        background: rgba(11, 26, 35, 0.36);
+	      }
+
+	      .sheet-mask.show {
+	        display: flex;
+	      }
+
+	      .sheet {
+	        width: min(100vw, 430px);
+	        padding: 10px 14px calc(14px + env(safe-area-inset-bottom, 0));
+	        border-radius: 12px 12px 0 0;
+	        background: #fff;
+	        box-shadow: 0 -18px 34px rgba(8, 45, 64, 0.18);
+	      }
+
+	      .sheet-title {
+	        padding: 8px 2px 12px;
+	        color: var(--ink);
+	        font-size: 15px;
+	        font-weight: 900;
+	        text-align: center;
+	      }
+
+	      .sheet-actions {
+	        display: grid;
+	        gap: 8px;
+	      }
+
+	      .sheet-action {
+	        height: 48px;
+	        border-radius: 8px;
+	        display: flex;
+	        align-items: center;
+	        justify-content: center;
+	        gap: 8px;
+	        color: var(--primary-dark);
+	        background: #eef8fb;
+	        font-size: 15px;
+	        font-weight: 900;
+	      }
+
+	      .sheet-action.cancel {
+	        color: var(--muted);
+	        background: #f2f5f6;
+	      }
+
+	      .sheet-action svg {
+	        width: 18px;
+	        height: 18px;
+	      }
 
       .agreement {
         display: grid;
@@ -334,17 +519,21 @@
         text-align: right;
       }
 
-      .status-card {
-        display: none;
+	      .status-card {
+	        display: none;
         border: 1px solid rgba(31, 150, 97, 0.18);
         background:
           radial-gradient(circle at 90% 0%, rgba(31, 150, 97, 0.14), transparent 28%),
           linear-gradient(145deg, #fff, #f3fff8);
       }
 
-      .status-card.show {
-        display: block;
-      }
+	      .status-card.show {
+	        display: block;
+	      }
+
+	      .hidden {
+	        display: none !important;
+	      }
 
       .success-title {
         display: flex;
@@ -419,11 +608,65 @@
         font-size: 13px;
       }
 
-      .toast.show {
-        opacity: 1;
-        transform: translate(-50%, 0);
-      }
-    </style>
+	      .toast.show {
+	        opacity: 1;
+	        transform: translate(-50%, 0);
+	      }
+
+	      .loading-mask {
+	        position: fixed;
+	        inset: 0;
+	        z-index: 120;
+	        display: none;
+	        align-items: center;
+	        justify-content: center;
+	        padding: 24px;
+	        background: rgba(11, 26, 35, 0.42);
+	        backdrop-filter: blur(8px);
+	      }
+
+	      .loading-mask.show {
+	        display: flex;
+	      }
+
+	      .loading-panel {
+	        width: min(82vw, 286px);
+	        padding: 22px 18px;
+	        border-radius: 16px;
+	        background: rgba(255, 255, 255, 0.96);
+	        box-shadow: 0 20px 64px rgba(8, 45, 64, 0.22);
+	        text-align: center;
+	      }
+
+	      .spinner {
+	        width: 42px;
+	        height: 42px;
+	        margin: 0 auto 14px;
+	        border: 4px solid rgba(15, 141, 173, 0.16);
+	        border-top-color: var(--primary);
+	        border-radius: 999px;
+	        animation: spin 0.82s linear infinite;
+	      }
+
+	      .loading-title {
+	        color: var(--ink);
+	        font-size: 16px;
+	        font-weight: 900;
+	      }
+
+	      .loading-text {
+	        margin-top: 6px;
+	        color: var(--muted);
+	        font-size: 13px;
+	        line-height: 1.45;
+	      }
+
+	      @keyframes spin {
+	        to {
+	          transform: rotate(360deg);
+	        }
+	      }
+	    </style>
   </head>
   <body>
     <main class="phone">
@@ -443,7 +686,31 @@
         </div>
       </section>
 
-      <form class="content" data-driver-form novalidate>
+	      <section class="content" data-login-panel>
+	        <section class="card">
+	          <div class="section-head">
+	            <h2>司机登录</h2>
+	            <span>先登录</span>
+	          </div>
+	          <div class="form-grid">
+	            <div class="field">
+	              <label for="login-phone">手机号</label>
+	              <input id="login-phone" data-login-phone inputmode="tel" maxlength="11" autocomplete="tel" placeholder="请输入已注册司机手机号" />
+	            </div>
+	            <div class="field">
+	              <label for="login-password">密码</label>
+	              <input id="login-password" data-login-password type="password" autocomplete="current-password" placeholder="请输入登录密码" />
+	            </div>
+	            <button class="submit-btn" type="button" data-login-submit style="width: 100%; border-radius: 8px">登录司机端</button>
+	            <button class="upload-card" type="button" data-show-register style="width: 100%; min-height: 52px">
+	              <i data-lucide="user-plus"></i>
+	              <span>没有注册过，立即入驻</span>
+	            </button>
+	          </div>
+	        </section>
+	      </section>
+
+	      <form class="content hidden" data-driver-form novalidate>
         <section class="card">
           <div class="section-head">
             <h2>入驻进度</h2>
@@ -461,20 +728,45 @@
             <h2>司机身份</h2>
             <span>必填</span>
           </div>
-          <div class="form-grid">
-            <div class="field">
-              <label for="driver-name">真实姓名</label>
-              <input id="driver-name" name="name" autocomplete="name" placeholder="请输入与身份证一致的姓名" required />
-            </div>
-            <div class="field">
-              <label for="driver-phone">手机号</label>
-              <input id="driver-phone" name="phone" inputmode="tel" maxlength="11" autocomplete="tel" placeholder="用于登录和接收审核通知" required />
-            </div>
-            <div class="field">
-              <label for="driver-id-card">身份证号</label>
-              <input id="driver-id-card" name="idCard" inputmode="text" maxlength="18" placeholder="请输入18位身份证号码" required />
-              <small>正式系统中身份证号应加密存储，对应数据库 drivers.id_card_no。</small>
-            </div>
+	          <div class="form-grid">
+	            <div class="field" data-field="name">
+	              <div class="label-row">
+	                <label for="driver-name">真实姓名</label>
+	                <span class="field-status"><i data-lucide="minus"></i></span>
+	              </div>
+	              <input id="driver-name" name="name" autocomplete="name" placeholder="请输入与身份证一致的姓名" required />
+	            </div>
+	            <div class="field" data-field="phone">
+	              <div class="label-row">
+	                <label for="driver-phone">手机号</label>
+	                <span class="field-status"><i data-lucide="minus"></i></span>
+	              </div>
+	              <input id="driver-phone" name="phone" inputmode="tel" maxlength="11" autocomplete="tel" placeholder="用于登录和接收审核通知" required />
+	            </div>
+	            <div class="inline-fields">
+	              <div class="field" data-field="password">
+	                <div class="label-row">
+	                  <label for="driver-password">设置密码</label>
+	                  <span class="field-status"><i data-lucide="minus"></i></span>
+	                </div>
+	                <input id="driver-password" name="password" type="password" autocomplete="new-password" minlength="8" placeholder="至少8位" required />
+	              </div>
+	              <div class="field" data-field="confirmPassword">
+	                <div class="label-row">
+	                  <label for="driver-confirm-password">确认密码</label>
+	                  <span class="field-status"><i data-lucide="minus"></i></span>
+	                </div>
+	                <input id="driver-confirm-password" name="confirmPassword" type="password" autocomplete="new-password" minlength="8" placeholder="再次输入" required />
+	              </div>
+	            </div>
+	            <div class="field" data-field="idCard">
+	              <div class="label-row">
+	                <label for="driver-id-card">身份证号</label>
+	                <span class="field-status"><i data-lucide="minus"></i></span>
+	              </div>
+	              <input id="driver-id-card" name="idCard" inputmode="text" maxlength="18" placeholder="请输入18位身份证号码" required />
+	              <small>正式系统中身份证号应加密存储，对应数据库 drivers.id_card_no。</small>
+	            </div>
           </div>
         </section>
 
@@ -483,30 +775,42 @@
             <h2>车辆信息</h2>
             <span>必填</span>
           </div>
-          <div class="form-grid">
-            <div class="field">
-              <label for="plate-no">车牌号</label>
-              <input id="plate-no" name="plateNo" maxlength="8" placeholder="例如：粤C12345" required />
-            </div>
-            <div class="inline-fields">
-              <div class="field">
-                <label for="vehicle-model">车型</label>
-                <input id="vehicle-model" name="model" placeholder="如 比亚迪秦EV" required />
-              </div>
-              <div class="field">
-                <label for="vehicle-seats">座位数</label>
-                <select id="vehicle-seats" name="seats" required>
+	          <div class="form-grid">
+	            <div class="field" data-field="plateNo">
+	              <div class="label-row">
+	                <label for="plate-no">车牌号</label>
+	                <span class="field-status"><i data-lucide="minus"></i></span>
+	              </div>
+	              <input id="plate-no" name="plateNo" inputmode="text" maxlength="8" autocomplete="off" placeholder="例如：粤C12345" required />
+	            </div>
+	            <div class="inline-fields">
+	              <div class="field" data-field="model">
+	                <div class="label-row">
+	                  <label for="vehicle-model">车型</label>
+	                  <span class="field-status"><i data-lucide="minus"></i></span>
+	                </div>
+	                <input id="vehicle-model" name="model" placeholder="如 比亚迪秦EV" required />
+	              </div>
+	              <div class="field" data-field="seats">
+	                <div class="label-row">
+	                  <label for="vehicle-seats">座位数</label>
+	                  <span class="field-status"><i data-lucide="minus"></i></span>
+	                </div>
+	                <select id="vehicle-seats" name="seats" required>
                   <option value="">选择</option>
                   <option value="4">4座</option>
                   <option value="5">5座</option>
                   <option value="6">6座</option>
                   <option value="7">7座</option>
                 </select>
-              </div>
-            </div>
-            <div class="field">
-              <label for="service-city">主要服务区域</label>
-              <select id="service-city" name="serviceCity" required>
+	              </div>
+	            </div>
+	            <div class="field" data-field="serviceCity">
+	              <div class="label-row">
+	                <label for="service-city">主要服务区域</label>
+	                <span class="field-status"><i data-lucide="minus"></i></span>
+	              </div>
+	              <select id="service-city" name="serviceCity" required>
                 <option value="">请选择区域</option>
                 <option value="香洲区">香洲区</option>
                 <option value="横琴粤澳深度合作区">横琴粤澳深度合作区</option>
@@ -518,44 +822,50 @@
           </div>
         </section>
 
-        <section class="card">
-          <div class="section-head">
-            <h2>证照上传</h2>
-            <span>原型占位</span>
-          </div>
-          <div class="upload-grid">
-            <button class="upload-card" type="button" data-upload="身份证正面">
-              <i data-lucide="id-card"></i>
-              <span>身份证正面</span>
-            </button>
-            <button class="upload-card" type="button" data-upload="驾驶证">
-              <i data-lucide="badge-check"></i>
-              <span>驾驶证</span>
-            </button>
-            <button class="upload-card" type="button" data-upload="行驶证">
-              <i data-lucide="file-badge"></i>
-              <span>行驶证</span>
-            </button>
-            <button class="upload-card" type="button" data-upload="车辆照片">
-              <i data-lucide="car-front"></i>
-              <span>车辆照片</span>
-            </button>
-          </div>
-        </section>
-
-        <section class="card">
-          <div class="section-head">
-            <h2>提交预览</h2>
-            <span>审核后台可见</span>
-          </div>
-          <div class="preview">
-            <div class="preview-row"><span>司机</span><strong data-preview="name">未填写</strong></div>
-            <div class="preview-row"><span>手机号</span><strong data-preview="phone">未填写</strong></div>
-            <div class="preview-row"><span>身份证</span><strong data-preview="idCard">未填写</strong></div>
-            <div class="preview-row"><span>车牌号</span><strong data-preview="plateNo">未填写</strong></div>
-            <div class="preview-row"><span>车辆</span><strong data-preview="vehicle">未填写</strong></div>
-          </div>
-        </section>
+	        <section class="card">
+	          <div class="section-head">
+	            <h2>证照上传</h2>
+	            <span>相册 / 拍照</span>
+	          </div>
+	          <div class="upload-grid">
+	            <article class="upload-card" data-upload-card="idFront" data-upload-open="idFront">
+	              <div class="upload-preview" data-upload-preview="idFront"><i data-lucide="image"></i></div>
+	              <div class="upload-head">
+	                <div class="upload-title"><i data-lucide="id-card"></i><span>身份证正面</span></div>
+	                <div class="upload-state" data-upload-file="idFront"><span class="field-status"><i data-lucide="minus"></i></span>未选择</div>
+	              </div>
+	              <input type="file" accept="image/*" data-upload-input="idFront" hidden />
+	              <input type="file" accept="image/*" capture="environment" data-camera-input="idFront" hidden />
+	            </article>
+	            <article class="upload-card" data-upload-card="driverLicense" data-upload-open="driverLicense">
+	              <div class="upload-preview" data-upload-preview="driverLicense"><i data-lucide="image"></i></div>
+	              <div class="upload-head">
+	                <div class="upload-title"><i data-lucide="badge-check"></i><span>驾驶证</span></div>
+	                <div class="upload-state" data-upload-file="driverLicense"><span class="field-status"><i data-lucide="minus"></i></span>未选择</div>
+	              </div>
+	              <input type="file" accept="image/*" data-upload-input="driverLicense" hidden />
+	              <input type="file" accept="image/*" capture="environment" data-camera-input="driverLicense" hidden />
+	            </article>
+	            <article class="upload-card" data-upload-card="vehicleLicense" data-upload-open="vehicleLicense">
+	              <div class="upload-preview" data-upload-preview="vehicleLicense"><i data-lucide="image"></i></div>
+	              <div class="upload-head">
+	                <div class="upload-title"><i data-lucide="file-badge"></i><span>行驶证</span></div>
+	                <div class="upload-state" data-upload-file="vehicleLicense"><span class="field-status"><i data-lucide="minus"></i></span>未选择</div>
+	              </div>
+	              <input type="file" accept="image/*" data-upload-input="vehicleLicense" hidden />
+	              <input type="file" accept="image/*" capture="environment" data-camera-input="vehicleLicense" hidden />
+	            </article>
+	            <article class="upload-card" data-upload-card="vehiclePhoto" data-upload-open="vehiclePhoto">
+	              <div class="upload-preview" data-upload-preview="vehiclePhoto"><i data-lucide="image"></i></div>
+	              <div class="upload-head">
+	                <div class="upload-title"><i data-lucide="car-front"></i><span>车辆照片</span></div>
+	                <div class="upload-state" data-upload-file="vehiclePhoto"><span class="field-status"><i data-lucide="minus"></i></span>未选择</div>
+	              </div>
+	              <input type="file" accept="image/*" data-upload-input="vehiclePhoto" hidden />
+	              <input type="file" accept="image/*" capture="environment" data-camera-input="vehiclePhoto" hidden />
+	            </article>
+	          </div>
+	        </section>
 
         <section class="card">
           <label class="agreement">
@@ -574,16 +884,33 @@
         </section>
       </form>
 
-      <footer class="bottom-bar">
-        <div>
-          <span>注册后进入审核</span>
-          <strong>通过后可绑定车座推广码</strong>
-        </div>
-        <button class="submit-btn" type="button" data-submit-proxy>提交注册</button>
-      </footer>
+	      <footer class="bottom-bar" data-bottom-bar>
+	        <div>
+	          <span data-bottom-kicker>司机端</span>
+	          <strong data-bottom-title>请先登录司机账号</strong>
+	        </div>
+	        <button class="submit-btn" type="button" data-submit-proxy>提交注册</button>
+	      </footer>
 
-      <div class="toast" role="status" aria-live="polite"></div>
-    </main>
+	      <div class="toast" role="status" aria-live="polite"></div>
+	      <div class="loading-mask" data-submit-loading aria-live="polite" aria-busy="true">
+	        <div class="loading-panel">
+	          <div class="spinner" aria-hidden="true"></div>
+	          <div class="loading-title" data-loading-title>正在提交</div>
+	          <div class="loading-text" data-loading-text>请稍候，正在处理注册资料</div>
+	        </div>
+	      </div>
+	      <div class="sheet-mask" data-upload-sheet>
+	        <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="upload-sheet-title">
+	          <div class="sheet-title" id="upload-sheet-title" data-upload-sheet-title>选择上传方式</div>
+	          <div class="sheet-actions">
+	            <button class="sheet-action" type="button" data-sheet-camera><i data-lucide="camera"></i>拍照</button>
+	            <button class="sheet-action" type="button" data-sheet-gallery><i data-lucide="image-plus"></i>本地图库</button>
+	            <button class="sheet-action cancel" type="button" data-sheet-cancel>取消</button>
+	          </div>
+	        </div>
+	      </div>
+	    </main>
 
     <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
     <script>
@@ -591,9 +918,42 @@
         window.lucide.createIcons();
       }
 
-      const form = document.querySelector("[data-driver-form]");
-      const toast = document.querySelector(".toast");
-      let toastTimer;
+	      const form = document.querySelector("[data-driver-form]");
+	      const loginPanel = document.querySelector("[data-login-panel]");
+	      const loginPhone = document.querySelector("[data-login-phone]");
+	      const loginPassword = document.querySelector("[data-login-password]");
+	      const loginSubmit = document.querySelector("[data-login-submit]");
+	      const showRegister = document.querySelector("[data-show-register]");
+	      const bottomBar = document.querySelector("[data-bottom-bar]");
+	      const bottomKicker = document.querySelector("[data-bottom-kicker]");
+	      const bottomTitle = document.querySelector("[data-bottom-title]");
+	      const submitProxy = document.querySelector("[data-submit-proxy]");
+	      const toast = document.querySelector(".toast");
+	      const uploadSheet = document.querySelector("[data-upload-sheet]");
+	      const uploadSheetTitle = document.querySelector("[data-upload-sheet-title]");
+	      const sheetCamera = document.querySelector("[data-sheet-camera]");
+	      const sheetGallery = document.querySelector("[data-sheet-gallery]");
+	      const sheetCancel = document.querySelector("[data-sheet-cancel]");
+	      const submitLoading = document.querySelector("[data-submit-loading]");
+	      const loadingTitle = document.querySelector("[data-loading-title]");
+	      const loadingText = document.querySelector("[data-loading-text]");
+	      const API_BASE = "/api/v1";
+	      const DRIVER_SESSION_KEY = "zhuhai_driver_session";
+	      const uploadFiles = {};
+	      const uploadLabels = {
+	        idFront: "身份证正面",
+	        driverLicense: "驾驶证",
+	        vehicleLicense: "行驶证",
+	        vehiclePhoto: "车辆照片",
+	      };
+	      const uploadKinds = {
+	        idFront: "id_front",
+	        driverLicense: "driver_license",
+	        vehicleLicense: "vehicle_license",
+	        vehiclePhoto: "vehicle_photo",
+	      };
+	      let activeUploadKey = "";
+	      let toastTimer;
 
       function showToast(message) {
         toast.textContent = message;
@@ -601,6 +961,19 @@
         clearTimeout(toastTimer);
         toastTimer = setTimeout(() => toast.classList.remove("show"), 1500);
       }
+
+	      function setSubmitLoading(show, title = "正在提交", text = "请稍候，正在处理注册资料") {
+	        loadingTitle.textContent = title;
+	        loadingText.textContent = text;
+	        submitLoading.classList.toggle("show", show);
+	        document.body.style.overflow = show ? "hidden" : "";
+	      }
+
+	      window.addEventListener("beforeunload", (event) => {
+	        if (!submitLoading.classList.contains("show")) return;
+	        event.preventDefault();
+	        event.returnValue = "";
+	      });
 
       function value(name) {
         return form.elements[name]?.value.trim() || "";
@@ -614,88 +987,380 @@
         return idCard.length >= 14 ? `${idCard.slice(0, 6)}********${idCard.slice(-4)}` : idCard || "未填写";
       }
 
-      function setPreview(key, text) {
-        document.querySelectorAll(`[data-preview="${key}"]`).forEach((node) => {
-          node.textContent = text || "未填写";
-        });
-      }
+	      function normalizePlateNo(value) {
+	        const trimmed = value.trim();
+	        if (!trimmed) return "";
+	        return trimmed.slice(0, 1) + trimmed.slice(1).toUpperCase();
+	      }
 
-      function updatePreview() {
-        setPreview("name", value("name"));
-        setPreview("phone", maskPhone(value("phone")));
-        setPreview("idCard", maskIdCard(value("idCard").toUpperCase()));
-        setPreview("plateNo", value("plateNo").toUpperCase());
-        setPreview("vehicle", [value("model"), value("seats") ? `${value("seats")}座` : ""].filter(Boolean).join(" · "));
-      }
+	      function setFieldStatus(name, valid, touched = true) {
+	        const field = document.querySelector(`[data-field="${name}"]`);
+	        if (!field) return;
+	        field.classList.toggle("is-valid", Boolean(valid));
+	        field.classList.toggle("is-invalid", touched && !valid);
+	        const icon = field.querySelector(".field-status");
+	        if (icon) {
+	          icon.innerHTML = valid ? '<i data-lucide="check"></i>' : touched ? '<i data-lucide="x"></i>' : '<i data-lucide="minus"></i>';
+	        }
+	      }
+
+	      function getSession() {
+	        try {
+	          return JSON.parse(localStorage.getItem(DRIVER_SESSION_KEY) || "null");
+	        } catch (error) {
+	          return null;
+	        }
+	      }
+
+	      function setSession(data) {
+	        localStorage.setItem(DRIVER_SESSION_KEY, JSON.stringify(data));
+	      }
+
+	      function setMode(mode) {
+	        const isLoggedIn = mode === "logged_in";
+	        const isRegister = mode === "register";
+	        loginPanel.classList.toggle("hidden", isLoggedIn || isRegister);
+	        form.classList.toggle("hidden", !isRegister);
+	        submitProxy.classList.toggle("hidden", !isRegister);
+	        bottomKicker.textContent = isLoggedIn ? "已登录" : isRegister ? "注册后进入审核" : "司机端";
+	        bottomTitle.textContent = isLoggedIn ? "可查看钱包、佣金和提现" : isRegister ? "通过后可绑定车座推广码" : "请先登录司机账号";
+	      }
+
+	      async function api(path, options = {}) {
+	        const response = await fetch(`${API_BASE}${path}`, {
+	          headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+	          ...options,
+	        });
+	        const payload = await response.json().catch(() => ({}));
+	        if (!response.ok || payload.code >= 400) {
+	          throw new Error(payload.message || "请求失败");
+	        }
+	        return payload.data;
+	      }
+
+	      async function apiWithSession(path, options = {}) {
+	        const session = getSession();
+	        if (!session?.access_token) {
+	          throw new Error("请先登录");
+	        }
+	        return api(path, {
+	          ...options,
+	          headers: {
+	            Authorization: `Bearer ${session.access_token}`,
+	            ...(options.headers || {}),
+	          },
+	        });
+	      }
+
+	      async function loginDriver(phone, password) {
+	        return api("/driver/login", {
+	          method: "POST",
+	          body: JSON.stringify({ phone, password }),
+	        });
+	      }
+
+	      async function uploadLicenseImage(key, file) {
+	        const formData = new FormData();
+	        formData.append("kind", uploadKinds[key]);
+	        formData.append("file", file);
+	        const response = await fetch(`${API_BASE}/driver/upload-license`, {
+	          method: "POST",
+	          body: formData,
+	        });
+	        const payload = await response.json().catch(() => ({}));
+	        if (!response.ok || payload.code >= 400) {
+	          throw new Error(payload.message || `${uploadLabels[key]}上传失败`);
+	        }
+	        return payload.data.url;
+	      }
+
+	      async function ensureLoggedIn() {
+	        const session = getSession();
+	        if (!session?.access_token) {
+	          setMode("login");
+	          return;
+	        }
+	        try {
+	          await apiWithSession("/driver/wallet");
+	          setMode("logged_in");
+	        } catch (error) {
+	          localStorage.removeItem(DRIVER_SESSION_KEY);
+	          setMode("login");
+	        }
+	      }
+
+	      function updateFieldStates() {
+	        setFieldStatus("name", Boolean(value("name")), Boolean(value("name")));
+	        setFieldStatus("phone", /^1[3-9]\d{9}$/.test(value("phone")), Boolean(value("phone")));
+	        setFieldStatus("password", value("password").length >= 8, Boolean(value("password")));
+	        setFieldStatus("confirmPassword", value("confirmPassword").length >= 8 && value("confirmPassword") === value("password"), Boolean(value("confirmPassword")));
+	        setFieldStatus("idCard", /^\d{17}[\dX]$/.test(value("idCard").toUpperCase()), Boolean(value("idCard")));
+	        setFieldStatus("plateNo", /^[\u4e00-\u9fa5][A-Z][A-Z0-9]{5,6}$/.test(normalizePlateNo(value("plateNo"))), Boolean(value("plateNo")));
+	        setFieldStatus("model", Boolean(value("model")), Boolean(value("model")));
+	        setFieldStatus("seats", Boolean(value("seats")), Boolean(value("seats")));
+	        setFieldStatus("serviceCity", Boolean(value("serviceCity")), Boolean(value("serviceCity")));
+	        if (window.lucide) window.lucide.createIcons();
+	      }
+
+	      function setUploadStatus(key, file) {
+	        const card = document.querySelector(`[data-upload-card="${key}"]`);
+	        const preview = document.querySelector(`[data-upload-preview="${key}"]`);
+	        const fileLabel = document.querySelector(`[data-upload-file="${key}"]`);
+	        if (!card || !preview || !fileLabel) return;
+
+	        card.classList.toggle("is-valid", Boolean(file));
+	        card.classList.toggle("is-invalid", !file);
+	        const icon = card.querySelector(".field-status");
+	        if (icon) icon.innerHTML = file ? '<i data-lucide="check"></i>' : '<i data-lucide="x"></i>';
+
+	        if (!file) {
+	          preview.innerHTML = '<i data-lucide="image"></i>';
+	          fileLabel.innerHTML = '<span class="field-status"><i data-lucide="x"></i></span>未选择';
+	          if (window.lucide) window.lucide.createIcons();
+	          return;
+	        }
+
+	        fileLabel.innerHTML = '<span class="field-status"><i data-lucide="check"></i></span>已选择';
+	        const url = URL.createObjectURL(file);
+	        preview.innerHTML = "";
+	        const img = document.createElement("img");
+	        img.src = url;
+	        img.alt = file.name;
+	        img.onload = () => URL.revokeObjectURL(url);
+	        preview.appendChild(img);
+	        if (window.lucide) window.lucide.createIcons();
+	      }
+
+	      function missingUploadName() {
+	        for (const key of Object.keys(uploadLabels)) {
+	          if (!uploadFiles[key]) return uploadLabels[key];
+	        }
+	        return "";
+	      }
+
+	      function openUploadSheet(key) {
+	        activeUploadKey = key;
+	        uploadSheetTitle.textContent = uploadLabels[key] || "选择上传方式";
+	        uploadSheet.classList.add("show");
+	        if (window.lucide) window.lucide.createIcons();
+	      }
+
+	      function closeUploadSheet() {
+	        activeUploadKey = "";
+	        uploadSheet.classList.remove("show");
+	      }
 
       function validateForm() {
         const phone = value("phone");
         const idCard = value("idCard").toUpperCase();
-        const plateNo = value("plateNo").toUpperCase();
+        const plateNo = normalizePlateNo(value("plateNo"));
 
         if (!value("name")) return "请填写真实姓名";
         if (!/^1[3-9]\d{9}$/.test(phone)) return "请填写正确的11位手机号";
+	        if (value("password").length < 8) return "请设置至少8位登录密码";
+	        if (value("confirmPassword") !== value("password")) return "两次输入的密码不一致";
         if (!/^\d{17}[\dX]$/.test(idCard)) return "请填写正确的18位身份证号码";
         if (!/^[\u4e00-\u9fa5][A-Z][A-Z0-9]{5,6}$/.test(plateNo)) return "请填写正确的车牌号，例如粤C12345";
-        if (!value("model")) return "请填写车辆车型";
-        if (!value("seats")) return "请选择座位数";
-        if (!value("serviceCity")) return "请选择主要服务区域";
-        if (!form.elements.agreement.checked) return "请勾选信息真实性确认";
-        return "";
-      }
+	        if (!value("model")) return "请填写车辆车型";
+	        if (!value("seats")) return "请选择座位数";
+	        if (!value("serviceCity")) return "请选择主要服务区域";
+	        const missingUpload = missingUploadName();
+	        if (missingUpload) return `请上传${missingUpload}`;
+	        if (!form.elements.agreement.checked) return "请勾选信息真实性确认";
+	        return "";
+	      }
 
-      function submitRegister() {
-        const error = validateForm();
-        if (error) {
-          showToast(error);
-          return;
-        }
+	      async function submitRegister() {
+	        const error = validateForm();
+	        if (error) {
+	          showToast(error);
+	          return;
+	        }
 
-        const driverNo = `DR-ZH-${String(Date.now()).slice(-6)}`;
-        document.querySelector("[data-result='driverNo']").textContent = driverNo;
-        document.querySelector("[data-status-card]").classList.add("show");
-        localStorage.setItem(
+	        submitProxy.disabled = true;
+	        submitProxy.textContent = "上传证照中";
+	        setSubmitLoading(true, "正在上传证照", "请不要关闭页面或重复提交");
+	        try {
+	          const uploaded = {};
+	          const uploadKeys = Object.keys(uploadLabels);
+	          for (const [index, key] of uploadKeys.entries()) {
+	            setSubmitLoading(true, "正在上传证照", `${uploadLabels[key]} ${index + 1}/${uploadKeys.length}`);
+	            uploaded[key] = await uploadLicenseImage(key, uploadFiles[key]);
+	          }
+	          submitProxy.textContent = "提交中";
+	          setSubmitLoading(true, "正在提交注册", "证照已上传，正在提交审核资料");
+	          const data = await api("/driver/register", {
+	            method: "POST",
+	            body: JSON.stringify({
+	              name: value("name"),
+	              phone: value("phone"),
+	              password: value("password"),
+	              id_card_no: value("idCard").toUpperCase(),
+	              plate_no: normalizePlateNo(value("plateNo")),
+	              model: value("model"),
+	              seats: Number(value("seats")),
+	              service_city: value("serviceCity"),
+	              id_card_front_url: uploaded.idFront,
+	              driver_license_url: uploaded.driverLicense,
+	              vehicle_license_url: uploaded.vehicleLicense,
+	              vehicle_photo_url: uploaded.vehiclePhoto,
+	            }),
+	          });
+	          const driverNo = data.driver_no || `DR-ZH-${String(Date.now()).slice(-6)}`;
+	        document.querySelector("[data-result='driverNo']").textContent = driverNo;
+	        document.querySelector("[data-status-card]").classList.add("show");
+	        localStorage.setItem(
           "zhuhai_driver_register_demo",
           JSON.stringify({
             driverNo,
             name: value("name"),
             phone: value("phone"),
             idCard: value("idCard").toUpperCase(),
-            plateNo: value("plateNo").toUpperCase(),
+            plateNo: normalizePlateNo(value("plateNo")),
             model: value("model"),
             seats: value("seats"),
-            serviceCity: value("serviceCity"),
-            status: "pending_review",
-          }),
-        );
-        showToast("注册申请已提交，等待后台审核");
-        document.querySelector("[data-status-card]").scrollIntoView({ behavior: "smooth", block: "center" });
-      }
+	            serviceCity: value("serviceCity"),
+	            uploads: uploaded,
+	            status: "pending_review",
+	          }),
+	        );
+	        showToast("注册申请已提交，等待后台审核");
+	        document.querySelector("[data-status-card]").scrollIntoView({ behavior: "smooth", block: "center" });
+	        } catch (error) {
+	          showToast(error.message);
+	        } finally {
+	          setSubmitLoading(false);
+	          submitProxy.disabled = false;
+	          submitProxy.textContent = "提交注册";
+	        }
+	      }
 
       form.id = "driver-register-form";
       form.addEventListener("input", (event) => {
-        if (event.target.name === "plateNo" || event.target.name === "idCard") {
-          event.target.value = event.target.value.toUpperCase();
-        }
-        updatePreview();
-      });
-      form.addEventListener("change", updatePreview);
+	        if (event.isComposing || event.target.composing === "true") {
+	          return;
+	        }
+	        if (event.target.name === "idCard") {
+	          event.target.value = event.target.value.toUpperCase();
+	        }
+	        if (event.target.name === "plateNo") {
+	          event.target.value = normalizePlateNo(event.target.value);
+	        }
+	        updateFieldStates();
+	      });
+	      form.addEventListener("compositionstart", (event) => {
+	        if (event.target.name === "plateNo" || event.target.name === "idCard") {
+	          event.target.composing = "true";
+	        }
+	      });
+	      form.addEventListener("compositionend", (event) => {
+	        if (event.target.name === "plateNo") {
+	          event.target.composing = "false";
+	          event.target.value = normalizePlateNo(event.target.value);
+	          updateFieldStates();
+	        }
+	        if (event.target.name === "idCard") {
+	          event.target.composing = "false";
+	          event.target.value = event.target.value.toUpperCase();
+	          updateFieldStates();
+	        }
+	      });
+	      form.addEventListener("blur", (event) => {
+	        if (event.target.name === "plateNo") {
+	          event.target.value = normalizePlateNo(event.target.value);
+	          updateFieldStates();
+	        }
+	      }, true);
+	      form.addEventListener("change", updateFieldStates);
       form.addEventListener("submit", (event) => {
         event.preventDefault();
         submitRegister();
       });
 
-      document.querySelector("[data-submit-proxy]").addEventListener("click", () => {
-        form.requestSubmit();
-      });
+	      submitProxy.addEventListener("click", () => {
+	        form.requestSubmit();
+	      });
 
-      document.querySelectorAll("[data-upload]").forEach((button) => {
-        button.addEventListener("click", () => {
-          showToast(`${button.dataset.upload}上传功能预留`);
-        });
-      });
+	      loginSubmit.addEventListener("click", async () => {
+	        const phone = loginPhone.value.trim();
+	        const password = loginPassword.value;
+	        if (!/^1[3-9]\d{9}$/.test(phone)) {
+	          showToast("请填写正确的11位手机号");
+	          return;
+	        }
+	        if (!password) {
+	          showToast("请输入登录密码");
+	          return;
+	        }
+	        loginSubmit.disabled = true;
+	        loginSubmit.textContent = "登录中";
+	        try {
+	          const data = await loginDriver(phone, password);
+	          setSession(data);
+	          showToast("登录成功");
+	          setMode("logged_in");
+	        } catch (error) {
+	          showToast("未找到已注册司机，请先注册");
+	          form.elements.phone.value = phone;
+	          updateFieldStates();
+	          setMode("register");
+	        } finally {
+	          loginSubmit.disabled = false;
+	          loginSubmit.textContent = "登录司机端";
+	        }
+	      });
 
-      updatePreview();
-    </script>
+	      showRegister.addEventListener("click", () => {
+	        const phone = loginPhone.value.trim();
+	        if (phone) form.elements.phone.value = phone;
+	        if (loginPassword.value) form.elements.password.value = loginPassword.value;
+	        updateFieldStates();
+	        setMode("register");
+	      });
+
+	      document.querySelectorAll("[data-upload-open]").forEach((card) => {
+	        card.addEventListener("click", () => {
+	          openUploadSheet(card.dataset.uploadOpen);
+	        });
+	      });
+
+	      sheetGallery.addEventListener("click", () => {
+	        if (activeUploadKey) {
+	          document.querySelector(`[data-upload-input="${activeUploadKey}"]`)?.click();
+	        }
+	        closeUploadSheet();
+	      });
+
+	      sheetCamera.addEventListener("click", () => {
+	        if (activeUploadKey) {
+	          document.querySelector(`[data-camera-input="${activeUploadKey}"]`)?.click();
+	        }
+	        closeUploadSheet();
+	      });
+
+	      sheetCancel.addEventListener("click", closeUploadSheet);
+	      uploadSheet.addEventListener("click", (event) => {
+	        if (event.target === uploadSheet) closeUploadSheet();
+	      });
+
+	      document.querySelectorAll("[data-upload-input], [data-camera-input]").forEach((input) => {
+	        input.addEventListener("change", () => {
+	          const key = input.dataset.uploadInput || input.dataset.cameraInput;
+	          const file = input.files?.[0];
+	          if (!file) return;
+	          if (!file.type.startsWith("image/")) {
+	            showToast("请选择图片文件");
+	            return;
+	          }
+	          uploadFiles[key] = file;
+	          setUploadStatus(key, file);
+	          showToast("图片已选择");
+	        });
+	      });
+
+	      ensureLoggedIn();
+	      updateFieldStates();
+	      ["idFront", "driverLicense", "vehicleLicense", "vehiclePhoto"].forEach((key) => setUploadStatus(key, null));
+	    </script>
   </body>
 </html>

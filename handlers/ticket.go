@@ -46,10 +46,10 @@ func TicketByQR(c *gin.Context) {
 // TicketVerify 核销电子票
 func TicketVerify(c *gin.Context) {
 	var req struct {
-		TicketID         uint64  `json:"ticket_id" binding:"required"`
-		VerifierAdminID  *uint64 `json:"verifier_admin_id"`
-		VerifyLocation   string  `json:"verify_location"`
-		VerifyNote       string  `json:"verify_note"`
+		TicketID        uint64  `json:"ticket_id" binding:"required"`
+		VerifierAdminID *uint64 `json:"verifier_admin_id"`
+		VerifyLocation  string  `json:"verify_location"`
+		VerifyNote      string  `json:"verify_note"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, dto.Fail(400, "参数错误"))
@@ -104,19 +104,20 @@ func TicketVerify(c *gin.Context) {
 		if err := tx.First(&order, item.OrderID).Error; err == nil && order.DriverID != nil {
 			var count int64
 			tx.Model(&models.DriverCommission{}).
-				Where("order_item_id = ? AND driver_id = ?", item.ID, *order.DriverID).
+				Where("ticket_id = ? AND driver_id = ?", ticket.ID, *order.DriverID).
 				Count(&count)
 			if count == 0 {
 				var driver models.Driver
 				if tx.First(&driver, *order.DriverID).Error == nil {
-					commAmount := float64(item.Quantity) * item.UnitPrice * driver.CommissionRate
+					commAmount := item.UnitPrice * driver.CommissionRate
 					if commAmount > 0 {
 						commNo := fmt.Sprintf("CM%s%04d", timeNow().Format("20060102150405"), rand.Intn(10000))
 						tx.Create(&models.DriverCommission{
 							DriverID: *order.DriverID, OrderID: order.ID, OrderItemID: item.ID,
-							CommissionNo: commNo,
-							BaseAmount:   float64(item.Quantity) * item.UnitPrice,
-							Rate:         driver.CommissionRate,
+							TicketID:         &ticket.ID,
+							CommissionNo:     commNo,
+							BaseAmount:       item.UnitPrice,
+							Rate:             driver.CommissionRate,
 							CommissionAmount: commAmount,
 						})
 					}
@@ -128,10 +129,10 @@ func TicketVerify(c *gin.Context) {
 	tx.Commit()
 
 	c.JSON(http.StatusOK, dto.Success(gin.H{
-		"ticket_id":    ticket.ID,
-		"ticket_no":    ticket.TicketNo,
-		"status":       "used",
-		"verified_at":  now,
+		"ticket_id":   ticket.ID,
+		"ticket_no":   ticket.TicketNo,
+		"status":      "used",
+		"verified_at": now,
 	}))
 }
 
@@ -142,4 +143,3 @@ func VerificationHistory(c *gin.Context) {
 	database.DB.Where("ticket_id = ?", ticketID).Order("created_at DESC").Find(&list)
 	c.JSON(http.StatusOK, dto.Success(list))
 }
-

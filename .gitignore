@@ -43,4 +43,9 @@ pnpm-debug.log*
 .idea/
 .vscode/
 *.swp
->>>>>>> origin/main
+
+# Runtime artifacts
+server.bak.*
+uploads/
+__pycache__/
+*.pyc

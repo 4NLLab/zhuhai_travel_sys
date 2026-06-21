@@ -14,9 +14,8 @@ import (
 
 // UserProfile 获取用户信息
 func UserProfile(c *gin.Context) {
-	id := c.Query("user_id")
 	var user models.User
-	if err := database.DB.First(&user, id).Error; err != nil {
+	if err := database.DB.First(&user, currentUserID(c)).Error; err != nil {
 		c.JSON(http.StatusNotFound, dto.Fail(404, "用户不存在"))
 		return
 	}
@@ -26,7 +25,6 @@ func UserProfile(c *gin.Context) {
 // UserRealnameSubmit 提交实名认证
 func UserRealnameSubmit(c *gin.Context) {
 	var req struct {
-		UserID   uint64 `json:"user_id" binding:"required"`
 		RealName string `json:"real_name" binding:"required"`
 		IdCardNo string `json:"id_card_no" binding:"required"`
 	}
@@ -34,7 +32,7 @@ func UserRealnameSubmit(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, dto.Fail(400, "参数错误"))
 		return
 	}
-	if err := database.DB.Model(&models.User{}).Where("id = ?", req.UserID).Updates(map[string]interface{}{
+	if err := database.DB.Model(&models.User{}).Where("id = ?", currentUserID(c)).Updates(map[string]interface{}{
 		"real_name":       req.RealName,
 		"id_card_no":      req.IdCardNo,
 		"realname_status": "verified",
@@ -49,9 +47,8 @@ func UserRealnameSubmit(c *gin.Context) {
 
 // TravelerList 出游人列表
 func TravelerList(c *gin.Context) {
-	userID := c.Query("user_id")
 	var travelers []models.Traveler
-	database.DB.Where("user_id = ?", userID).Order("is_default DESC").Find(&travelers)
+	database.DB.Where("user_id = ?", currentUserID(c)).Order("is_default DESC").Find(&travelers)
 	c.JSON(http.StatusOK, dto.Success(travelers))
 }
 
@@ -62,6 +59,7 @@ func TravelerCreate(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, dto.Fail(400, "参数错误"))
 		return
 	}
+	t.UserID = currentUserID(c)
 	if t.IsDefault == 1 {
 		database.DB.Model(&models.Traveler{}).Where("user_id = ?", t.UserID).Update("is_default", 0)
 	}
@@ -76,7 +74,7 @@ func TravelerCreate(c *gin.Context) {
 func TravelerUpdate(c *gin.Context) {
 	id := c.Param("id")
 	var t models.Traveler
-	if err := database.DB.First(&t, id).Error; err != nil {
+	if err := database.DB.Where("id = ? AND user_id = ?", id, currentUserID(c)).First(&t).Error; err != nil {
 		c.JSON(http.StatusNotFound, dto.Fail(404, "出游人不存在"))
 		return
 	}
@@ -84,6 +82,7 @@ func TravelerUpdate(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, dto.Fail(400, "参数错误"))
 		return
 	}
+	t.UserID = currentUserID(c)
 	database.DB.Save(&t)
 	c.JSON(http.StatusOK, dto.Success(t))
 }
@@ -91,7 +90,7 @@ func TravelerUpdate(c *gin.Context) {
 // TravelerDelete 删除出游人
 func TravelerDelete(c *gin.Context) {
 	id := c.Param("id")
-	database.DB.Delete(&models.Traveler{}, id)
+	database.DB.Where("user_id = ?", currentUserID(c)).Delete(&models.Traveler{}, id)
 	c.JSON(http.StatusOK, dto.Success(nil))
 }
 
@@ -99,16 +98,14 @@ func TravelerDelete(c *gin.Context) {
 
 // FavoriteList 收藏列表
 func FavoriteList(c *gin.Context) {
-	userID := c.Query("user_id")
 	var favs []models.UserFavorite
-	database.DB.Where("user_id = ?", userID).Preload("Product").Find(&favs)
+	database.DB.Where("user_id = ?", currentUserID(c)).Preload("Product").Find(&favs)
 	c.JSON(http.StatusOK, dto.Success(favs))
 }
 
 // FavoriteToggle 切换收藏
 func FavoriteToggle(c *gin.Context) {
 	var req struct {
-		UserID    uint64 `json:"user_id" binding:"required"`
 		ProductID uint64 `json:"product_id" binding:"required"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -116,13 +113,16 @@ func FavoriteToggle(c *gin.Context) {
 		return
 	}
 	var fav models.UserFavorite
-	err := database.DB.Where("user_id = ? AND product_id = ?", req.UserID, req.ProductID).First(&fav).Error
+	err := database.DB.Where("user_id = ? AND product_id = ?", currentUserID(c), req.ProductID).First(&fav).Error
 	if err == nil {
 		database.DB.Delete(&fav)
 		c.JSON(http.StatusOK, dto.Success(gin.H{"favorited": false}))
 	} else {
-		newFav := models.UserFavorite{UserID: req.UserID, ProductID: req.ProductID}
-		database.DB.Create(&newFav)
+		newFav := models.UserFavorite{UserID: currentUserID(c), ProductID: req.ProductID}
+		if err := database.DB.Create(&newFav).Error; err != nil {
+			c.JSON(http.StatusBadRequest, dto.Fail(400, "收藏失败"))
+			return
+		}
 		c.JSON(http.StatusOK, dto.Success(gin.H{"favorited": true}))
 	}
 }
@@ -131,9 +131,8 @@ func FavoriteToggle(c *gin.Context) {
 
 // InvoiceTitleList 发票抬头列表
 func InvoiceTitleList(c *gin.Context) {
-	userID := c.Query("user_id")
 	var titles []models.InvoiceTitle
-	database.DB.Where("user_id = ?", userID).Find(&titles)
+	database.DB.Where("user_id = ?", currentUserID(c)).Find(&titles)
 	c.JSON(http.StatusOK, dto.Success(titles))
 }
 
@@ -144,24 +143,27 @@ func InvoiceTitleCreate(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, dto.Fail(400, "参数错误"))
 		return
 	}
+	t.UserID = currentUserID(c)
 	if t.IsDefault == 1 {
 		database.DB.Model(&models.InvoiceTitle{}).Where("user_id = ?", t.UserID).Update("is_default", 0)
 	}
-	database.DB.Create(&t)
+	if err := database.DB.Create(&t).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, dto.Fail(500, "添加失败"))
+		return
+	}
 	c.JSON(http.StatusOK, dto.Success(t))
 }
 
 // InvoiceTitleDelete 删除发票抬头
 func InvoiceTitleDelete(c *gin.Context) {
 	id := c.Param("id")
-	database.DB.Delete(&models.InvoiceTitle{}, id)
+	database.DB.Where("user_id = ?", currentUserID(c)).Delete(&models.InvoiceTitle{}, id)
 	c.JSON(http.StatusOK, dto.Success(nil))
 }
 
 // InvoiceCreate 申请开票
 func InvoiceCreate(c *gin.Context) {
 	var req struct {
-		UserID         uint64  `json:"user_id" binding:"required"`
 		OrderID        uint64  `json:"order_id" binding:"required"`
 		InvoiceTitleID *uint64 `json:"invoice_title_id"`
 		Amount         float64 `json:"amount" binding:"required"`
@@ -170,15 +172,55 @@ func InvoiceCreate(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, dto.Fail(400, "参数错误"))
 		return
 	}
-	inv := models.Invoice{
-		UserID:  req.UserID,
-		OrderID: req.OrderID,
-		InvoiceTitleID: req.InvoiceTitleID,
-		Amount:  req.Amount,
-		InvoiceNo: strPtr(""),
+	var order models.Order
+	if err := database.DB.Where("id = ? AND user_id = ?", req.OrderID, currentUserID(c)).First(&order).Error; err != nil {
+		c.JSON(http.StatusNotFound, dto.Fail(404, "订单不存在"))
+		return
 	}
-	database.DB.Create(&inv)
+	if order.Status != "paid" && order.Status != "completed" {
+		c.JSON(http.StatusBadRequest, dto.Fail(400, "仅已支付订单可申请开票"))
+		return
+	}
+	if req.Amount <= 0 || req.Amount > order.PaidAmount {
+		c.JSON(http.StatusBadRequest, dto.Fail(400, "开票金额不合法"))
+		return
+	}
+	if req.InvoiceTitleID != nil {
+		var title models.InvoiceTitle
+		if err := database.DB.Where("id = ? AND user_id = ?", *req.InvoiceTitleID, currentUserID(c)).First(&title).Error; err != nil {
+			c.JSON(http.StatusBadRequest, dto.Fail(400, "发票抬头不存在"))
+			return
+		}
+	}
+	var invoiced float64
+	database.DB.Model(&models.Invoice{}).
+		Where("order_id = ? AND status <> ?", req.OrderID, "rejected").
+		Select("COALESCE(SUM(amount), 0)").Scan(&invoiced)
+	if invoiced+req.Amount > order.PaidAmount {
+		c.JSON(http.StatusBadRequest, dto.Fail(400, "累计开票金额超过实付金额"))
+		return
+	}
+	inv := models.Invoice{
+		UserID:         currentUserID(c),
+		OrderID:        req.OrderID,
+		InvoiceTitleID: req.InvoiceTitleID,
+		Amount:         req.Amount,
+		InvoiceNo:      strPtr(""),
+	}
+	if err := database.DB.Create(&inv).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, dto.Fail(500, "申请失败"))
+		return
+	}
 	c.JSON(http.StatusOK, dto.Success(inv))
 }
 
 func strPtr(s string) *string { return &s }
+
+func currentUserID(c *gin.Context) uint64 {
+	if v, ok := c.Get("actor_id"); ok {
+		if id, ok := v.(uint64); ok {
+			return id
+		}
+	}
+	return 0
+}

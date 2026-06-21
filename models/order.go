@@ -32,22 +32,22 @@ type Order struct {
 func (Order) TableName() string { return "orders" }
 
 type OrderItem struct {
-	ID           uint64           `gorm:"primaryKey" json:"id"`
-	OrderID      uint64           `gorm:"index;not null" json:"order_id"`
-	ProductID    uint64           `gorm:"index;not null" json:"product_id"`
-	SkuID        uint64           `gorm:"not null" json:"sku_id"`
-	ScheduleID   *uint64          `gorm:"index" json:"schedule_id"`
-	ProductTitle string           `gorm:"size:160;not null" json:"product_title"`
-	SkuName      string           `gorm:"size:120;not null" json:"sku_name"`
-	TravelDate   *string          `gorm:"type:date" json:"travel_date"`
-	StartTime    *string          `gorm:"type:time" json:"start_time"`
-	Quantity     uint             `gorm:"not null" json:"quantity"`
-	UnitPrice    float64          `gorm:"type:decimal(10,2);not null" json:"unit_price"`
-	TotalPrice   float64          `gorm:"type:decimal(10,2);not null" json:"total_price"`
-	Status       string           `gorm:"size:32;default:active" json:"status"`
-	CreatedAt    time.Time        `json:"created_at"`
-	Tickets      []Ticket         `gorm:"foreignKey:OrderItemID" json:"tickets,omitempty"`
-	Travelers    []OrderTraveler  `gorm:"foreignKey:OrderItemID" json:"travelers,omitempty"`
+	ID           uint64          `gorm:"primaryKey" json:"id"`
+	OrderID      uint64          `gorm:"index;not null" json:"order_id"`
+	ProductID    uint64          `gorm:"index;not null" json:"product_id"`
+	SkuID        uint64          `gorm:"not null" json:"sku_id"`
+	ScheduleID   *uint64         `gorm:"index" json:"schedule_id"`
+	ProductTitle string          `gorm:"size:160;not null" json:"product_title"`
+	SkuName      string          `gorm:"size:120;not null" json:"sku_name"`
+	TravelDate   *string         `gorm:"type:date" json:"travel_date"`
+	StartTime    *string         `gorm:"type:time" json:"start_time"`
+	Quantity     uint            `gorm:"not null" json:"quantity"`
+	UnitPrice    float64         `gorm:"type:decimal(10,2);not null" json:"unit_price"`
+	TotalPrice   float64         `gorm:"type:decimal(10,2);not null" json:"total_price"`
+	Status       string          `gorm:"size:32;default:active" json:"status"`
+	CreatedAt    time.Time       `json:"created_at"`
+	Tickets      []Ticket        `gorm:"foreignKey:OrderItemID" json:"tickets,omitempty"`
+	Travelers    []OrderTraveler `gorm:"foreignKey:OrderItemID" json:"travelers,omitempty"`
 }
 
 func (OrderItem) TableName() string { return "order_items" }
@@ -94,6 +94,7 @@ type Ticket struct {
 	UsedAt      *time.Time `json:"used_at"`
 	CreatedAt   time.Time  `json:"created_at"`
 	UpdatedAt   time.Time  `json:"updated_at"`
+	OrderItem   OrderItem  `gorm:"foreignKey:OrderItemID" json:"order_item,omitempty"`
 }
 
 func (Ticket) TableName() string { return "tickets" }

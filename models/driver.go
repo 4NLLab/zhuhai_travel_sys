@@ -5,15 +5,21 @@ import "time"
 // -------------------- 司机模块 --------------------
 
 type Driver struct {
-	ID             uint64    `gorm:"primaryKey" json:"id"`
-	DriverNo       string    `gorm:"uniqueIndex;size:40;not null" json:"driver_no"`
-	Name           string    `gorm:"size:80;not null" json:"name"`
-	Phone          string    `gorm:"size:32;index;not null" json:"phone"`
-	IdCardNo       *string   `gorm:"size:255" json:"id_card_no"`
-	Status         string    `gorm:"size:24;default:active;index" json:"status"`
-	CommissionRate float64   `gorm:"type:decimal(6,4);default:0.0800" json:"commission_rate"`
-	CreatedAt      time.Time `json:"created_at"`
-	UpdatedAt      time.Time `json:"updated_at"`
+	ID                uint64    `gorm:"primaryKey" json:"id"`
+	DriverNo          string    `gorm:"uniqueIndex;size:40;not null" json:"driver_no"`
+	Name              string    `gorm:"size:80;not null" json:"name"`
+	Phone             string    `gorm:"size:32;index;not null" json:"phone"`
+	PasswordHash      string    `gorm:"size:255;not null" json:"-"`
+	IdCardNo          *string   `gorm:"size:255" json:"id_card_no"`
+	Status            string    `gorm:"size:24;default:active;index" json:"status"`
+	IdCardFrontURL    string    `gorm:"size:500" json:"id_card_front_url"`
+	DriverLicenseURL  string    `gorm:"size:500" json:"driver_license_url"`
+	VehicleLicenseURL string    `gorm:"size:500" json:"vehicle_license_url"`
+	VehiclePhotoURL   string    `gorm:"size:500" json:"vehicle_photo_url"`
+	ReviewRemark      string    `gorm:"size:255" json:"review_remark"`
+	CommissionRate    float64   `gorm:"type:decimal(6,4);default:0.0800" json:"commission_rate"`
+	CreatedAt         time.Time `json:"created_at"`
+	UpdatedAt         time.Time `json:"updated_at"`
 }
 
 func (Driver) TableName() string { return "drivers" }
@@ -45,18 +51,19 @@ type DriverQRCode struct {
 func (DriverQRCode) TableName() string { return "driver_qr_codes" }
 
 type DriverCommission struct {
-	ID              uint64     `gorm:"primaryKey" json:"id"`
-	DriverID        uint64     `gorm:"index;not null" json:"driver_id"`
-	OrderID         uint64     `gorm:"index;not null" json:"order_id"`
-	OrderItemID     uint64     `gorm:"not null" json:"order_item_id"`
-	CommissionNo    string     `gorm:"uniqueIndex;size:64;not null" json:"commission_no"`
-	BaseAmount      float64    `gorm:"type:decimal(10,2);not null" json:"base_amount"`
-	Rate            float64    `gorm:"type:decimal(6,4);not null" json:"rate"`
-	CommissionAmount float64   `gorm:"type:decimal(10,2);not null" json:"commission_amount"`
-	Status          string     `gorm:"size:32;default:pending" json:"status"`
-	SettledAt       *time.Time `json:"settled_at"`
-	CreatedAt       time.Time  `json:"created_at"`
-	UpdatedAt       time.Time  `json:"updated_at"`
+	ID               uint64     `gorm:"primaryKey" json:"id"`
+	DriverID         uint64     `gorm:"index;not null" json:"driver_id"`
+	OrderID          uint64     `gorm:"index;not null" json:"order_id"`
+	OrderItemID      uint64     `gorm:"not null" json:"order_item_id"`
+	TicketID         *uint64    `gorm:"uniqueIndex" json:"ticket_id"`
+	CommissionNo     string     `gorm:"uniqueIndex;size:64;not null" json:"commission_no"`
+	BaseAmount       float64    `gorm:"type:decimal(10,2);not null" json:"base_amount"`
+	Rate             float64    `gorm:"type:decimal(6,4);not null" json:"rate"`
+	CommissionAmount float64    `gorm:"type:decimal(10,2);not null" json:"commission_amount"`
+	Status           string     `gorm:"size:32;default:pending" json:"status"`
+	SettledAt        *time.Time `json:"settled_at"`
+	CreatedAt        time.Time  `json:"created_at"`
+	UpdatedAt        time.Time  `json:"updated_at"`
 }
 
 func (DriverCommission) TableName() string { return "driver_commissions" }
@@ -114,6 +121,7 @@ type UserFavorite struct {
 	ID        uint64    `gorm:"primaryKey" json:"id"`
 	UserID    uint64    `gorm:"uniqueIndex:uk_favorites_user_product;not null" json:"user_id"`
 	ProductID uint64    `gorm:"uniqueIndex:uk_favorites_user_product;index;not null" json:"product_id"`
+	Product   Product   `gorm:"foreignKey:ProductID" json:"product,omitempty"`
 	CreatedAt time.Time `json:"created_at"`
 }
 
@@ -135,16 +143,20 @@ type SupportTicket struct {
 func (SupportTicket) TableName() string { return "support_tickets" }
 
 type AuditLog struct {
-	ID        uint64    `gorm:"primaryKey" json:"id"`
-	ActorType string    `gorm:"size:24;index:idx_audit_actor;not null" json:"actor_type"`
-	ActorID   *uint64   `gorm:"index:idx_audit_actor" json:"actor_id"`
-	Action    string    `gorm:"size:80;not null" json:"action"`
-	TargetType *string  `gorm:"size:80;index:idx_audit_target" json:"target_type"`
-	TargetID  *uint64   `gorm:"index:idx_audit_target" json:"target_id"`
-	IP        *string   `gorm:"size:64" json:"ip"`
-	UserAgent *string   `gorm:"size:500" json:"user_agent"`
-	Payload   *string   `gorm:"type:json" json:"payload"`
-	CreatedAt time.Time `gorm:"index" json:"created_at"`
+	ID         uint64    `gorm:"primaryKey" json:"id"`
+	ActorType  string    `gorm:"size:24;index:idx_audit_actor;not null" json:"actor_type"`
+	ActorID    *uint64   `gorm:"index:idx_audit_actor" json:"actor_id"`
+	ActorName  *string   `gorm:"size:120" json:"actor_name"`
+	Action     string    `gorm:"size:80;not null" json:"action"`
+	TargetType *string   `gorm:"size:80;index:idx_audit_target" json:"target_type"`
+	TargetID   *uint64   `gorm:"index:idx_audit_target" json:"target_id"`
+	Method     string    `gorm:"size:12" json:"method"`
+	Path       string    `gorm:"size:255" json:"path"`
+	StatusCode int       `json:"status_code"`
+	IP         *string   `gorm:"size:64" json:"ip"`
+	UserAgent  *string   `gorm:"size:500" json:"user_agent"`
+	Payload    *string   `gorm:"type:json" json:"payload"`
+	CreatedAt  time.Time `gorm:"index" json:"created_at"`
 }
 
 func (AuditLog) TableName() string { return "audit_logs" }
