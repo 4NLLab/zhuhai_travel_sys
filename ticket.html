@@ -1,0 +1,769 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>景点门票核销码</title>
+    <link rel="icon" href="data:," />
+    <style>
+      :root {
+        --primary: #0f8dad;
+        --primary-dark: #086d89;
+        --accent: #f15a2b;
+        --ink: #15191d;
+        --muted: #71777d;
+        --subtle: #a0a6ab;
+        --line: #edf0f2;
+        --page: #f4f5f6;
+        --card: #fff;
+        --green: #1c8b55;
+        --orange: #b46b00;
+        --shadow: 0 8px 22px rgba(18, 35, 45, 0.07);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 22% 0%, rgba(15, 141, 173, 0.16), transparent 28%),
+          radial-gradient(circle at 82% 18%, rgba(244, 178, 63, 0.13), transparent 26%),
+          linear-gradient(180deg, #f8fbfc 0%, #dcecef 100%);
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB",
+          "Microsoft YaHei", sans-serif;
+      }
+
+      button {
+        border: 0;
+        font: inherit;
+        cursor: pointer;
+      }
+
+      .phone {
+        width: min(100vw, 430px);
+        min-height: 100vh;
+        margin: 0 auto;
+        position: relative;
+        overflow-x: hidden;
+        background:
+          radial-gradient(circle at 92% 180px, rgba(244, 178, 63, 0.16), transparent 28%),
+          linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(244, 245, 246, 0.96) 260px),
+          var(--page);
+        box-shadow: 0 0 0 1px rgba(20, 35, 45, 0.05), 0 24px 80px rgba(8, 45, 64, 0.18);
+      }
+
+      .top-safe {
+        padding: calc(14px + env(safe-area-inset-top, 0)) 18px 8px;
+        background: var(--page);
+      }
+
+      .status-bar {
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: #000;
+        font-size: 24px;
+        line-height: 1;
+        font-weight: 800;
+      }
+
+      .system-icons {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #000;
+      }
+
+      .battery {
+        width: 32px;
+        height: 17px;
+        border: 2px solid currentColor;
+        border-radius: 5px;
+        position: relative;
+      }
+
+      .battery::before {
+        content: "";
+        position: absolute;
+        top: 3px;
+        right: -5px;
+        width: 3px;
+        height: 7px;
+        border-radius: 0 2px 2px 0;
+        background: currentColor;
+      }
+
+      .battery::after {
+        content: "";
+        position: absolute;
+        inset: 3px;
+        border-radius: 2px;
+        background: currentColor;
+      }
+
+      .nav {
+        height: 54px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .nav button {
+        width: 38px;
+        height: 38px;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        color: #111;
+        background: transparent;
+      }
+
+      .nav-actions {
+        display: flex;
+        gap: 16px;
+      }
+
+      .nav svg {
+        width: 28px;
+        height: 28px;
+        stroke-width: 2.4;
+      }
+
+      .content {
+        padding: 0 12px calc(104px + env(safe-area-inset-bottom, 0));
+      }
+
+      .ticket-state {
+        padding: 6px 8px 18px;
+      }
+
+      .ticket-visual {
+        position: relative;
+        min-height: 116px;
+        margin: 0 0 12px;
+        overflow: hidden;
+        border-radius: 8px;
+        background:
+          linear-gradient(135deg, rgba(238, 251, 254, 0.95), rgba(255, 248, 233, 0.92)),
+          #fff;
+        box-shadow: var(--shadow);
+      }
+
+      .ticket-visual img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center bottom;
+      }
+
+      .ticket-visual::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, rgba(255, 255, 255, 0.74), rgba(255, 255, 255, 0.05) 58%);
+        pointer-events: none;
+      }
+
+      .ticket-visual-text {
+        position: relative;
+        z-index: 1;
+        max-width: 210px;
+        padding: 18px;
+      }
+
+      .ticket-visual-text strong,
+      .ticket-visual-text span {
+        display: block;
+      }
+
+      .ticket-visual-text strong {
+        font-size: 20px;
+        line-height: 1.2;
+      }
+
+      .ticket-visual-text span {
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.45;
+      }
+
+      .state-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 34px;
+        font-weight: 850;
+        line-height: 1.15;
+      }
+
+      .state-title svg {
+        width: 36px;
+        height: 36px;
+      }
+
+      .state-subtitle {
+        margin-top: 10px;
+        color: #61666b;
+        font-size: 17px;
+        line-height: 1.4;
+      }
+
+      .card {
+        margin: 0 0 12px;
+        padding: 14px;
+        border-radius: 8px;
+        background: var(--card);
+        box-shadow: var(--shadow);
+      }
+
+      .visit-card {
+        display: grid;
+        gap: 10px;
+      }
+
+      .visit-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .visit-head h2,
+      .section-title {
+        margin: 0;
+        font-size: 20px;
+        line-height: 1.2;
+      }
+
+      .tag {
+        flex: 0 0 auto;
+        padding: 5px 8px;
+        border-radius: 8px;
+        color: var(--green);
+        background: #e4f8ee;
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .visit-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+      }
+
+      .visit-item {
+        min-height: 64px;
+        padding: 10px 8px;
+        border-radius: 8px;
+        background: #f7f9fa;
+      }
+
+      .visit-item span {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .visit-item strong {
+        display: block;
+        margin-top: 6px;
+        font-size: 15px;
+        line-height: 1.2;
+      }
+
+      .product {
+        display: grid;
+        grid-template-columns: 78px minmax(0, 1fr) auto;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .thumb {
+        width: 78px;
+        height: 78px;
+        overflow: hidden;
+        border-radius: 8px;
+        background: #d9ebee;
+      }
+
+      .thumb img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: cover;
+      }
+
+      .product h3 {
+        margin: 0;
+        font-size: 17px;
+        line-height: 1.28;
+      }
+
+      .product p {
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.35;
+      }
+
+      .price {
+        text-align: right;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.7;
+      }
+
+      .price strong {
+        display: block;
+        color: var(--ink);
+        font-size: 18px;
+      }
+
+      .ticket-main {
+        padding: 0;
+        overflow: hidden;
+      }
+
+      .qr-wrap {
+        padding: 30px 18px 24px;
+        display: grid;
+        place-items: center;
+        background: #fff;
+      }
+
+      .fake-qr-large {
+        width: min(68vw, 276px);
+        aspect-ratio: 1;
+        position: relative;
+        border: 10px solid #fff;
+        background:
+          linear-gradient(90deg, #000 12px, transparent 12px) 0 0 / 28px 28px,
+          linear-gradient(#000 12px, transparent 12px) 0 0 / 28px 28px,
+          linear-gradient(135deg, transparent 43%, #000 44% 56%, transparent 57%) 0 0 / 24px 24px,
+          #fff;
+      }
+
+      .fake-qr-large::before,
+      .fake-qr-large::after,
+      .qr-corner {
+        content: "";
+        position: absolute;
+        width: 74px;
+        height: 74px;
+        background: #fff;
+        border: 13px solid #000;
+        box-shadow: inset 0 0 0 12px #fff, inset 0 0 0 24px #000;
+      }
+
+      .fake-qr-large::before {
+        left: 0;
+        top: 0;
+      }
+
+      .fake-qr-large::after {
+        right: 0;
+        top: 0;
+      }
+
+      .qr-corner {
+        left: 0;
+        bottom: 0;
+      }
+
+      .coupon {
+        padding: 17px 18px 18px;
+        border-top: 1px dashed #e5e8eb;
+      }
+
+      .coupon h2 {
+        margin: 0 0 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 21px;
+        line-height: 1.2;
+      }
+
+      .coupon h2 em {
+        color: var(--accent);
+        font-style: normal;
+      }
+
+      .code-line {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 20px;
+        font-weight: 800;
+      }
+
+      .copy {
+        height: 26px;
+        padding: 0 9px;
+        border-radius: 6px;
+        color: #7d8287;
+        background: #f0f2f3;
+        font-size: 13px;
+      }
+
+      .spot-card h2,
+      .notice-card h2,
+      .order-card h2 {
+        margin: 0 0 12px;
+        font-size: 21px;
+        line-height: 1.2;
+      }
+
+      .spot-head {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 58px;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .spot-title {
+        margin: 0;
+        font-size: 20px;
+        line-height: 1.2;
+      }
+
+      .spot-line {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        margin-top: 9px;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.4;
+      }
+
+      .spot-line svg {
+        flex: 0 0 auto;
+        width: 17px;
+        height: 17px;
+        margin-top: 1px;
+      }
+
+      .call {
+        width: 54px;
+        height: 54px;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        color: #111;
+        background: #f6f7f8;
+      }
+
+      .notice-card p {
+        margin: 0;
+        color: #4a5055;
+        font-size: 15px;
+        line-height: 1.6;
+      }
+
+      .notice-card ul {
+        margin: 10px 0 0;
+        padding: 0 0 0 18px;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.75;
+      }
+
+      .info-row {
+        display: grid;
+        grid-template-columns: 92px minmax(0, 1fr);
+        gap: 8px;
+        padding: 9px 0;
+        border-bottom: 1px solid var(--line);
+        font-size: 16px;
+        line-height: 1.45;
+      }
+
+      .info-row:last-child {
+        border-bottom: 0;
+      }
+
+      .info-row span {
+        color: var(--subtle);
+      }
+
+      .info-row strong {
+        font-weight: 500;
+      }
+
+      .bottom-actions {
+        position: fixed;
+        z-index: 20;
+        left: 50%;
+        bottom: 0;
+        width: min(100vw, 430px);
+        transform: translateX(-50%);
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        padding: 12px 14px calc(12px + env(safe-area-inset-bottom, 0));
+        background: rgba(255, 255, 255, 0.96);
+        border-top: 1px solid rgba(10, 26, 35, 0.08);
+        backdrop-filter: blur(12px);
+      }
+
+      .bottom-actions button {
+        height: 52px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border: 1px solid #d7dce0;
+        border-radius: 26px;
+        color: #1f2327;
+        background: #fff;
+        font-size: 18px;
+        font-weight: 800;
+      }
+
+      .bottom-actions svg {
+        width: 22px;
+        height: 22px;
+      }
+
+      .toast {
+        position: fixed;
+        z-index: 30;
+        left: 50%;
+        bottom: calc(84px + env(safe-area-inset-bottom, 0));
+        width: max-content;
+        max-width: min(86vw, 360px);
+        transform: translate(-50%, 14px);
+        padding: 10px 14px;
+        border-radius: 8px;
+        color: #fff;
+        background: rgba(17, 37, 48, 0.9);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease, transform 0.2s ease;
+        font-size: 13px;
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
+
+      @media (max-width: 360px) {
+        .state-title {
+          font-size: 30px;
+        }
+
+        .qr-grid,
+        .visit-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .product {
+          grid-template-columns: 70px minmax(0, 1fr);
+        }
+
+        .price {
+          grid-column: 2;
+          text-align: left;
+        }
+      }
+
+      @media (min-width: 431px) {
+        body {
+          padding: 28px 0;
+        }
+
+        .phone {
+          min-height: 860px;
+          border-radius: 26px;
+        }
+
+        .bottom-actions {
+          border-radius: 0 0 26px 26px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="phone">
+      <header class="top-safe">
+        <div class="status-bar">
+          <span>21:47</span>
+          <div class="system-icons">
+            <i data-lucide="signal-high" aria-hidden="true"></i>
+            <i data-lucide="wifi" aria-hidden="true"></i>
+            <span class="battery" aria-hidden="true"></span>
+          </div>
+        </div>
+        <nav class="nav" aria-label="页面导航">
+          <button type="button" aria-label="返回"><i data-lucide="chevron-left"></i></button>
+          <div class="nav-actions">
+            <button type="button" aria-label="客服"><i data-lucide="headphones"></i></button>
+            <button type="button" aria-label="分享"><i data-lucide="share-2"></i></button>
+            <button type="button" aria-label="首页"><i data-lucide="home"></i></button>
+          </div>
+        </nav>
+      </header>
+
+      <section class="content">
+        <div class="ticket-state">
+          <div class="state-title"><i data-lucide="clock-3"></i><span>待使用</span></div>
+          <div class="state-subtitle">游玩日期 2026-07-15，有效期至当日 23:59</div>
+        </div>
+
+        <section class="ticket-visual" aria-label="电子票核销">
+          <img src="assets/verify-hero-wide-clean-web.png" alt="" />
+          <div class="ticket-visual-text">
+            <strong>出示核销码检票</strong>
+            <span>湾仔旅游码头检票口核验后登船。</span>
+          </div>
+        </section>
+
+        <section class="card ticket-main">
+          <div class="qr-wrap">
+            <div class="fake-qr-large" aria-label="核销二维码">
+              <span class="qr-corner"></span>
+            </div>
+          </div>
+          <div class="coupon">
+            <h2>待使用券码 <em>1</em> 张 <i data-lucide="eye"></i></h2>
+            <div class="code-line">
+              <span>· 0105 0491 4380 6</span>
+              <button class="copy" type="button">复制</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="card visit-card">
+          <div class="visit-head">
+            <h2>澳门环岛游夜景船票</h2>
+            <span class="tag">电子票</span>
+          </div>
+          <div class="visit-grid">
+            <div class="visit-item">
+              <span>游玩日期</span>
+              <strong>07-15 周三</strong>
+            </div>
+            <div class="visit-item">
+              <span>入园时段</span>
+              <strong>19:30-21:00</strong>
+            </div>
+            <div class="visit-item">
+              <span>数量</span>
+              <strong>成人票 x1</strong>
+            </div>
+          </div>
+        </section>
+
+        <section class="card product">
+          <div class="thumb">
+            <img src="assets/macau-cruise-night-banner-web.jpg" alt="澳门环岛游夜景船票" />
+          </div>
+          <div>
+            <h3>澳门环岛游夜景船票</h3>
+            <p>湾仔旅游码头出发，凭核销码检票登船</p>
+          </div>
+          <div class="price">
+            <span>¥128</span>
+            <span>x1</span>
+            <strong>实付 ¥88</strong>
+          </div>
+        </section>
+
+        <section class="card spot-card">
+          <div class="spot-head">
+            <div>
+              <h2 class="spot-title">湾仔旅游码头检票口</h2>
+              <div class="spot-line">
+                <i data-lucide="clock-3"></i>
+                <span><b style="color: var(--green)">营业中</b> 周一至周日 09:30-21:30</span>
+              </div>
+              <div class="spot-line">
+                <i data-lucide="map-pin"></i>
+                <span>珠海市香洲区湾仔旅游码头售票大厅旁</span>
+              </div>
+            </div>
+            <button class="call" type="button" aria-label="电话"><i data-lucide="phone"></i></button>
+          </div>
+        </section>
+
+        <section class="card notice-card">
+          <div class="visit-head">
+            <h2>使用须知</h2>
+            <span style="color: var(--muted); font-size: 14px">查看全部 ›</span>
+          </div>
+          <p>请在游玩日期当天到检票口出示二维码，工作人员扫码后入园/登船。</p>
+          <ul>
+            <li>核销前请勿将券码提供给无关人员。</li>
+            <li>逾期未使用按产品规则处理，退款以订单页展示为准。</li>
+            <li>如遇天气、航班调整，请以景区或码头现场通知为准。</li>
+          </ul>
+        </section>
+
+        <section class="card order-card">
+          <h2>订单信息</h2>
+          <div class="info-row">
+            <span>实际付款</span>
+            <strong>¥88</strong>
+          </div>
+          <div class="info-row">
+            <span>手机号码</span>
+            <strong>189****6928</strong>
+          </div>
+          <div class="info-row">
+            <span>订单编号</span>
+            <strong>ZH20260715001028 <button class="copy" type="button">复制</button></strong>
+          </div>
+          <div class="info-row">
+            <span>下单来源</span>
+            <strong>车座购票码</strong>
+          </div>
+          <div class="info-row">
+            <span>付款时间</span>
+            <strong>2026-06-10 21:45:31</strong>
+          </div>
+        </section>
+      </section>
+
+      <footer class="bottom-actions">
+        <button type="button"><i data-lucide="phone"></i>景区电话</button>
+        <button type="button">申请退款</button>
+      </footer>
+      <div class="toast" role="status" aria-live="polite"></div>
+    </main>
+
+    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+    <script>
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
+
+      const toast = document.querySelector(".toast");
+      let toastTimer;
+
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove("show"), 1600);
+      }
+
+      document.querySelectorAll("button").forEach((button) => {
+        button.addEventListener("click", () => {
+          const text = button.textContent.trim() || button.getAttribute("aria-label") || "操作";
+          showToast(`${text}功能预留`);
+        });
+      });
+    </script>
+  </body>
+</html>

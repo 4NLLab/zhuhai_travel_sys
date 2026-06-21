@@ -1,0 +1,2329 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>珠海文旅本地生活小程序原型</title>
+    <link rel="icon" href="data:," />
+    <style>
+      :root {
+        --primary: #119fc4;
+        --primary-dark: #087393;
+        --accent: #f2b544;
+        --pink: #ee5b84;
+        --purple: #7c51b5;
+        --green: #48a868;
+        --ink: #172530;
+        --muted: #6d7c87;
+        --line: #e7edf1;
+        --page: #edf5f7;
+        --white: #fff;
+        --shadow: 0 12px 30px rgba(10, 49, 70, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 25% 0%, rgba(17, 159, 196, 0.15), transparent 34%),
+          linear-gradient(180deg, #f8fbfd 0%, #dfeff2 100%);
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB",
+          "Microsoft YaHei", sans-serif;
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      button {
+        border: 0;
+        cursor: pointer;
+      }
+
+      .page-shell {
+        width: min(100vw, 430px);
+        min-height: 100vh;
+        margin: 0 auto;
+        background: var(--page);
+        position: relative;
+        overflow-x: hidden;
+        box-shadow: 0 0 0 1px rgba(9, 50, 66, 0.04), 0 24px 80px rgba(8, 45, 64, 0.18);
+      }
+
+      .hero {
+        position: relative;
+        height: 430px;
+        color: var(--white);
+        overflow: hidden;
+        background: #126c91;
+      }
+
+      .hero-slider,
+      .hero-slide {
+        position: absolute;
+        inset: 0;
+      }
+
+      .hero-slider {
+        z-index: 0;
+      }
+
+      .hero-slide {
+        opacity: 0;
+        transition: opacity 0.55s ease;
+      }
+
+      .hero-slide.active {
+        opacity: 1;
+      }
+
+      .hero-slide img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: cover;
+        object-position: top center;
+      }
+
+      .hero-slide:nth-child(2) img {
+        object-position: center center;
+      }
+
+      .hero-slide:nth-child(3) img {
+        object-position: center center;
+      }
+
+      .hero::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(180deg, rgba(5, 23, 32, 0.18) 0%, rgba(5, 23, 32, 0.02) 42%, rgba(5, 23, 32, 0.22) 100%),
+          linear-gradient(90deg, rgba(6, 40, 53, 0.2), transparent 55%);
+        pointer-events: none;
+      }
+
+      .hero-greeting {
+        position: absolute;
+        z-index: 2;
+        top: 106px;
+        left: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        max-width: min(62%, 240px);
+        color: var(--white);
+        pointer-events: none;
+        text-shadow: 0 4px 16px rgba(6, 31, 40, 0.34);
+      }
+
+      .hero-greeting::before {
+        content: "";
+        position: absolute;
+        left: 4px;
+        right: 8px;
+        bottom: 7px;
+        height: 16px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0.06));
+        filter: blur(8px);
+        transform: rotate(-6deg);
+      }
+
+      .hero-greeting span,
+      .hero-greeting strong {
+        position: relative;
+        display: block;
+        font-family: "STKaiti", "Kaiti SC", "KaiTi", "HanziPen SC", serif;
+        font-weight: 700;
+        line-height: 1;
+        letter-spacing: 2px;
+      }
+
+      .hero-greeting span {
+        font-size: 30px;
+        transform: rotate(-7deg);
+      }
+
+      .hero-greeting strong {
+        margin-top: -2px;
+        font-size: 52px;
+        transform: rotate(-5deg);
+      }
+
+      .top-bar {
+        position: absolute;
+        z-index: 2;
+        top: env(safe-area-inset-top, 0);
+        left: 0;
+        right: 0;
+        min-height: 76px;
+        padding: 18px 14px 0;
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        align-items: start;
+        gap: 12px;
+      }
+
+      .brand-lockup {
+        display: inline-grid;
+        grid-template-columns: 42px minmax(0, 1fr);
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+        color: #fff;
+        text-shadow: 0 2px 12px rgba(8, 37, 48, 0.28);
+      }
+
+      .brand-logo {
+        width: 42px;
+        height: 42px;
+        display: block;
+        object-fit: contain;
+        filter: drop-shadow(0 8px 14px rgba(7, 42, 55, 0.18));
+      }
+
+      .brand-logo .mark-bg {
+        fill: rgba(255, 255, 255, 0.94);
+      }
+
+      .brand-logo .mark-wave {
+        fill: #0f9cbd;
+      }
+
+      .brand-logo .mark-sea {
+        fill: #53c4ce;
+      }
+
+      .brand-logo .mark-sun {
+        fill: #f2b544;
+      }
+
+      .brand-logo .mark-bridge {
+        fill: none;
+        stroke: #087393;
+        stroke-linecap: round;
+        stroke-width: 3.2;
+      }
+
+      .brand-logo .mark-pearl {
+        fill: #fff7d7;
+        stroke: #f2b544;
+        stroke-width: 1.8;
+      }
+
+      .brand-lockup strong,
+      .brand-lockup span {
+        display: block;
+      }
+
+      .brand-lockup strong {
+        font-size: 18px;
+        line-height: 1.05;
+      }
+
+      .brand-lockup span {
+        margin-top: 4px;
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 11px;
+      }
+
+      .capsule {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        height: 32px;
+        padding: 0 10px;
+        border: 1px solid rgba(255, 255, 255, 0.58);
+        border-radius: 18px;
+        color: var(--white);
+        background: rgba(11, 50, 64, 0.26);
+        backdrop-filter: blur(8px);
+      }
+
+      .capsule span {
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: currentColor;
+        opacity: 0.9;
+      }
+
+      .search-card {
+        position: relative;
+        z-index: 2;
+        left: auto;
+        right: auto;
+        bottom: auto;
+        justify-self: end;
+        width: min(218px, 58vw);
+        height: 36px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        align-items: center;
+        padding: 0 13px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.68);
+        box-shadow: 0 10px 24px rgba(11, 45, 65, 0.12);
+        backdrop-filter: blur(16px);
+      }
+
+      .search-card label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .search-card svg {
+        width: 17px;
+        height: 17px;
+        flex: 0 0 auto;
+      }
+
+      .search-card input {
+        width: 100%;
+        min-width: 0;
+        border: 0;
+        outline: 0;
+        color: var(--ink);
+        background: transparent;
+      }
+
+      .search-card button {
+        display: none;
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 8px;
+        color: var(--white);
+        background: var(--primary);
+        font-weight: 700;
+      }
+
+      .hero-carousel-copy {
+        position: absolute;
+        z-index: 2;
+        left: 18px;
+        right: 18px;
+        bottom: 50px;
+        display: grid;
+        gap: 6px;
+        color: var(--white);
+        text-shadow: 0 4px 18px rgba(5, 27, 38, 0.38);
+        pointer-events: none;
+      }
+
+      .hero-carousel-copy b {
+        font-size: 25px;
+        line-height: 1.05;
+        letter-spacing: 0;
+      }
+
+      .hero-carousel-copy span {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 13px;
+      }
+
+      .hero-dots {
+        display: flex;
+        gap: 5px;
+        margin-top: 4px;
+        pointer-events: auto;
+      }
+
+      .hero-dots button {
+        width: 5px;
+        height: 5px;
+        padding: 0;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.56);
+      }
+
+      .hero-dots button.active {
+        width: 18px;
+        background: var(--white);
+      }
+
+      .content {
+        position: relative;
+        z-index: 3;
+        margin-top: -24px;
+        padding-bottom: calc(86px + env(safe-area-inset-bottom, 0));
+      }
+
+      .page-shell:not(.is-home) .hero {
+        display: none;
+      }
+
+      .page-shell:not(.is-home) .content {
+        min-height: 100vh;
+        margin-top: 0;
+        padding-top: calc(14px + env(safe-area-inset-top, 0));
+      }
+
+      .app-page {
+        display: none;
+      }
+
+      .app-page.active {
+        display: block;
+      }
+
+      .page-heading {
+        margin: 0 14px 12px;
+        padding: 16px 14px;
+        border-radius: 8px;
+        color: var(--white);
+        background: linear-gradient(135deg, #0f8b8d, #226bb8);
+        box-shadow: var(--shadow);
+      }
+
+      .page-heading h1 {
+        margin: 0;
+        font-size: 22px;
+        line-height: 1.2;
+      }
+
+      .page-heading p {
+        margin: 7px 0 0;
+        color: rgba(255, 255, 255, 0.86);
+        font-size: 13px;
+        line-height: 1.45;
+      }
+
+      .quick-sheet {
+        padding: 14px;
+        border-radius: 18px 18px 8px 8px;
+        background: var(--white);
+      }
+
+      .section-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin: 0 0 12px;
+      }
+
+      .section-title h2 {
+        margin: 0;
+        font-size: 18px;
+        line-height: 1.2;
+      }
+
+      .section-title a {
+        color: var(--muted);
+        font-size: 13px;
+        text-decoration: none;
+      }
+
+      .quick-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        row-gap: 16px;
+      }
+
+      .spotlight-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-auto-rows: minmax(88px, auto);
+        gap: 8px;
+      }
+
+      .spotlight-item {
+        min-height: 88px;
+        display: grid;
+        justify-items: center;
+        align-content: center;
+        gap: 7px;
+        padding: 10px 6px;
+        border-radius: 8px;
+        color: #875a32;
+        background:
+          linear-gradient(135deg, rgba(255, 255, 255, 0.82), rgba(255, 246, 236, 0.42)),
+          #fff0df;
+        text-decoration: none;
+        box-shadow:
+          inset 0 0 0 1px rgba(177, 104, 45, 0.08),
+          0 8px 16px rgba(125, 83, 45, 0.06);
+      }
+
+      .spotlight-item:nth-child(2n) {
+        color: #4f7c51;
+        background:
+          linear-gradient(135deg, rgba(255, 255, 255, 0.82), rgba(236, 248, 234, 0.5)),
+          #edf8eb;
+      }
+
+      .spotlight-item:nth-child(3n) {
+        color: #3f7281;
+        background:
+          linear-gradient(135deg, rgba(255, 255, 255, 0.82), rgba(231, 246, 250, 0.5)),
+          #eaf7fa;
+      }
+
+      .spotlight-item .spotlight-icon {
+        width: 34px;
+        height: 34px;
+        display: grid;
+        place-items: center;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.66);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.58);
+      }
+
+      .spotlight-item .spotlight-icon svg {
+        width: 22px;
+        height: 22px;
+        stroke-width: 2.1;
+      }
+
+      .spotlight-item strong,
+      .spotlight-copy,
+      .spotlight-copy span {
+        display: block;
+        min-width: 0;
+        text-align: center;
+        line-height: 1.18;
+      }
+
+      .spotlight-item strong {
+        font-size: 14px;
+      }
+
+      .spotlight-copy span {
+        margin-top: 4px;
+        color: rgba(84, 74, 67, 0.68);
+        font-size: 11px;
+      }
+
+      .quick-item {
+        display: grid;
+        justify-items: center;
+        gap: 7px;
+        min-width: 0;
+        color: var(--ink);
+        text-align: center;
+        text-decoration: none;
+      }
+
+      .quick-icon {
+        width: 42px;
+        height: 42px;
+        display: grid;
+        place-items: center;
+        border-radius: 8px;
+        color: var(--white);
+        box-shadow: 0 8px 18px rgba(28, 82, 96, 0.14);
+      }
+
+      .quick-icon svg {
+        width: 24px;
+        height: 24px;
+        stroke-width: 2.2;
+      }
+
+      .art-icon {
+        width: 56px;
+        height: 48px;
+        border-radius: 0;
+        background-image: url("assets/icons-lingnan-grid-clean-web.png");
+        background-repeat: no-repeat;
+        background-size: 400% 300%;
+        box-shadow: none;
+      }
+
+      .art-ship {
+        background-position: 0% 0%;
+      }
+
+      .art-hotel {
+        background-position: 33.333% 0%;
+      }
+
+      .art-island {
+        background-position: 66.666% 0%;
+      }
+
+      .art-chimelong {
+        background-position: 100% 0%;
+      }
+
+      .art-cable {
+        background-position: 0% 50%;
+      }
+
+      .art-heli {
+        background-position: 33.333% 50%;
+      }
+
+      .art-hk {
+        background-position: 66.666% 50%;
+      }
+
+      .art-macau {
+        background-position: 100% 50%;
+      }
+
+      .art-car {
+        background-position: 0% 100%;
+      }
+
+      .art-leisure {
+        background-position: 33.333% 100%;
+      }
+
+      .art-deal {
+        background-position: 66.666% 100%;
+      }
+
+      .art-service {
+        background-position: 100% 100%;
+      }
+
+      .quick-item span {
+        max-width: 72px;
+        font-size: 13px;
+        line-height: 1.2;
+        white-space: normal;
+      }
+
+      .promo {
+        margin: 10px 14px 0;
+        min-height: 98px;
+        padding: 16px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 12px;
+        border-radius: 8px;
+        overflow: hidden;
+        color: var(--white);
+        background:
+          linear-gradient(105deg, rgba(4, 28, 42, 0.9) 0%, rgba(8, 84, 107, 0.5) 52%, rgba(244, 178, 63, 0.44) 100%),
+          url("assets/macau-cruise-night-banner-web.jpg") center / cover;
+        box-shadow: var(--shadow);
+        text-decoration: none;
+      }
+
+      .promo strong {
+        display: block;
+        font-size: 22px;
+        line-height: 1.1;
+      }
+
+      .promo p {
+        margin: 7px 0 0;
+        color: rgba(255, 255, 255, 0.86);
+        font-size: 12px;
+        line-height: 1.5;
+      }
+
+      .promo-badge {
+        align-self: start;
+        padding: 5px 8px;
+        border-radius: 8px;
+        color: #442a03;
+        background: #ffd071;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .notice-strip {
+        margin: 10px 14px 0;
+        padding: 11px 12px;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        border-radius: 8px;
+        background: #fff8e9;
+        color: #74511c;
+        font-size: 13px;
+      }
+
+      .notice-strip b {
+        color: #b16c00;
+      }
+
+      .tabs {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        display: flex;
+        gap: 8px;
+        margin: 10px 0 0;
+        padding: 12px 14px;
+        overflow-x: auto;
+        background: rgba(237, 245, 247, 0.94);
+        backdrop-filter: blur(8px);
+        scrollbar-width: none;
+      }
+
+      .tabs::-webkit-scrollbar {
+        display: none;
+      }
+
+      .tab {
+        flex: 0 0 auto;
+        height: 34px;
+        padding: 0 13px;
+        border-radius: 8px;
+        color: var(--muted);
+        background: var(--white);
+        border: 1px solid var(--line);
+        font-size: 14px;
+      }
+
+      .tab.active {
+        color: var(--white);
+        background: var(--primary-dark);
+        border-color: var(--primary-dark);
+        font-weight: 700;
+      }
+
+      .products {
+        padding: 0 14px;
+      }
+
+      .product-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .product-card {
+        display: grid;
+        grid-template-columns: 112px minmax(0, 1fr);
+        align-items: start;
+        gap: 12px;
+        min-height: 118px;
+        padding: 10px;
+        border-radius: 8px;
+        background: var(--white);
+        box-shadow: 0 8px 20px rgba(10, 49, 70, 0.08);
+      }
+
+      .product-card[data-flow-link] {
+        cursor: pointer;
+      }
+
+      .product-card[data-flow-link]:focus-visible {
+        outline: 3px solid rgba(17, 159, 196, 0.36);
+        outline-offset: 2px;
+      }
+
+      .product-media {
+        position: relative;
+        align-self: start;
+        width: 100%;
+        min-height: 0;
+        aspect-ratio: 8 / 7;
+        overflow: hidden;
+        border-radius: 8px;
+        background: #d7e9ec;
+      }
+
+      .product-media img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: cover;
+        object-position: center center;
+      }
+
+      .product-tag {
+        position: absolute;
+        left: 7px;
+        top: 7px;
+        padding: 3px 6px;
+        border-radius: 6px;
+        color: var(--white);
+        background: rgba(8, 115, 147, 0.9);
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .product-info {
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .product-info h3 {
+        margin: 1px 0 6px;
+        font-size: 16px;
+        line-height: 1.28;
+      }
+
+      .product-info p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      .meta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin: 8px 0;
+      }
+
+      .meta-row span {
+        padding: 3px 6px;
+        border-radius: 6px;
+        color: var(--primary-dark);
+        background: #e9f7fa;
+        font-size: 11px;
+      }
+
+      .price-row {
+        margin-top: auto;
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .price {
+        color: #e65337;
+        font-weight: 800;
+        line-height: 1;
+      }
+
+      .price small {
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .price em {
+        font-size: 20px;
+        font-style: normal;
+      }
+
+      .reserve {
+        height: 30px;
+        min-width: 58px;
+        padding: 0 10px;
+        border-radius: 8px;
+        color: var(--white);
+        background: var(--pink);
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .admin-panel {
+        margin: 13px 14px 0;
+        padding: 14px;
+        border-radius: 8px;
+        background: #ffffff;
+        box-shadow: 0 8px 20px rgba(10, 49, 70, 0.08);
+      }
+
+      .admin-headline {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin: -2px 0 12px;
+      }
+
+      .admin-role {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 8px;
+        border-radius: 8px;
+        color: #7c4b00;
+        background: #fff1d1;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .admin-role svg {
+        width: 15px;
+        height: 15px;
+      }
+
+      .kpi-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .kpi-card {
+        padding: 12px;
+        border-radius: 8px;
+        background: #f4fafb;
+      }
+
+      .kpi-card.ticket-link {
+        width: 100%;
+        border: 0;
+        color: inherit;
+        text-align: left;
+        cursor: pointer;
+      }
+
+      .kpi-card.ticket-link:focus-visible {
+        outline: 3px solid rgba(17, 159, 196, 0.32);
+        outline-offset: 2px;
+      }
+
+      .kpi-card header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .kpi-card svg {
+        width: 18px;
+        height: 18px;
+        color: var(--primary-dark);
+      }
+
+      .kpi-value {
+        display: block;
+        margin-top: 8px;
+        font-size: 22px;
+        line-height: 1;
+        font-weight: 850;
+      }
+
+      .kpi-trend {
+        display: block;
+        margin-top: 7px;
+        color: #4b8a61;
+        font-size: 12px;
+      }
+
+      .ops-chart {
+        margin-top: 10px;
+        padding: 12px;
+        border-radius: 8px;
+        background: #172d3a;
+        color: var(--white);
+      }
+
+      .ops-chart h3 {
+        margin: 0 0 10px;
+        font-size: 15px;
+        line-height: 1.2;
+      }
+
+      .sync-row {
+        display: grid;
+        grid-template-columns: 78px 1fr 40px;
+        align-items: center;
+        gap: 8px;
+        margin-top: 8px;
+        font-size: 12px;
+      }
+
+      .sync-track {
+        height: 8px;
+        overflow: hidden;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.16);
+      }
+
+      .sync-fill {
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #28c2c8, #ffd071);
+      }
+
+      .module-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .module-tile {
+        display: grid;
+        grid-template-columns: 34px minmax(0, 1fr);
+        gap: 9px;
+        align-items: center;
+        min-height: 66px;
+        padding: 10px;
+        border-radius: 8px;
+        background: #f7fbfc;
+        text-align: left;
+      }
+
+      .module-tile i,
+      .module-tile svg {
+        width: 24px;
+        height: 24px;
+        color: var(--primary-dark);
+      }
+
+      .module-tile strong {
+        display: block;
+        color: var(--ink);
+        font-size: 14px;
+      }
+
+      .module-tile span {
+        display: block;
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.25;
+      }
+
+      .support-list {
+        display: grid;
+        gap: 10px;
+        margin: 0 14px;
+      }
+
+      .support-item {
+        display: grid;
+        grid-template-columns: 42px minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 10px;
+        min-height: 72px;
+        padding: 12px;
+        border-radius: 8px;
+        background: var(--white);
+        box-shadow: 0 8px 20px rgba(10, 49, 70, 0.08);
+      }
+
+      .support-icon {
+        width: 42px;
+        height: 42px;
+        display: grid;
+        place-items: center;
+        border-radius: 8px;
+        color: var(--white);
+        background: var(--primary);
+      }
+
+      .support-icon svg {
+        width: 23px;
+        height: 23px;
+      }
+
+      .support-item strong {
+        display: block;
+        font-size: 15px;
+      }
+
+      .support-item span {
+        display: block;
+        margin-top: 5px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.35;
+      }
+
+      .support-action {
+        min-width: 54px;
+        height: 30px;
+        border-radius: 8px;
+        color: var(--white);
+        background: var(--primary-dark);
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .profile-card {
+        margin: 0 14px 10px;
+        padding: 14px;
+        border-radius: 8px;
+        background: var(--white);
+        box-shadow: 0 8px 20px rgba(10, 49, 70, 0.08);
+      }
+
+      .profile-top {
+        display: grid;
+        grid-template-columns: 52px minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .avatar {
+        width: 52px;
+        height: 52px;
+        display: grid;
+        place-items: center;
+        border-radius: 8px;
+        color: var(--white);
+        background: linear-gradient(135deg, #0f8b8d, #226bb8);
+      }
+
+      .avatar svg {
+        width: 28px;
+        height: 28px;
+      }
+
+      .profile-top h2 {
+        margin: 0;
+        font-size: 18px;
+        line-height: 1.2;
+      }
+
+      .profile-top p {
+        margin: 6px 0 0;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .status-pill {
+        padding: 5px 8px;
+        border-radius: 8px;
+        color: #11623a;
+        background: #def8eb;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .relation-box {
+        margin-top: 12px;
+        padding: 11px;
+        border-radius: 8px;
+        background: #f7fbfc;
+      }
+
+      .relation-box strong {
+        display: block;
+        font-size: 14px;
+      }
+
+      .relation-box span {
+        display: block;
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.4;
+      }
+
+      .qr-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin: 0 14px 10px;
+      }
+
+      .qr-grid.single-qr {
+        grid-template-columns: 1fr;
+      }
+
+      .qr-grid.single-qr .qr-card {
+        display: grid;
+        grid-template-columns: 116px minmax(0, 1fr);
+        align-items: center;
+        gap: 12px;
+      }
+
+      .qr-grid.single-qr .fake-qr {
+        margin: 0;
+        grid-row: 1 / 4;
+      }
+
+      .qr-grid.single-qr .qr-card strong,
+      .qr-grid.single-qr .qr-card span {
+        grid-column: 2;
+        text-align: left;
+      }
+
+      .qr-grid.single-qr .qr-card button {
+        grid-column: 2;
+        margin-top: 0;
+      }
+
+      .qr-card {
+        padding: 12px;
+        border-radius: 8px;
+        background: var(--white);
+        box-shadow: 0 8px 20px rgba(10, 49, 70, 0.08);
+      }
+
+      .fake-qr {
+        width: 104px;
+        max-width: 100%;
+        aspect-ratio: 1;
+        margin: 0 auto 10px;
+        border: 8px solid #ffffff;
+        border-radius: 8px;
+        background:
+          linear-gradient(90deg, #172d3a 10px, transparent 10px) 0 0 / 22px 22px,
+          linear-gradient(#172d3a 10px, transparent 10px) 0 0 / 22px 22px,
+          linear-gradient(135deg, transparent 45%, #172d3a 46% 54%, transparent 55%) 0 0 / 18px 18px,
+          #eef6f7;
+        box-shadow: inset 0 0 0 1px var(--line);
+      }
+
+      .qr-card strong {
+        display: block;
+        font-size: 14px;
+        text-align: center;
+      }
+
+      .qr-card span {
+        display: block;
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.35;
+        text-align: center;
+      }
+
+      .qr-card button {
+        width: 100%;
+        height: 32px;
+        margin-top: 10px;
+        border-radius: 8px;
+        color: var(--white);
+        background: var(--primary-dark);
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .rule-list {
+        display: grid;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      .rule-item {
+        display: grid;
+        grid-template-columns: 24px minmax(0, 1fr);
+        gap: 8px;
+        align-items: start;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      .rule-item svg {
+        width: 18px;
+        height: 18px;
+        color: var(--primary-dark);
+      }
+
+      .driver-orders,
+      .passenger-orders {
+        margin: 0 14px 10px;
+        padding: 14px;
+        border-radius: 8px;
+        background: var(--white);
+        box-shadow: 0 8px 20px rgba(10, 49, 70, 0.08);
+      }
+
+      .order-filter {
+        display: flex;
+        gap: 7px;
+        margin: 0 0 10px;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+
+      .order-filter::-webkit-scrollbar {
+        display: none;
+      }
+
+      .order-filter button {
+        flex: 0 0 auto;
+        height: 30px;
+        padding: 0 10px;
+        border-radius: 8px;
+        color: var(--muted);
+        background: #f2f7f8;
+        font-size: 12px;
+      }
+
+      .order-filter button.active {
+        color: var(--white);
+        background: var(--primary-dark);
+        font-weight: 700;
+      }
+
+      .order-list {
+        display: grid;
+        gap: 9px;
+      }
+
+      .order-entry {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 44px minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 10px;
+        padding: 12px;
+        border: 1px solid rgba(13, 94, 118, 0.06);
+        border-radius: 8px;
+        background: var(--white);
+        box-shadow: 0 10px 26px rgba(10, 49, 70, 0.075);
+        text-align: left;
+      }
+
+      .order-entry-icon {
+        width: 44px;
+        height: 44px;
+        display: grid;
+        place-items: center;
+        border-radius: 8px;
+        color: var(--white);
+        background: linear-gradient(135deg, #12a8c7, #087393);
+      }
+
+      .order-entry-icon svg {
+        width: 24px;
+        height: 24px;
+      }
+
+      .order-entry strong,
+      .order-entry span {
+        display: block;
+      }
+
+      .order-entry strong {
+        color: var(--ink);
+        font-size: 16px;
+      }
+
+      .order-entry span {
+        margin-top: 5px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.35;
+      }
+
+      .order-entry > svg {
+        width: 18px;
+        height: 18px;
+        color: var(--muted);
+      }
+
+      .orders-page-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
+      }
+
+      .orders-page-head .back-to-mine {
+        width: 34px;
+        height: 34px;
+        display: grid;
+        place-items: center;
+        border-radius: 8px;
+        color: var(--white);
+        background: rgba(255, 255, 255, 0.18);
+      }
+
+      .orders-page-head .back-to-mine svg {
+        width: 19px;
+        height: 19px;
+      }
+
+      .order-card {
+        padding: 11px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fbfdfe;
+      }
+
+      .order-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .order-head strong {
+        min-width: 0;
+        font-size: 14px;
+        line-height: 1.25;
+      }
+
+      .order-status {
+        flex: 0 0 auto;
+        padding: 4px 7px;
+        border-radius: 8px;
+        color: #11623a;
+        background: #def8eb;
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .order-status.pending {
+        color: #7c4b00;
+        background: #fff1d1;
+      }
+
+      .order-status.refund {
+        color: #9b3b47;
+        background: #ffe8ec;
+      }
+
+      .order-meta {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 7px 10px;
+        margin-top: 9px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.35;
+      }
+
+      .order-meta b {
+        color: var(--ink);
+        font-weight: 700;
+      }
+
+      .order-foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-top: 10px;
+        padding-top: 9px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .commission {
+        color: #e65337;
+        font-size: 15px;
+        font-weight: 850;
+      }
+
+      .order-detail {
+        height: 28px;
+        padding: 0 10px;
+        border-radius: 8px;
+        color: var(--primary-dark);
+        background: #e9f7fa;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .bottom-nav {
+        position: fixed;
+        z-index: 20;
+        left: 50%;
+        bottom: 0;
+        width: min(100vw, 430px);
+        transform: translateX(-50%);
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        padding: 8px 8px calc(8px + env(safe-area-inset-bottom, 0));
+        border-top: 1px solid rgba(9, 50, 66, 0.08);
+        background: rgba(255, 255, 255, 0.96);
+        backdrop-filter: blur(12px);
+      }
+
+      .nav-item {
+        min-height: 50px;
+        display: grid;
+        place-items: center;
+        gap: 3px;
+        color: #66727a;
+        background: transparent;
+        font-size: 12px;
+      }
+
+      .nav-item svg {
+        width: 23px;
+        height: 23px;
+        stroke-width: 2.2;
+      }
+
+      .nav-item.active {
+        color: var(--primary);
+        font-weight: 700;
+      }
+
+      .toast {
+        position: fixed;
+        z-index: 30;
+        left: 50%;
+        bottom: calc(84px + env(safe-area-inset-bottom, 0));
+        width: max-content;
+        max-width: min(86vw, 360px);
+        transform: translate(-50%, 14px);
+        padding: 10px 14px;
+        border-radius: 8px;
+        color: var(--white);
+        background: rgba(17, 37, 48, 0.9);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease, transform 0.2s ease;
+        font-size: 13px;
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
+
+      /* Visual polish for customer-facing pages */
+      body {
+        background:
+          radial-gradient(circle at 18% 0%, rgba(17, 159, 196, 0.16), transparent 30%),
+          radial-gradient(circle at 84% 18%, rgba(242, 181, 68, 0.13), transparent 26%),
+          linear-gradient(180deg, #f9fcfd 0%, #dcecef 100%);
+      }
+
+      .page-shell {
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.28) 0, rgba(237, 245, 247, 0.94) 430px),
+          var(--page);
+      }
+
+      .hero {
+        height: 430px;
+        box-shadow: 0 16px 34px rgba(8, 71, 96, 0.16);
+        background: #bde7ee;
+      }
+
+      .hero::after {
+        background:
+          linear-gradient(180deg, rgba(3, 27, 35, 0.1) 0%, rgba(3, 27, 35, 0.02) 40%, rgba(3, 27, 35, 0.3) 100%),
+          linear-gradient(90deg, rgba(8, 66, 82, 0.2), transparent 58%);
+      }
+
+      .capsule {
+        background: rgba(7, 41, 55, 0.28);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+      }
+
+      .search-card {
+        border: 1px solid rgba(255, 255, 255, 0.62);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.62);
+        box-shadow: 0 12px 26px rgba(11, 45, 65, 0.12);
+        backdrop-filter: blur(16px);
+      }
+
+      .search-card button,
+      .reserve,
+      .qr-card button,
+      .support-action {
+        background: linear-gradient(135deg, #12a8c7, #087393);
+        box-shadow: 0 8px 18px rgba(17, 159, 196, 0.2);
+      }
+
+      .quick-sheet {
+        margin: 0;
+        border-radius: 18px 18px 8px 8px;
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 248, 239, 0.95)),
+          #fff;
+        box-shadow: 0 10px 26px rgba(10, 49, 70, 0.08);
+      }
+
+      .quick-icon {
+        border-radius: 8px;
+        box-shadow: 0 10px 18px rgba(28, 82, 96, 0.16);
+      }
+
+      .promo {
+        border: 1px solid rgba(255, 255, 255, 0.42);
+        box-shadow: 0 12px 28px rgba(42, 44, 54, 0.14);
+      }
+
+      .section-title h2::before {
+        content: "";
+        display: inline-block;
+        width: 4px;
+        height: 16px;
+        margin-right: 7px;
+        border-radius: 3px;
+        vertical-align: -2px;
+        background: linear-gradient(180deg, #f4b23f, #f15a2b);
+      }
+
+      .art-icon {
+        border-radius: 0;
+        background-color: transparent;
+        box-shadow: none;
+      }
+
+      .tab {
+        border-color: rgba(13, 94, 118, 0.06);
+        box-shadow: 0 5px 12px rgba(10, 49, 70, 0.05);
+      }
+
+      .product-card,
+      .profile-card,
+      .driver-orders,
+      .passenger-orders,
+      .admin-panel,
+      .support-item,
+      .qr-card {
+        border: 1px solid rgba(13, 94, 118, 0.06);
+        box-shadow: 0 10px 26px rgba(10, 49, 70, 0.075);
+      }
+
+      .product-media {
+        box-shadow: inset 0 0 0 1px rgba(13, 94, 118, 0.06);
+      }
+
+      .meta-row span,
+      .order-filter button,
+      .module-tile {
+        background: #f1fafb;
+      }
+
+      .bottom-nav {
+        box-shadow: 0 -10px 26px rgba(14, 48, 64, 0.08);
+      }
+
+      .nav-item.active {
+        color: var(--primary-dark);
+      }
+
+      @media (max-width: 360px) {
+        .hero {
+          height: 400px;
+        }
+
+        .hero-greeting {
+          top: 96px;
+          left: 16px;
+          max-width: 58%;
+        }
+
+        .hero-greeting span {
+          font-size: 26px;
+        }
+
+        .hero-greeting strong {
+          font-size: 44px;
+        }
+
+        .brand-lockup {
+          grid-template-columns: 34px minmax(0, 72px);
+        }
+
+        .brand-logo {
+          width: 34px;
+          height: 34px;
+        }
+
+        .brand-lockup strong {
+          font-size: 16px;
+        }
+
+        .brand-lockup span {
+          display: none;
+        }
+
+        .search-card {
+          width: min(180px, 50vw);
+        }
+
+        .spotlight-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          grid-auto-rows: minmax(84px, auto);
+          gap: 7px;
+        }
+
+        .spotlight-item {
+          gap: 6px;
+          min-height: 84px;
+          padding: 9px 5px;
+        }
+
+        .spotlight-item .spotlight-icon {
+          width: 30px;
+          height: 30px;
+        }
+
+        .spotlight-item strong {
+          font-size: 14px;
+        }
+
+        .spotlight-copy span {
+          font-size: 11px;
+        }
+
+        .product-card {
+          grid-template-columns: 98px minmax(0, 1fr);
+        }
+
+        .product-info h3 {
+          font-size: 15px;
+        }
+      }
+
+      @media (min-width: 431px) {
+        body {
+          padding: 28px 0;
+        }
+
+        .page-shell {
+          min-height: 860px;
+          border-radius: 26px;
+        }
+
+        .bottom-nav {
+          border-radius: 0 0 26px 26px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page-shell is-home">
+      <section class="hero" aria-label="九洲港至蛇口船票">
+        <div class="hero-slider" aria-hidden="true">
+          <div class="hero-slide active" data-title="珠海湾区漫游" data-subtitle="一屏看海岛、桥影与城市烟火">
+            <img src="assets/wechat_2026-06-20_150339_912.png" alt="" />
+          </div>
+          <div class="hero-slide" data-title="日月贝夜色" data-subtitle="城市灯火与海湾夜航同框">
+            <img src="assets/wechat_2026-06-20_150405_315.png" alt="" />
+          </div>
+          <div class="hero-slide" data-title="情侣路日落" data-subtitle="椰影海风，慢逛海滨黄昏">
+            <img src="assets/wechat_2026-06-20_150439_432.png" alt="" />
+          </div>
+        </div>
+        <div class="top-bar">
+          <div class="brand-lockup" aria-label="珠海湾游">
+            <svg class="brand-logo" viewBox="0 0 48 48" role="img" aria-label="珠海湾游标识">
+              <rect class="mark-bg" x="2" y="2" width="44" height="44" rx="14" />
+              <path class="mark-sea" d="M9 30c5-5 10-5 15 0s10 5 15 0v8H9z" />
+              <path class="mark-wave" d="M9 34c5-5 10-5 15 0s10 5 15 0v5H9z" />
+              <path class="mark-sun" d="M31 9a7 7 0 0 1 7 7c0 2.2-1 4.1-2.5 5.4L29.6 15c-1-1.1-.2-3.7 1.4-6z" />
+              <path class="mark-bridge" d="M13 28c6-8 16-11 25-8M28 17v12M34 20v10" />
+              <circle class="mark-pearl" cx="18" cy="18" r="6" />
+            </svg>
+            <div>
+              <strong>珠海湾游</strong>
+              <span>海上岭南 · 珠澳假期</span>
+            </div>
+          </div>
+          <form class="search-card" action="#">
+            <label>
+              <i data-lucide="search" aria-hidden="true"></i>
+              <input type="search" placeholder="搜索服务名称" />
+            </label>
+          </form>
+        </div>
+        <div class="hero-greeting" aria-label="您好，珠海">
+          <span>您好～</span>
+          <strong>珠海！</strong>
+        </div>
+        <div class="hero-carousel-copy" aria-label="首页轮播推荐">
+          <b>珠海湾区漫游</b>
+          <span>一屏看海岛、桥影与城市烟火</span>
+          <div class="hero-dots" aria-label="切换首页轮播">
+            <button class="active" type="button" aria-label="第 1 张轮播图"></button>
+            <button type="button" aria-label="第 2 张轮播图"></button>
+            <button type="button" aria-label="第 3 张轮播图"></button>
+          </div>
+        </div>
+      </section>
+
+      <section class="content">
+        <div class="app-page active" data-page="home">
+        <div class="quick-sheet">
+          <div class="section-title">
+            <h2>热门目的地</h2>
+            <a href="#all">全部分类</a>
+          </div>
+          <nav class="spotlight-grid" aria-label="珠海热门目的地">
+            <a class="spotlight-item" href="flow.html" data-direct-link data-name="九洲港船票">
+              <span class="spotlight-icon"><i data-lucide="ship" aria-hidden="true"></i></span>
+              <span class="spotlight-copy"><strong>九洲港船票</strong><span>蛇口航线</span></span>
+            </a>
+            <a class="spotlight-item" href="#" data-name="横琴长隆">
+              <span class="spotlight-icon"><i data-lucide="ticket" aria-hidden="true"></i></span>
+              <span class="spotlight-copy"><strong>横琴长隆</strong><span>亲子玩乐</span></span>
+            </a>
+            <a class="spotlight-item" href="#" data-name="海岛船票">
+              <span class="spotlight-icon"><i data-lucide="waves" aria-hidden="true"></i></span>
+              <span class="spotlight-copy"><strong>海岛船票</strong><span>东澳桂山</span></span>
+            </a>
+            <a class="spotlight-item" href="#" data-name="情侣路">
+              <span class="spotlight-icon"><i data-lucide="route" aria-hidden="true"></i></span>
+              <span class="spotlight-copy"><strong>情侣路漫游</strong><span>城市观景</span></span>
+            </a>
+            <a class="spotlight-item" href="#" data-name="珠海渔女">
+              <span class="spotlight-icon"><i data-lucide="map-pin" aria-hidden="true"></i></span>
+              <span class="spotlight-copy"><strong>珠海渔女</strong><span>地标打卡</span></span>
+            </a>
+            <a class="spotlight-item" href="#" data-name="港珠澳大桥">
+              <span class="spotlight-icon"><i data-lucide="landmark" aria-hidden="true"></i></span>
+              <span class="spotlight-copy"><strong>港珠澳桥</strong><span>湾区观光</span></span>
+            </a>
+          </nav>
+        </div>
+
+        <a class="promo" href="flow.html" data-direct-link aria-label="打开九洲港至蛇口船票购买页">
+          <div>
+            <strong>九洲港至蛇口船票</strong>
+            <p>九洲港出发，先选成人/儿童/长者人数，再查询接口真实可售船次</p>
+          </div>
+          <span class="promo-badge">立即购票</span>
+        </a>
+
+        <div class="tabs" role="tablist" aria-label="商品分类">
+          <button class="tab active" type="button" data-filter="all">推荐</button>
+          <button class="tab" type="button" data-filter="ship">船票</button>
+          <button class="tab" type="button" data-filter="hotel">酒店民宿</button>
+          <button class="tab" type="button" data-filter="tour">港澳游</button>
+          <button class="tab" type="button" data-filter="play">休闲娱乐</button>
+          <button class="tab" type="button" data-filter="car">接送租车</button>
+        </div>
+
+        <section class="products" id="all">
+          <div class="section-title">
+            <h2>精选商品</h2>
+            <a href="#">上新提醒</a>
+          </div>
+          <div class="product-list">
+            <article class="product-card" data-type="ship" data-flow-link="flow.html" role="link" tabindex="0" aria-label="打开九洲港至蛇口船票购买页">
+              <div class="product-media">
+                <img src="assets/macau-cruise-night-banner-web.jpg" alt="九洲港至蛇口船票" />
+                <span class="product-tag">热卖</span>
+              </div>
+              <div class="product-info">
+                <h3>九洲港至蛇口船票</h3>
+                <p>对接九洲港分销接口，真实航班、票价和锁票链路</p>
+                <div class="meta-row"><span>即时确认</span><span>可核销</span></div>
+                <div class="price-row">
+                  <div class="price"><small>¥</small><em>140</em><small>起</small></div>
+                  <button class="reserve" type="button" data-flow-link="flow.html">预订</button>
+                </div>
+              </div>
+            </article>
+
+            <article class="product-card" data-type="hotel">
+              <div class="product-media">
+                <img src="assets/zhuhai-bay-home-hero-web.jpg" alt="珠海澳门酒店套餐" />
+                <span class="product-tag">套餐</span>
+              </div>
+              <div class="product-info">
+                <h3>珠海横琴酒店双人套餐</h3>
+                <p>近长隆与口岸，含早餐，可加购接送服务</p>
+                <div class="meta-row"><span>库存同步</span><span>到店入住</span></div>
+                <div class="price-row">
+                  <div class="price"><small>¥</small><em>399</em><small>起</small></div>
+                  <button class="reserve" type="button">预订</button>
+                </div>
+              </div>
+            </article>
+
+            <article class="product-card" data-type="tour">
+              <div class="product-media">
+                <img src="assets/macau-cruise-night-banner-web.jpg" alt="香港澳门游" />
+                <span class="product-tag">定制</span>
+              </div>
+              <div class="product-info">
+                <h3>香港澳门一日游路线</h3>
+                <p>口岸集合，可选导游、用车、门票与酒店组合</p>
+                <div class="meta-row"><span>专属顾问</span><span>团队价</span></div>
+                <div class="price-row">
+                  <div class="price"><small>¥</small><em>268</em><small>起</small></div>
+                  <button class="reserve" type="button">咨询</button>
+                </div>
+              </div>
+            </article>
+
+            <article class="product-card" data-type="play">
+              <div class="product-media">
+                <img src="assets/ticket-wallet-illustration-web.jpg" alt="长隆及观光娱乐" />
+                <span class="product-tag">玩乐</span>
+              </div>
+              <div class="product-info">
+                <h3>长隆门票与石景山缆车</h3>
+                <p>亲子玩乐组合，支持单品或套票售卖</p>
+                <div class="meta-row"><span>电子票</span><span>自动结算</span></div>
+                <div class="price-row">
+                  <div class="price"><small>¥</small><em>128</em><small>起</small></div>
+                  <button class="reserve" type="button">查看</button>
+                </div>
+              </div>
+            </article>
+
+            <article class="product-card" data-type="car">
+              <div class="product-media">
+                <img src="assets/taxi-scan-illustration-web.jpg" alt="汽车租赁接送" />
+                <span class="product-tag">接送</span>
+              </div>
+              <div class="product-info">
+                <h3>珠港澳口岸接送租车</h3>
+                <p>商务车、包车半日游、机场码头接送</p>
+                <div class="meta-row"><span>车型可选</span><span>司导服务</span></div>
+                <div class="price-row">
+                  <div class="price"><small>¥</small><em>180</em><small>起</small></div>
+                  <button class="reserve" type="button">询价</button>
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        </div>
+
+        <div class="app-page" data-page="service">
+          <section class="page-heading">
+            <h1>客服中心</h1>
+            <p>售前咨询、订单售后、团队定制与紧急协助统一从这里进入。</p>
+          </section>
+          <div class="support-list">
+            <article class="support-item">
+              <span class="support-icon"><i data-lucide="message-circle"></i></span>
+              <div>
+                <strong>在线客服</strong>
+                <span>船票、酒店、长隆、港澳游售前咨询</span>
+              </div>
+              <button class="support-action" type="button">咨询</button>
+            </article>
+            <article class="support-item">
+              <span class="support-icon" style="background: #e59e24"><i data-lucide="clipboard-check"></i></span>
+              <div>
+                <strong>订单售后</strong>
+                <span>改期、退款、核销异常、入住问题处理</span>
+              </div>
+              <button class="support-action" type="button">提交</button>
+            </article>
+            <article class="support-item">
+              <span class="support-icon" style="background: #7c51b5"><i data-lucide="map-pinned"></i></span>
+              <div>
+                <strong>定制需求</strong>
+                <span>珠港澳私人订制、企业团建、车辆接送</span>
+              </div>
+              <button class="support-action" type="button">预约</button>
+            </article>
+          </div>
+        </div>
+
+        <div class="app-page" data-page="distribution">
+          <section class="page-heading">
+            <h1>分销中心</h1>
+            <p>超级管理员查看渠道业绩、佣金规则、结算提现与分销关系。</p>
+          </section>
+          <section class="admin-panel">
+            <div class="section-title">
+              <h2>分销看板</h2>
+              <a href="#">佣金明细</a>
+            </div>
+            <div class="admin-headline">
+              <span class="admin-role"><i data-lucide="shield-check"></i>超级管理员可见</span>
+              <span style="color: var(--muted); font-size: 12px">今日 10:30 更新</span>
+            </div>
+            <div class="kpi-grid">
+              <article class="kpi-card">
+                <header><span>分销订单</span><i data-lucide="clipboard-list"></i></header>
+                <strong class="kpi-value">126</strong>
+                <span class="kpi-trend">渠道占比 38%</span>
+              </article>
+              <article class="kpi-card">
+                <header><span>待结佣金</span><i data-lucide="hand-coins"></i></header>
+                <strong class="kpi-value">¥8.2k</strong>
+                <span class="kpi-trend">42 笔待入账</span>
+              </article>
+              <article class="kpi-card">
+                <header><span>分销员</span><i data-lucide="users-round"></i></header>
+                <strong class="kpi-value">284</strong>
+                <span class="kpi-trend">本周新增 17</span>
+              </article>
+              <article class="kpi-card">
+                <header><span>提现待审</span><i data-lucide="wallet-cards"></i></header>
+                <strong class="kpi-value">9</strong>
+                <span class="kpi-trend">预计 ¥3.6k</span>
+              </article>
+            </div>
+            <div class="ops-chart">
+              <h3>佣金结算进度</h3>
+              <div class="sync-row">
+                <span>已结算</span>
+                <span class="sync-track"><span class="sync-fill" style="width: 76%"></span></span>
+                <b>76%</b>
+              </div>
+              <div class="sync-row">
+                <span>待入账</span>
+                <span class="sync-track"><span class="sync-fill" style="width: 54%"></span></span>
+                <b>54%</b>
+              </div>
+              <div class="sync-row">
+                <span>待提现</span>
+                <span class="sync-track"><span class="sync-fill" style="width: 38%"></span></span>
+                <b>38%</b>
+              </div>
+            </div>
+            <div class="module-grid">
+              <button class="module-tile" type="button">
+                <i data-lucide="network"></i>
+                <span><strong>二级分销</strong><span>佣金规则、渠道关系</span></span>
+              </button>
+              <button class="module-tile" type="button">
+                <i data-lucide="wallet-cards"></i>
+                <span><strong>结算提现</strong><span>账单、周期、提现审核</span></span>
+              </button>
+            </div>
+          </section>
+        </div>
+
+        <div class="app-page" data-page="mine">
+          <section class="page-heading">
+            <h1>我的</h1>
+            <p>查看我的票券、订单状态、出行人和售后服务。</p>
+          </section>
+
+          <section class="profile-card">
+            <div class="profile-top">
+              <span class="avatar"><i data-lucide="user-round"></i></span>
+              <div>
+                <h2>珠海游客</h2>
+                <p>手机号：138****6321</p>
+              </div>
+              <span class="status-pill">已实名</span>
+            </div>
+            <div class="relation-box">
+              <strong>下一段行程：九洲港至蛇口船票</strong>
+              <span>6月21日 09:00 开航 · 九洲港客运码头 · 2 张成人票</span>
+            </div>
+            <div class="rule-list">
+              <div class="rule-item">
+                <i data-lucide="ticket-check"></i>
+                <span>可用票券：3 张</span>
+              </div>
+              <div class="rule-item">
+                <i data-lucide="clipboard-list"></i>
+                <span>近30天订单：5 笔</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="admin-panel">
+            <div class="section-title">
+              <h2>我的票券</h2>
+              <a href="#">票券夹</a>
+            </div>
+            <div class="kpi-grid">
+              <button class="kpi-card ticket-link" type="button" data-ticket-filter="pending">
+                <header><span>待使用</span><i data-lucide="ticket"></i></header>
+                <strong class="kpi-value">3</strong>
+                <span class="kpi-trend">船票、门票可核销</span>
+              </button>
+              <button class="kpi-card ticket-link" type="button" data-ticket-filter="refund">
+                <header><span>退款中</span><i data-lucide="rotate-ccw"></i></header>
+                <strong class="kpi-value">1</strong>
+                <span class="kpi-trend">售后处理中</span>
+              </button>
+            </div>
+          </section>
+
+          <section class="admin-panel">
+            <button class="order-entry" type="button" data-page-link="orders">
+              <span class="order-entry-icon"><i data-lucide="clipboard-list" aria-hidden="true"></i></span>
+              <span>
+                <strong>我的订单</strong>
+                <span>查看待使用、已预约、已完成和退款售后订单</span>
+              </span>
+              <i data-lucide="chevron-right" aria-hidden="true"></i>
+            </button>
+          </section>
+
+          <section class="admin-panel">
+            <div class="section-title">
+              <h2>常用服务</h2>
+              <a href="#">更多</a>
+            </div>
+            <div class="module-grid">
+              <button class="module-tile" type="button">
+                <i data-lucide="users-round"></i>
+                <span><strong>常用出行人</strong><span>实名信息、证件管理</span></span>
+              </button>
+              <button class="module-tile" type="button">
+                <i data-lucide="receipt-text"></i>
+                <span><strong>发票抬头</strong><span>企业抬头、开票记录</span></span>
+              </button>
+              <button class="module-tile" type="button">
+                <i data-lucide="headphones"></i>
+                <span><strong>售后进度</strong><span>退款、改期、投诉建议</span></span>
+              </button>
+              <button class="module-tile" type="button">
+                <i data-lucide="heart"></i>
+                <span><strong>我的收藏</strong><span>景点、酒店、路线</span></span>
+              </button>
+            </div>
+          </section>
+        </div>
+
+        <div class="app-page" data-page="orders">
+          <section class="page-heading">
+            <div class="orders-page-head">
+              <button class="back-to-mine" type="button" aria-label="返回我的">
+                <i data-lucide="chevron-left" aria-hidden="true"></i>
+              </button>
+              <div>
+                <h1>我的订单</h1>
+                <p>查看待使用、已预约、已完成和退款售后订单。</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="passenger-orders" id="passenger-order-list">
+            <div class="order-filter" aria-label="订单状态筛选">
+              <button class="active" type="button" data-order-filter="all">全部</button>
+              <button type="button" data-order-filter="pending">待使用</button>
+              <button type="button" data-order-filter="paid">已预约</button>
+              <button type="button" data-order-filter="completed">已完成</button>
+              <button type="button" data-order-filter="refund">退款售后</button>
+            </div>
+            <div class="order-list">
+              <article class="order-card" data-order-state="pending">
+                <div class="order-head">
+                  <strong>九洲港至蛇口船票</strong>
+                  <span class="order-status pending">待使用</span>
+                </div>
+                <div class="order-meta">
+                  <span>订单号：<b>ZH0608-1028</b></span>
+                  <span>出行日：<b>6月22日</b></span>
+                  <span>数量：<b>2 张成人票</b></span>
+                  <span>金额：<b>¥176</b></span>
+                </div>
+                <div class="order-foot">
+                  <span>凭电子票码到码头核销</span>
+                  <button class="order-detail" type="button">详情</button>
+                </div>
+              </article>
+
+              <article class="order-card" data-order-state="paid">
+                <div class="order-head">
+                  <strong>珠海横琴酒店双人套餐</strong>
+                  <span class="order-status pending">已预约</span>
+                </div>
+                <div class="order-meta">
+                  <span>订单号：<b>ZH0608-0995</b></span>
+                  <span>入住：<b>6月24日</b></span>
+                  <span>间夜：<b>1 间 1 晚</b></span>
+                  <span>金额：<b>¥399</b></span>
+                </div>
+                <div class="order-foot">
+                  <span>到店凭证件办理入住</span>
+                  <button class="order-detail" type="button">详情</button>
+                </div>
+              </article>
+
+              <article class="order-card" data-order-state="completed">
+                <div class="order-head">
+                  <strong>香港澳门一日游路线</strong>
+                  <span class="order-status">已完成</span>
+                </div>
+                <div class="order-meta">
+                  <span>订单号：<b>ZH0607-0842</b></span>
+                  <span>出行日：<b>6月18日</b></span>
+                  <span>人数：<b>2 成人</b></span>
+                  <span>金额：<b>¥536</b></span>
+                </div>
+                <div class="order-foot">
+                  <span>可查看行程回顾与发票</span>
+                  <button class="order-detail" type="button">详情</button>
+                </div>
+              </article>
+
+              <article class="order-card" data-order-state="refund">
+                <div class="order-head">
+                  <strong>长隆门票与石景山缆车</strong>
+                  <span class="order-status refund">退款中</span>
+                </div>
+                <div class="order-meta">
+                  <span>订单号：<b>ZH0607-0711</b></span>
+                  <span>申请：<b>6月19日</b></span>
+                  <span>数量：<b>2 张套票</b></span>
+                  <span>金额：<b>¥256</b></span>
+                </div>
+                <div class="order-foot">
+                  <span>预计1-3个工作日原路退回</span>
+                  <button class="order-detail" type="button">详情</button>
+                </div>
+              </article>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <nav class="bottom-nav" aria-label="底部导航">
+        <button class="nav-item active" type="button" data-page-target="home">
+          <i data-lucide="home"></i>
+          <span>首页</span>
+        </button>
+        <button class="nav-item" type="button" data-page-target="service">
+          <i data-lucide="headphones"></i>
+          <span>客服</span>
+        </button>
+        <button class="nav-item" type="button" data-page-target="mine">
+          <i data-lucide="user-round"></i>
+          <span>我的</span>
+        </button>
+      </nav>
+      <div class="toast" role="status" aria-live="polite"></div>
+    </main>
+
+    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+    <script>
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
+
+      const toast = document.querySelector(".toast");
+      let toastTimer;
+
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove("show"), 1600);
+      }
+
+      function switchPage(pageName) {
+        document.querySelectorAll(".app-page").forEach((page) => {
+          page.classList.toggle("active", page.dataset.page === pageName);
+        });
+        const navPageName = pageName === "orders" ? "mine" : pageName;
+        document.querySelectorAll(".nav-item").forEach((item) => {
+          item.classList.toggle("active", item.dataset.pageTarget === navPageName);
+        });
+        document.querySelector(".page-shell").classList.toggle("is-home", pageName === "home");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      const heroSlides = Array.from(document.querySelectorAll(".hero-slide"));
+      const heroDots = Array.from(document.querySelectorAll(".hero-dots button"));
+      const heroTitle = document.querySelector(".hero-carousel-copy b");
+      const heroSubtitle = document.querySelector(".hero-carousel-copy span");
+      let heroSlideIndex = 0;
+      let heroSlideTimer;
+
+      function showHeroSlide(index) {
+        if (!heroSlides.length) return;
+        heroSlideIndex = (index + heroSlides.length) % heroSlides.length;
+        const activeSlide = heroSlides[heroSlideIndex];
+
+        heroSlides.forEach((slide, slideIndex) => {
+          slide.classList.toggle("active", slideIndex === heroSlideIndex);
+        });
+        heroDots.forEach((dot, dotIndex) => {
+          dot.classList.toggle("active", dotIndex === heroSlideIndex);
+        });
+        heroTitle.textContent = activeSlide.dataset.title;
+        heroSubtitle.textContent = activeSlide.dataset.subtitle;
+      }
+
+      function startHeroCarousel() {
+        clearInterval(heroSlideTimer);
+        heroSlideTimer = setInterval(() => showHeroSlide(heroSlideIndex + 1), 4200);
+      }
+
+      heroDots.forEach((dot, index) => {
+        dot.addEventListener("click", () => {
+          showHeroSlide(index);
+          startHeroCarousel();
+        });
+      });
+
+      startHeroCarousel();
+
+      document.querySelector(".search-card").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const value = event.currentTarget.querySelector("input").value.trim();
+        showToast(value ? `搜索：${value}` : "请输入要查询的商品或服务");
+      });
+
+      document.querySelectorAll(".quick-item, .spotlight-item").forEach((item) => {
+        item.addEventListener("click", (event) => {
+          if (item.dataset.directLink !== undefined) return;
+          event.preventDefault();
+          if (item.dataset.pageLink) {
+            switchPage(item.dataset.pageLink);
+            return;
+          }
+          showToast(`进入：${item.dataset.name}`);
+        });
+      });
+
+      document.querySelectorAll("[data-flow-link]").forEach((item) => {
+        item.addEventListener("click", (event) => {
+          event.stopPropagation();
+          window.location.href = item.dataset.flowLink;
+        });
+        item.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            window.location.href = item.dataset.flowLink;
+          }
+        });
+      });
+
+      document.querySelectorAll(".nav-item").forEach((button) => {
+        button.addEventListener("click", () => {
+          switchPage(button.dataset.pageTarget);
+        });
+      });
+
+      document.querySelectorAll(".tab").forEach((tab) => {
+        tab.addEventListener("click", () => {
+          document.querySelectorAll(".tab").forEach((item) => item.classList.remove("active"));
+          tab.classList.add("active");
+          const filter = tab.dataset.filter;
+
+          document.querySelectorAll(".product-card").forEach((card) => {
+            const visible = filter === "all" || card.dataset.type === filter;
+            card.style.display = visible ? "grid" : "none";
+          });
+        });
+      });
+
+      function applyOrderFilter(filter) {
+        document.querySelectorAll(".order-filter button").forEach((item) => {
+          item.classList.toggle("active", item.dataset.orderFilter === filter);
+        });
+        document.querySelectorAll(".order-card").forEach((card) => {
+          const visible = filter === "all" || card.dataset.orderState === filter;
+          card.style.display = visible ? "block" : "none";
+        });
+      }
+
+      document.querySelectorAll(".order-filter button").forEach((button) => {
+        button.addEventListener("click", () => {
+          applyOrderFilter(button.dataset.orderFilter);
+        });
+      });
+
+      document.querySelector(".order-entry").addEventListener("click", () => {
+        applyOrderFilter("all");
+        switchPage("orders");
+      });
+
+      document.querySelectorAll("[data-ticket-filter]").forEach((button) => {
+        button.addEventListener("click", () => {
+          applyOrderFilter(button.dataset.ticketFilter);
+          switchPage("orders");
+        });
+      });
+
+      document.querySelector(".back-to-mine").addEventListener("click", () => {
+        switchPage("mine");
+      });
+
+      document.querySelectorAll(".reserve:not([data-flow-link]), .module-tile, .support-action, .qr-card button, .order-detail").forEach((button) => {
+        button.addEventListener("click", () => {
+          const text = button.textContent.trim();
+          showToast(`${text}功能预留`);
+        });
+      });
+    </script>
+  </body>
+</html>

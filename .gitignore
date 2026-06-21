@@ -1,3 +1,6 @@
+.DS_Store
+Thumbs.db
+
 # Binaries
 /tmp
 /server
@@ -16,10 +19,28 @@
 *.swp
 *.swo
 
-# Environment
+# Local secrets
 .env
-.env.local
-.env.production
+.env.*
+!.env.example
 
-# Dependencies
-vendor/
+# Dependencies and build output
+node_modules/
+dist/
+build/
+.cache/
+vendor/.parcel-cache/
+.vite/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editor/system files
+.idea/
+.vscode/
+*.swp
+>>>>>>> origin/main

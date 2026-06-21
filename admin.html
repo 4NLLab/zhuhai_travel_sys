@@ -1,0 +1,1258 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>超级管理员控制台</title>
+    <link rel="icon" href="data:," />
+    <style>
+      :root {
+        --primary: #0f8dad;
+        --primary-dark: #086d89;
+        --blue: #246fb2;
+        --green: #1f9661;
+        --orange: #f15a2b;
+        --gold: #f4b23f;
+        --ink: #14202a;
+        --muted: #697783;
+        --line: #e6edf1;
+        --page: #edf5f7;
+        --card: #fff;
+        --panel: #f7fbfc;
+        --shadow: 0 8px 22px rgba(18, 35, 45, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--ink);
+        background: #eaf2f4;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB",
+          "Microsoft YaHei", sans-serif;
+      }
+
+      button,
+      input,
+      select {
+        font: inherit;
+      }
+
+      button {
+        border: 0;
+        cursor: pointer;
+      }
+
+      .phone {
+        width: min(100vw, 430px);
+        min-height: 100vh;
+        margin: 0 auto;
+        background: var(--page);
+        overflow-x: hidden;
+        box-shadow: 0 0 0 1px rgba(20, 35, 45, 0.05), 0 24px 80px rgba(8, 45, 64, 0.18);
+      }
+
+      .top {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        padding: calc(10px + env(safe-area-inset-top, 0)) 14px 10px;
+        background: rgba(237, 245, 247, 0.94);
+        backdrop-filter: blur(12px);
+      }
+
+      .nav {
+        height: 42px;
+        display: grid;
+        grid-template-columns: 42px minmax(0, 1fr) 42px;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .icon-btn {
+        width: 38px;
+        height: 38px;
+        display: grid;
+        place-items: center;
+        color: var(--ink);
+        background: transparent;
+      }
+
+      .icon-btn svg {
+        width: 22px;
+        height: 22px;
+      }
+
+      .title {
+        overflow: hidden;
+        text-align: center;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 18px;
+        font-weight: 850;
+      }
+
+      .content {
+        padding: 0 14px calc(22px + env(safe-area-inset-bottom, 0));
+      }
+
+      .hero {
+        margin-bottom: 10px;
+        padding: 16px;
+        border-radius: 8px;
+        color: #fff;
+        background: linear-gradient(135deg, #0f8dad, #246fb2);
+        box-shadow: var(--shadow);
+      }
+
+      .hero h1 {
+        margin: 0;
+        font-size: 23px;
+        line-height: 1.2;
+      }
+
+      .hero p {
+        margin: 8px 0 0;
+        color: rgba(255, 255, 255, 0.88);
+        font-size: 13px;
+        line-height: 1.45;
+      }
+
+      .role-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-top: 14px;
+      }
+
+      .role {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 9px;
+        border-radius: 8px;
+        color: #704800;
+        background: #fff1d1;
+        font-size: 12px;
+        font-weight: 850;
+      }
+
+      .role svg {
+        width: 15px;
+        height: 15px;
+      }
+
+      .sync-time {
+        color: rgba(255, 255, 255, 0.82);
+        font-size: 12px;
+      }
+
+      .tabs {
+        position: sticky;
+        top: 62px;
+        z-index: 15;
+        display: flex;
+        gap: 8px;
+        margin: 0 -14px 10px;
+        padding: 10px 14px;
+        overflow-x: auto;
+        background: rgba(237, 245, 247, 0.94);
+        backdrop-filter: blur(10px);
+        scrollbar-width: none;
+      }
+
+      .tabs::-webkit-scrollbar {
+        display: none;
+      }
+
+      .tab {
+        flex: 0 0 auto;
+        height: 34px;
+        padding: 0 13px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: var(--muted);
+        background: #fff;
+        font-size: 14px;
+      }
+
+      .tab.active {
+        color: #fff;
+        background: var(--primary-dark);
+        border-color: var(--primary-dark);
+        font-weight: 850;
+      }
+
+      .section {
+        display: none;
+      }
+
+      .section.active {
+        display: block;
+      }
+
+      .card {
+        margin-bottom: 10px;
+        padding: 14px;
+        border-radius: 8px;
+        background: var(--card);
+        box-shadow: var(--shadow);
+      }
+
+      .section-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+
+      .section-head h2 {
+        margin: 0;
+        font-size: 19px;
+        line-height: 1.2;
+      }
+
+      .section-head a,
+      .hint {
+        color: var(--muted);
+        font-size: 13px;
+        text-decoration: none;
+      }
+
+      .kpi-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .kpi {
+        min-height: 96px;
+        padding: 12px;
+        border-radius: 8px;
+        background: var(--panel);
+      }
+
+      .kpi header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .kpi svg {
+        width: 18px;
+        height: 18px;
+        color: var(--primary-dark);
+      }
+
+      .kpi strong {
+        display: block;
+        margin-top: 9px;
+        font-size: 25px;
+        line-height: 1;
+      }
+
+      .kpi span {
+        display: block;
+        margin-top: 8px;
+        color: var(--green);
+        font-size: 12px;
+      }
+
+      .chart-panel {
+        margin-top: 10px;
+        padding: 12px;
+        border-radius: 8px;
+        color: #fff;
+        background: #172d3a;
+      }
+
+      .chart-panel h3 {
+        margin: 0 0 12px;
+        font-size: 16px;
+      }
+
+      .bar-row {
+        display: grid;
+        grid-template-columns: 82px 1fr 44px;
+        align-items: center;
+        gap: 9px;
+        margin-top: 10px;
+        font-size: 12px;
+      }
+
+      .bar-track {
+        height: 9px;
+        overflow: hidden;
+        border-radius: 9px;
+        background: rgba(255, 255, 255, 0.16);
+      }
+
+      .bar-fill {
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #28c2c8, #ffd071);
+      }
+
+      .line-chart {
+        width: 100%;
+        height: 132px;
+        margin-top: 6px;
+      }
+
+      .line-chart text {
+        fill: rgba(255, 255, 255, 0.68);
+        font-size: 11px;
+      }
+
+      .config-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .config-item {
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fbfdfe;
+      }
+
+      .config-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .config-title strong {
+        font-size: 15px;
+      }
+
+      .value-pill {
+        padding: 4px 7px;
+        border-radius: 8px;
+        color: var(--primary-dark);
+        background: #e9f7fa;
+        font-size: 12px;
+        font-weight: 850;
+      }
+
+      .range-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 70px;
+        gap: 10px;
+        align-items: center;
+        margin-top: 12px;
+      }
+
+      input[type="range"] {
+        width: 100%;
+        accent-color: var(--primary);
+      }
+
+      .num-input {
+        width: 100%;
+        height: 34px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: var(--ink);
+        background: #fff;
+        text-align: center;
+        font-weight: 850;
+      }
+
+      .form-grid {
+        display: grid;
+        gap: 10px;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 92px minmax(0, 1fr);
+        align-items: center;
+        gap: 10px;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .form-row:last-child {
+        border-bottom: 0;
+      }
+
+      .form-row label {
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .form-row input,
+      .form-row select {
+        width: 100%;
+        height: 36px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 0 10px;
+        color: var(--ink);
+        background: #fff;
+      }
+
+      .banner-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .banner-item {
+        display: grid;
+        grid-template-columns: 118px minmax(0, 1fr);
+        gap: 12px;
+        padding: 10px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fbfdfe;
+      }
+
+      .banner-img {
+        width: 118px;
+        min-height: 76px;
+        overflow: hidden;
+        border-radius: 8px;
+        background: #d9ebee;
+      }
+
+      .banner-img img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: cover;
+      }
+
+      .banner-item h3 {
+        margin: 0;
+        font-size: 15px;
+        line-height: 1.25;
+      }
+
+      .banner-item p {
+        margin: 7px 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.35;
+      }
+
+      .button-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .mini-btn {
+        height: 30px;
+        padding: 0 10px;
+        border-radius: 8px;
+        color: var(--primary-dark);
+        background: #e9f7fa;
+        font-size: 12px;
+        font-weight: 850;
+      }
+
+      .mini-btn.dark {
+        color: #fff;
+        background: var(--primary-dark);
+      }
+
+      .upload-box {
+        display: grid;
+        grid-template-columns: 42px minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 10px;
+        padding: 12px;
+        border: 1px dashed #b9d7df;
+        border-radius: 8px;
+        background: #f7fcfd;
+      }
+
+      .upload-icon {
+        width: 42px;
+        height: 42px;
+        display: grid;
+        place-items: center;
+        border-radius: 8px;
+        color: #fff;
+        background: linear-gradient(135deg, var(--primary), var(--blue));
+      }
+
+      .order-list {
+        display: grid;
+        gap: 9px;
+      }
+
+      .order {
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fbfdfe;
+      }
+
+      .order-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .order-head strong {
+        min-width: 0;
+        font-size: 15px;
+        line-height: 1.25;
+      }
+
+      .status {
+        flex: 0 0 auto;
+        padding: 4px 7px;
+        border-radius: 8px;
+        color: var(--green);
+        background: #e4f8ee;
+        font-size: 11px;
+        font-weight: 850;
+      }
+
+      .order-meta {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 7px 10px;
+        margin-top: 9px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.35;
+      }
+
+      .order-meta b {
+        color: var(--ink);
+      }
+
+      .order-foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-top: 10px;
+        padding-top: 9px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .amount {
+        color: var(--orange);
+        font-size: 16px;
+        font-weight: 850;
+      }
+
+      .payout-summary {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+
+      .payout-stat {
+        min-height: 78px;
+        padding: 12px;
+        border-radius: 8px;
+        background: var(--panel);
+      }
+
+      .payout-stat span {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .payout-stat strong {
+        display: block;
+        margin-top: 8px;
+        font-size: 21px;
+        line-height: 1;
+      }
+
+      .batch-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .batch {
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fbfdfe;
+      }
+
+      .batch-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .batch-head strong {
+        display: block;
+        font-size: 15px;
+        line-height: 1.28;
+      }
+
+      .batch-head span {
+        display: block;
+        margin-top: 5px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .status.warn {
+        color: #8a5a00;
+        background: #fff1d1;
+      }
+
+      .status.error {
+        color: #9b3b47;
+        background: #ffe8ec;
+      }
+
+      .batch-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      .batch-cell {
+        padding: 8px;
+        border-radius: 8px;
+        background: #f2f8fa;
+      }
+
+      .batch-cell span {
+        display: block;
+        color: var(--muted);
+        font-size: 11px;
+      }
+
+      .batch-cell strong {
+        display: block;
+        margin-top: 5px;
+        font-size: 14px;
+      }
+
+      .detail-toggle {
+        width: 100%;
+        height: 34px;
+        margin-top: 10px;
+        border-radius: 8px;
+        color: var(--primary-dark);
+        background: #e9f7fa;
+        font-size: 13px;
+        font-weight: 850;
+      }
+
+      .payout-details {
+        display: none;
+        margin-top: 10px;
+        border-top: 1px solid var(--line);
+        padding-top: 10px;
+      }
+
+      .payout-details.open {
+        display: grid;
+        gap: 8px;
+      }
+
+      .driver-payout {
+        padding: 10px;
+        border-radius: 8px;
+        background: #fff;
+        border: 1px solid var(--line);
+      }
+
+      .driver-payout h4 {
+        margin: 0 0 8px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        font-size: 14px;
+      }
+
+      .driver-payout dl {
+        display: grid;
+        grid-template-columns: 76px minmax(0, 1fr);
+        gap: 6px 8px;
+        margin: 0;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .driver-payout dt,
+      .driver-payout dd {
+        margin: 0;
+      }
+
+      .driver-payout dd {
+        color: var(--ink);
+        font-weight: 650;
+      }
+
+      .save-bar {
+        position: sticky;
+        bottom: 0;
+        z-index: 12;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin: 12px -14px 0;
+        padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0));
+        background: rgba(255, 255, 255, 0.96);
+        border-top: 1px solid rgba(10, 26, 35, 0.08);
+        backdrop-filter: blur(12px);
+      }
+
+      .save-bar button {
+        height: 42px;
+        border-radius: 8px;
+        font-weight: 850;
+      }
+
+      .save-bar .ghost {
+        color: var(--primary-dark);
+        background: #e9f7fa;
+      }
+
+      .save-bar .solid {
+        color: #fff;
+        background: var(--orange);
+      }
+
+      .toast {
+        position: fixed;
+        z-index: 30;
+        left: 50%;
+        bottom: calc(84px + env(safe-area-inset-bottom, 0));
+        width: max-content;
+        max-width: min(86vw, 360px);
+        transform: translate(-50%, 14px);
+        padding: 10px 14px;
+        border-radius: 8px;
+        color: #fff;
+        background: rgba(17, 37, 48, 0.9);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease, transform 0.2s ease;
+        font-size: 13px;
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
+
+      @media (max-width: 360px) {
+        .banner-item {
+          grid-template-columns: 96px minmax(0, 1fr);
+        }
+
+        .banner-img {
+          width: 96px;
+        }
+
+        .kpi strong {
+          font-size: 22px;
+        }
+      }
+
+      @media (min-width: 431px) {
+        body {
+          padding: 28px 0;
+        }
+
+        .phone {
+          min-height: 860px;
+          border-radius: 26px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="phone">
+      <header class="top">
+        <nav class="nav">
+          <button class="icon-btn" type="button" aria-label="返回"><i data-lucide="chevron-left"></i></button>
+          <div class="title">超级管理员控制台</div>
+          <button class="icon-btn" type="button" aria-label="通知"><i data-lucide="bell"></i></button>
+        </nav>
+      </header>
+
+      <div class="content">
+        <section class="hero">
+          <h1>运营管理</h1>
+          <p>配置司机推广提成、手机端轮播图、交易监控、订单与自动发放。</p>
+          <div class="role-row">
+            <span class="role"><i data-lucide="shield-check"></i>超级管理员</span>
+            <span class="sync-time">今日 14:30 更新</span>
+          </div>
+        </section>
+
+        <nav class="tabs" aria-label="后台模块">
+          <button class="tab active" type="button" data-target="dashboard">看板</button>
+          <button class="tab" type="button" data-target="params">参数</button>
+          <button class="tab" type="button" data-target="banners">页面配置</button>
+          <button class="tab" type="button" data-target="payouts">提成</button>
+          <button class="tab" type="button" data-target="orders">订单</button>
+        </nav>
+
+        <section class="section active" data-section="dashboard">
+          <section class="card">
+            <div class="section-head">
+              <h2>今日数据</h2>
+              <a href="#">详情</a>
+            </div>
+            <div class="kpi-grid">
+              <article class="kpi">
+                <header><span>成功交易</span><i data-lucide="receipt-text"></i></header>
+                <strong>326</strong>
+                <span>较昨日 +18.6%</span>
+              </article>
+              <article class="kpi">
+                <header><span>交易金额</span><i data-lucide="circle-dollar-sign"></i></header>
+                <strong>¥42.8k</strong>
+                <span>船票占比 46%</span>
+              </article>
+              <article class="kpi">
+                <header><span>扫码转化率</span><i data-lucide="scan-line"></i></header>
+                <strong>12.4%</strong>
+                <span>车座码进线 2,634</span>
+              </article>
+              <article class="kpi">
+                <header><span>待核销</span><i data-lucide="qr-code"></i></header>
+                <strong>89</strong>
+                <span>异常 2 单</span>
+              </article>
+            </div>
+
+            <div class="chart-panel">
+              <h3>近 7 日交易趋势</h3>
+              <svg class="line-chart" viewBox="0 0 360 132" role="img" aria-label="近七日交易折线图">
+                <line x1="20" y1="104" x2="340" y2="104" stroke="rgba(255,255,255,.16)" />
+                <line x1="20" y1="68" x2="340" y2="68" stroke="rgba(255,255,255,.12)" />
+                <line x1="20" y1="32" x2="340" y2="32" stroke="rgba(255,255,255,.12)" />
+                <polyline
+                  points="24,92 76,76 128,82 180,48 232,56 284,32 336,42"
+                  fill="none"
+                  stroke="#ffd071"
+                  stroke-width="4"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <polyline
+                  points="24,102 76,88 128,94 180,68 232,72 284,52 336,58"
+                  fill="none"
+                  stroke="#28c2c8"
+                  stroke-width="4"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <text x="20" y="126">06-12</text>
+                <text x="294" y="126">06-18</text>
+              </svg>
+              <div class="bar-row">
+                <span>船票交易</span>
+                <span class="bar-track"><span class="bar-fill" style="width: 86%"></span></span>
+                <b>86%</b>
+              </div>
+              <div class="bar-row">
+                <span>酒店套餐</span>
+                <span class="bar-track"><span class="bar-fill" style="width: 62%"></span></span>
+                <b>62%</b>
+              </div>
+              <div class="bar-row">
+                <span>休闲娱乐</span>
+                <span class="bar-track"><span class="bar-fill" style="width: 38%"></span></span>
+                <b>38%</b>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <section class="section" data-section="params">
+          <section class="card">
+            <div class="section-head">
+              <h2>提成参数</h2>
+              <span class="hint">当前一级推广</span>
+            </div>
+            <div class="config-list">
+              <article class="config-item">
+                <div class="config-title">
+                  <strong>司机推广提成</strong>
+                  <span class="value-pill">8%</span>
+                </div>
+                <div class="range-row">
+                  <input type="range" min="0" max="20" value="8" />
+                  <input class="num-input" value="8%" />
+                </div>
+              </article>
+              <article class="config-item">
+                <div class="config-title">
+                  <strong>平台服务费</strong>
+                  <span class="value-pill">3%</span>
+                </div>
+                <div class="range-row">
+                  <input type="range" min="0" max="10" value="3" />
+                  <input class="num-input" value="3%" />
+                </div>
+              </article>
+              <article class="config-item">
+                <div class="config-title">
+                  <strong>退款佣金冻结期</strong>
+                  <span class="value-pill">24 小时</span>
+                </div>
+                <div class="range-row">
+                  <input type="range" min="0" max="72" value="24" />
+                  <input class="num-input" value="24h" />
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="section-head">
+              <h2>结算规则</h2>
+              <span class="hint">保存后生效</span>
+            </div>
+            <div class="form-grid">
+              <div class="form-row">
+                <label>结算周期</label>
+                <select>
+                  <option>核销后 T+1</option>
+                  <option>核销后 T+3</option>
+                  <option>每周统一结算</option>
+                </select>
+              </div>
+              <div class="form-row">
+                <label>最低提现</label>
+                <input value="100 元" />
+              </div>
+              <div class="form-row">
+                <label>异常处理</label>
+                <select>
+                  <option>退款自动冻结收益</option>
+                  <option>人工审核后冻结</option>
+                </select>
+              </div>
+            </div>
+          </section>
+          <div class="save-bar">
+            <button class="ghost" type="button">重置</button>
+            <button class="solid" type="button">保存参数</button>
+          </div>
+        </section>
+
+        <section class="section" data-section="banners">
+          <section class="card">
+            <div class="section-head">
+              <h2>手机端轮播图</h2>
+              <a href="#">预览首页</a>
+            </div>
+            <div class="banner-list">
+              <article class="banner-item">
+                <div class="banner-img">
+                  <img src="assets/zhuhai-macau-reference.jpg" alt="澳门环岛游轮播图" />
+                </div>
+                <div>
+                  <h3>澳门环岛游夜景船票</h3>
+                  <p>展示位置：首页顶部第 1 张 · 状态：启用</p>
+                  <div class="button-row">
+                    <button class="mini-btn dark" type="button">替换图片</button>
+                    <button class="mini-btn" type="button">编辑跳转</button>
+                    <button class="mini-btn" type="button">下架</button>
+                  </div>
+                </div>
+              </article>
+              <article class="banner-item">
+                <div class="banner-img" style="background: linear-gradient(135deg, #f4b23f, #f15a2b)"></div>
+                <div>
+                  <h3>长隆门票暑期活动</h3>
+                  <p>展示位置：首页顶部第 2 张 · 状态：草稿</p>
+                  <div class="button-row">
+                    <button class="mini-btn dark" type="button">上传图片</button>
+                    <button class="mini-btn" type="button">配置商品</button>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="section-head">
+              <h2>新增轮播</h2>
+              <span class="hint">建议 750 x 420</span>
+            </div>
+            <div class="upload-box">
+              <span class="upload-icon"><i data-lucide="image-plus"></i></span>
+              <div>
+                <strong>上传用户端首页图像</strong>
+                <div class="hint" style="margin-top: 4px">支持景点、酒店、船票专题图</div>
+              </div>
+              <button class="mini-btn dark" type="button">选择</button>
+            </div>
+            <div class="form-grid" style="margin-top: 10px">
+              <div class="form-row">
+                <label>跳转类型</label>
+                <select>
+                  <option>商品详情页</option>
+                  <option>分类列表</option>
+                  <option>活动专题</option>
+                </select>
+              </div>
+              <div class="form-row">
+                <label>绑定商品</label>
+                <input value="澳门环岛游夜景船票" />
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <section class="section" data-section="payouts">
+          <section class="card">
+            <div class="section-head">
+              <h2>自动发放提成</h2>
+              <span class="hint">按核销后 T+1 计算</span>
+            </div>
+            <div class="payout-summary">
+              <div class="payout-stat">
+                <span>本周已发放</span>
+                <strong>¥12,860</strong>
+              </div>
+              <div class="payout-stat">
+                <span>待发放</span>
+                <strong>¥3,420</strong>
+              </div>
+              <div class="payout-stat">
+                <span>覆盖司机</span>
+                <strong>186</strong>
+              </div>
+              <div class="payout-stat">
+                <span>异常记录</span>
+                <strong style="color: #d94b3d">3</strong>
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="section-head">
+              <h2>发放批次</h2>
+              <a href="#">结算规则</a>
+            </div>
+            <div class="batch-list">
+              <article class="batch">
+                <div class="batch-head">
+                  <div>
+                    <strong>批次 JS20260618-1430</strong>
+                    <span>系统自动发放 · 今日 14:30</span>
+                  </div>
+                  <span class="status">已完成</span>
+                </div>
+                <div class="batch-grid">
+                  <div class="batch-cell"><span>司机数</span><strong>42</strong></div>
+                  <div class="batch-cell"><span>订单数</span><strong>126</strong></div>
+                  <div class="batch-cell"><span>发放额</span><strong>¥4,286</strong></div>
+                </div>
+                <button class="detail-toggle" type="button">查看明细</button>
+                <div class="payout-details">
+                  <div class="driver-payout">
+                    <h4>粤C·T2688 / A司机 <span class="status">已发放</span></h4>
+                    <dl>
+                      <dt>关联订单</dt><dd>ZH0618-1028 等 5 单</dd>
+                      <dt>核销时间</dt><dd>2026-06-18 12:06</dd>
+                      <dt>提成参数</dt><dd>司机推广提成 8%</dd>
+                      <dt>发放金额</dt><dd>¥46.40</dd>
+                    </dl>
+                  </div>
+                  <div class="driver-payout">
+                    <h4>粤C·K9120 / 陈司机 <span class="status">已发放</span></h4>
+                    <dl>
+                      <dt>关联订单</dt><dd>ZH0618-0842 等 3 单</dd>
+                      <dt>核销时间</dt><dd>2026-06-18 11:42</dd>
+                      <dt>提成参数</dt><dd>司机推广提成 8%</dd>
+                      <dt>发放金额</dt><dd>¥128.64</dd>
+                    </dl>
+                  </div>
+                </div>
+              </article>
+
+              <article class="batch">
+                <div class="batch-head">
+                  <div>
+                    <strong>批次 JS20260618-0900</strong>
+                    <span>系统自动发放 · 今日 09:00</span>
+                  </div>
+                  <span class="status warn">处理中</span>
+                </div>
+                <div class="batch-grid">
+                  <div class="batch-cell"><span>司机数</span><strong>31</strong></div>
+                  <div class="batch-cell"><span>订单数</span><strong>88</strong></div>
+                  <div class="batch-cell"><span>预计额</span><strong>¥2,930</strong></div>
+                </div>
+                <button class="detail-toggle" type="button">查看明细</button>
+                <div class="payout-details">
+                  <div class="driver-payout">
+                    <h4>粤C·M5521 / 李司机 <span class="status warn">待发放</span></h4>
+                    <dl>
+                      <dt>关联订单</dt><dd>ZH0618-0662 等 4 单</dd>
+                      <dt>核销时间</dt><dd>2026-06-18 08:12</dd>
+                      <dt>提成参数</dt><dd>司机推广提成 8%</dd>
+                      <dt>预计金额</dt><dd>¥72.00</dd>
+                    </dl>
+                  </div>
+                </div>
+              </article>
+
+              <article class="batch">
+                <div class="batch-head">
+                  <div>
+                    <strong>批次 JS20260617-2300</strong>
+                    <span>系统自动发放 · 昨日 23:00</span>
+                  </div>
+                  <span class="status error">部分异常</span>
+                </div>
+                <div class="batch-grid">
+                  <div class="batch-cell"><span>司机数</span><strong>27</strong></div>
+                  <div class="batch-cell"><span>订单数</span><strong>73</strong></div>
+                  <div class="batch-cell"><span>异常</span><strong>3</strong></div>
+                </div>
+                <button class="detail-toggle" type="button">查看明细</button>
+                <div class="payout-details">
+                  <div class="driver-payout">
+                    <h4>粤C·P7810 / 王司机 <span class="status error">账户异常</span></h4>
+                    <dl>
+                      <dt>关联订单</dt><dd>ZH0617-0918</dd>
+                      <dt>核销时间</dt><dd>2026-06-17 20:36</dd>
+                      <dt>提成参数</dt><dd>司机推广提成 8%</dd>
+                      <dt>待处理</dt><dd>收款账户未完成实名</dd>
+                    </dl>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </section>
+        </section>
+
+        <section class="section" data-section="orders">
+          <section class="card">
+            <div class="section-head">
+              <h2>最近成功交易</h2>
+              <a href="#">导出</a>
+            </div>
+            <div class="order-list">
+              <article class="order">
+                <div class="order-head">
+                  <strong>澳门环岛游夜景船票</strong>
+                  <span class="status">支付成功</span>
+                </div>
+                <div class="order-meta">
+                  <span>订单号：<b>ZH0618-1028</b></span>
+                  <span>来源：<b>车座码</b></span>
+                  <span>司机：<b>粤C·T2688</b></span>
+                  <span>用户：<b>尾号 6928</b></span>
+                </div>
+                <div class="order-foot">
+                  <span>14:26:33 · 待核销</span>
+                  <strong class="amount">¥88</strong>
+                </div>
+              </article>
+              <article class="order">
+                <div class="order-head">
+                  <strong>珠海横琴酒店双人套餐</strong>
+                  <span class="status">支付成功</span>
+                </div>
+                <div class="order-meta">
+                  <span>订单号：<b>ZH0618-0995</b></span>
+                  <span>来源：<b>首页搜索</b></span>
+                  <span>司机：<b>无</b></span>
+                  <span>用户：<b>尾号 8097</b></span>
+                </div>
+                <div class="order-foot">
+                  <span>14:18:02 · 待入住</span>
+                  <strong class="amount">¥399</strong>
+                </div>
+              </article>
+              <article class="order">
+                <div class="order-head">
+                  <strong>香港澳门一日游路线</strong>
+                  <span class="status">支付成功</span>
+                </div>
+                <div class="order-meta">
+                  <span>订单号：<b>ZH0618-0842</b></span>
+                  <span>来源：<b>车座码</b></span>
+                  <span>司机：<b>粤C·K9120</b></span>
+                  <span>用户：<b>尾号 2160</b></span>
+                </div>
+                <div class="order-foot">
+                  <span>14:03:55 · 已确认</span>
+                  <strong class="amount">¥536</strong>
+                </div>
+              </article>
+            </div>
+          </section>
+        </section>
+      </div>
+
+      <div class="toast" role="status" aria-live="polite"></div>
+    </main>
+
+    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+    <script>
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
+
+      const toast = document.querySelector(".toast");
+      let toastTimer;
+
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove("show"), 1400);
+      }
+
+      document.querySelectorAll(".tab").forEach((tab) => {
+        tab.addEventListener("click", () => {
+          document.querySelectorAll(".tab").forEach((item) => item.classList.remove("active"));
+          document.querySelectorAll(".section").forEach((section) => section.classList.remove("active"));
+          tab.classList.add("active");
+          document.querySelector(`[data-section="${tab.dataset.target}"]`).classList.add("active");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+      });
+
+      document.querySelectorAll(".detail-toggle").forEach((button) => {
+        button.addEventListener("click", () => {
+          const details = button.nextElementSibling;
+          details.classList.toggle("open");
+          button.textContent = details.classList.contains("open") ? "收起明细" : "查看明细";
+        });
+      });
+
+      document.querySelectorAll("button:not(.tab):not(.detail-toggle)").forEach((button) => {
+        button.addEventListener("click", () => {
+          const text = button.textContent.trim() || button.getAttribute("aria-label") || "操作";
+          showToast(`${text}功能预留`);
+        });
+      });
+    </script>
+  </body>
+</html>
