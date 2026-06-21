@@ -613,6 +613,7 @@
           linear-gradient(105deg, rgba(4, 28, 42, 0.9) 0%, rgba(8, 84, 107, 0.5) 52%, rgba(244, 178, 63, 0.44) 100%),
           url("assets/macau-cruise-night-banner-web.jpg") center / cover;
         box-shadow: var(--shadow);
+        text-decoration: none;
       }
 
       .promo strong {
@@ -709,6 +710,15 @@
         border-radius: 8px;
         background: var(--white);
         box-shadow: 0 8px 20px rgba(10, 49, 70, 0.08);
+      }
+
+      .product-card[data-flow-link] {
+        cursor: pointer;
+      }
+
+      .product-card[data-flow-link]:focus-visible {
+        outline: 3px solid rgba(17, 159, 196, 0.36);
+        outline-offset: 2px;
       }
 
       .product-media {
@@ -854,6 +864,19 @@
         padding: 12px;
         border-radius: 8px;
         background: #f4fafb;
+      }
+
+      .kpi-card.ticket-link {
+        width: 100%;
+        border: 0;
+        color: inherit;
+        text-align: left;
+        cursor: pointer;
+      }
+
+      .kpi-card.ticket-link:focus-visible {
+        outline: 3px solid rgba(17, 159, 196, 0.32);
+        outline-offset: 2px;
       }
 
       .kpi-card header {
@@ -1660,7 +1683,7 @@
   </head>
   <body>
     <main class="page-shell is-home">
-      <section class="hero" aria-label="珠海澳门环岛游">
+      <section class="hero" aria-label="九洲港至蛇口船票">
         <div class="hero-slider" aria-hidden="true">
           <div class="hero-slide active" data-title="珠海湾区漫游" data-subtitle="一屏看海岛、桥影与城市烟火">
             <img src="assets/wechat_2026-06-20_150339_912.png" alt="" />
@@ -1717,9 +1740,9 @@
             <a href="#all">全部分类</a>
           </div>
           <nav class="spotlight-grid" aria-label="珠海热门目的地">
-            <a class="spotlight-item" href="#" data-name="澳门环岛">
+            <a class="spotlight-item" href="flow.html" data-direct-link data-name="九洲港船票">
               <span class="spotlight-icon"><i data-lucide="ship" aria-hidden="true"></i></span>
-              <span class="spotlight-copy"><strong>澳门环岛</strong><span>邮轮体验</span></span>
+              <span class="spotlight-copy"><strong>九洲港船票</strong><span>蛇口航线</span></span>
             </a>
             <a class="spotlight-item" href="#" data-name="横琴长隆">
               <span class="spotlight-icon"><i data-lucide="ticket" aria-hidden="true"></i></span>
@@ -1744,13 +1767,13 @@
           </nav>
         </div>
 
-        <section class="promo" aria-label="珠港澳私人定制">
+        <a class="promo" href="flow.html" data-direct-link aria-label="打开九洲港至蛇口船票购买页">
           <div>
-            <strong>珠港澳游私人订制</strong>
-            <p>企业团建、家庭出行、口岸接送、港澳一日游路线打包安排</p>
+            <strong>九洲港至蛇口船票</strong>
+            <p>九洲港出发，先选成人/儿童/长者人数，再查询接口真实可售船次</p>
           </div>
-          <span class="promo-badge">专人跟进</span>
-        </section>
+          <span class="promo-badge">立即购票</span>
+        </a>
 
         <div class="tabs" role="tablist" aria-label="商品分类">
           <button class="tab active" type="button" data-filter="all">推荐</button>
@@ -1767,18 +1790,18 @@
             <a href="#">上新提醒</a>
           </div>
           <div class="product-list">
-            <article class="product-card" data-type="ship">
+            <article class="product-card" data-type="ship" data-flow-link="flow.html" role="link" tabindex="0" aria-label="打开九洲港至蛇口船票购买页">
               <div class="product-media">
-                <img src="assets/macau-cruise-night-banner-web.jpg" alt="澳门环岛游船票" />
+                <img src="assets/macau-cruise-night-banner-web.jpg" alt="九洲港至蛇口船票" />
                 <span class="product-tag">热卖</span>
               </div>
               <div class="product-info">
-                <h3>澳门环岛游夜景船票</h3>
-                <p>湾仔码头出发，打卡澳氹夜景与友谊大桥</p>
+                <h3>九洲港至蛇口船票</h3>
+                <p>对接九洲港分销接口，真实航班、票价和锁票链路</p>
                 <div class="meta-row"><span>即时确认</span><span>可核销</span></div>
                 <div class="price-row">
-                  <div class="price"><small>¥</small><em>88</em><small>起</small></div>
-                  <button class="reserve" type="button">预订</button>
+                  <div class="price"><small>¥</small><em>140</em><small>起</small></div>
+                  <button class="reserve" type="button" data-flow-link="flow.html">预订</button>
                 </div>
               </div>
             </article>
@@ -1967,8 +1990,8 @@
               <span class="status-pill">已实名</span>
             </div>
             <div class="relation-box">
-              <strong>下一段行程：澳门环岛游夜景船票</strong>
-              <span>6月22日 19:30 开航 · 湾仔旅游码头 · 2 张成人票</span>
+              <strong>下一段行程：九洲港至蛇口船票</strong>
+              <span>6月21日 09:00 开航 · 九洲港客运码头 · 2 张成人票</span>
             </div>
             <div class="rule-list">
               <div class="rule-item">
@@ -1988,26 +2011,16 @@
               <a href="#">票券夹</a>
             </div>
             <div class="kpi-grid">
-              <article class="kpi-card">
+              <button class="kpi-card ticket-link" type="button" data-ticket-filter="pending">
                 <header><span>待使用</span><i data-lucide="ticket"></i></header>
                 <strong class="kpi-value">3</strong>
                 <span class="kpi-trend">船票、门票可核销</span>
-              </article>
-              <article class="kpi-card">
-                <header><span>待出行</span><i data-lucide="calendar-days"></i></header>
-                <strong class="kpi-value">2</strong>
-                <span class="kpi-trend">未来7天行程</span>
-              </article>
-              <article class="kpi-card">
+              </button>
+              <button class="kpi-card ticket-link" type="button" data-ticket-filter="refund">
                 <header><span>退款中</span><i data-lucide="rotate-ccw"></i></header>
                 <strong class="kpi-value">1</strong>
                 <span class="kpi-trend">售后处理中</span>
-              </article>
-              <article class="kpi-card">
-                <header><span>收藏</span><i data-lucide="heart"></i></header>
-                <strong class="kpi-value">8</strong>
-                <span class="kpi-trend">酒店、路线、景点</span>
-              </article>
+              </button>
             </div>
           </section>
 
@@ -2072,7 +2085,7 @@
             <div class="order-list">
               <article class="order-card" data-order-state="pending">
                 <div class="order-head">
-                  <strong>澳门环岛游夜景船票</strong>
+                  <strong>九洲港至蛇口船票</strong>
                   <span class="order-status pending">待使用</span>
                 </div>
                 <div class="order-meta">
@@ -2231,12 +2244,26 @@
 
       document.querySelectorAll(".quick-item, .spotlight-item").forEach((item) => {
         item.addEventListener("click", (event) => {
+          if (item.dataset.directLink !== undefined) return;
           event.preventDefault();
           if (item.dataset.pageLink) {
             switchPage(item.dataset.pageLink);
             return;
           }
           showToast(`进入：${item.dataset.name}`);
+        });
+      });
+
+      document.querySelectorAll("[data-flow-link]").forEach((item) => {
+        item.addEventListener("click", (event) => {
+          event.stopPropagation();
+          window.location.href = item.dataset.flowLink;
+        });
+        item.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            window.location.href = item.dataset.flowLink;
+          }
         });
       });
 
@@ -2259,28 +2286,39 @@
         });
       });
 
+      function applyOrderFilter(filter) {
+        document.querySelectorAll(".order-filter button").forEach((item) => {
+          item.classList.toggle("active", item.dataset.orderFilter === filter);
+        });
+        document.querySelectorAll(".order-card").forEach((card) => {
+          const visible = filter === "all" || card.dataset.orderState === filter;
+          card.style.display = visible ? "block" : "none";
+        });
+      }
+
       document.querySelectorAll(".order-filter button").forEach((button) => {
         button.addEventListener("click", () => {
-          document.querySelectorAll(".order-filter button").forEach((item) => item.classList.remove("active"));
-          button.classList.add("active");
-          const filter = button.dataset.orderFilter;
-
-          document.querySelectorAll(".order-card").forEach((card) => {
-            const visible = filter === "all" || card.dataset.orderState === filter;
-            card.style.display = visible ? "block" : "none";
-          });
+          applyOrderFilter(button.dataset.orderFilter);
         });
       });
 
       document.querySelector(".order-entry").addEventListener("click", () => {
+        applyOrderFilter("all");
         switchPage("orders");
+      });
+
+      document.querySelectorAll("[data-ticket-filter]").forEach((button) => {
+        button.addEventListener("click", () => {
+          applyOrderFilter(button.dataset.ticketFilter);
+          switchPage("orders");
+        });
       });
 
       document.querySelector(".back-to-mine").addEventListener("click", () => {
         switchPage("mine");
       });
 
-      document.querySelectorAll(".reserve, .module-tile, .support-action, .qr-card button, .order-detail").forEach((button) => {
+      document.querySelectorAll(".reserve:not([data-flow-link]), .module-tile, .support-action, .qr-card button, .order-detail").forEach((button) => {
         button.addEventListener("click", () => {
           const text = button.textContent.trim();
           showToast(`${text}功能预留`);
