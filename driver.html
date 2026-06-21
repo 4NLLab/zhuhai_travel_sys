@@ -1,0 +1,701 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>司机端注册</title>
+    <link rel="icon" href="data:," />
+    <style>
+      :root {
+        --primary: #0f8dad;
+        --primary-dark: #086d89;
+        --accent: #f15a2b;
+        --gold: #f4b23f;
+        --green: #1f9661;
+        --ink: #15242d;
+        --muted: #6c7a84;
+        --line: #e4edf1;
+        --page: #edf5f7;
+        --card: #fff;
+        --danger: #d94b3d;
+        --shadow: 0 14px 34px rgba(8, 45, 64, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 20% 0%, rgba(15, 141, 173, 0.18), transparent 34%),
+          linear-gradient(180deg, #f7fbfc, #dfeff2);
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB",
+          "Microsoft YaHei", sans-serif;
+      }
+
+      button,
+      input,
+      select {
+        font: inherit;
+      }
+
+      button {
+        border: 0;
+        cursor: pointer;
+      }
+
+      .phone {
+        width: min(100vw, 430px);
+        min-height: 100vh;
+        margin: 0 auto;
+        position: relative;
+        overflow-x: hidden;
+        background: var(--page);
+        box-shadow: 0 0 0 1px rgba(20, 35, 45, 0.05), 0 24px 80px rgba(8, 45, 64, 0.18);
+      }
+
+      .hero {
+        position: relative;
+        min-height: 238px;
+        padding: calc(18px + env(safe-area-inset-top, 0)) 16px 18px;
+        overflow: hidden;
+        color: #fff;
+        background:
+          linear-gradient(135deg, rgba(8, 109, 137, 0.96), rgba(15, 141, 173, 0.82)),
+          url("assets/taxi-scan-illustration-web.jpg") center / cover;
+      }
+
+      .hero::after {
+        content: "";
+        position: absolute;
+        inset: auto -54px -86px 36%;
+        height: 190px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.16);
+        transform: rotate(-12deg);
+      }
+
+      .top-line,
+      .hero-copy,
+      .hero-card {
+        position: relative;
+        z-index: 1;
+      }
+
+      .top-line {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .back-link,
+      .help-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        min-height: 34px;
+        padding: 0 10px;
+        border-radius: 999px;
+        color: #fff;
+        text-decoration: none;
+        background: rgba(255, 255, 255, 0.16);
+        backdrop-filter: blur(8px);
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .back-link svg,
+      .help-chip svg {
+        width: 17px;
+        height: 17px;
+      }
+
+      .hero-copy {
+        margin-top: 30px;
+      }
+
+      .hero-copy h1 {
+        margin: 0;
+        font-size: 30px;
+        line-height: 1.12;
+        letter-spacing: -0.8px;
+      }
+
+      .hero-copy p {
+        max-width: 300px;
+        margin: 10px 0 0;
+        color: rgba(255, 255, 255, 0.88);
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      .hero-card {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+        margin-top: 20px;
+      }
+
+      .metric {
+        min-height: 72px;
+        padding: 11px 9px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.14);
+        backdrop-filter: blur(10px);
+      }
+
+      .metric strong,
+      .metric span {
+        display: block;
+      }
+
+      .metric strong {
+        font-size: 18px;
+      }
+
+      .metric span {
+        margin-top: 5px;
+        color: rgba(255, 255, 255, 0.78);
+        font-size: 11px;
+        line-height: 1.35;
+      }
+
+      .content {
+        padding: 12px 14px calc(96px + env(safe-area-inset-bottom, 0));
+      }
+
+      .card {
+        margin-bottom: 10px;
+        padding: 14px;
+        border-radius: 8px;
+        background: var(--card);
+        box-shadow: var(--shadow);
+      }
+
+      .section-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+
+      .section-head h2 {
+        margin: 0;
+        font-size: 18px;
+      }
+
+      .section-head span {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .step-row {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 7px;
+      }
+
+      .step {
+        padding: 9px 8px;
+        border-radius: 8px;
+        color: #56707a;
+        background: #f2f8fa;
+        font-size: 12px;
+        font-weight: 800;
+        text-align: center;
+      }
+
+      .step.active {
+        color: var(--primary-dark);
+        background: #e8f7fb;
+      }
+
+      .form-grid {
+        display: grid;
+        gap: 10px;
+      }
+
+      .field {
+        display: grid;
+        gap: 7px;
+      }
+
+      .field label {
+        color: #4c5f69;
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .field input,
+      .field select {
+        width: 100%;
+        height: 46px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        outline: 0;
+        padding: 0 12px;
+        color: var(--ink);
+        background: #fbfdfe;
+        font-size: 15px;
+      }
+
+      .field input:focus,
+      .field select:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(15, 141, 173, 0.1);
+      }
+
+      .field small {
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.35;
+      }
+
+      .inline-fields {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .upload-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 9px;
+      }
+
+      .upload-card {
+        min-height: 98px;
+        display: grid;
+        place-items: center;
+        gap: 8px;
+        padding: 12px;
+        border: 1px dashed #bfd0d8;
+        border-radius: 8px;
+        color: var(--primary-dark);
+        background: #f7fcfd;
+        text-align: center;
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .upload-card svg {
+        width: 24px;
+        height: 24px;
+      }
+
+      .agreement {
+        display: grid;
+        grid-template-columns: 22px minmax(0, 1fr);
+        gap: 8px;
+        align-items: start;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.5;
+      }
+
+      .agreement input {
+        width: 18px;
+        height: 18px;
+        margin: 1px 0 0;
+        accent-color: var(--primary);
+      }
+
+      .preview {
+        display: grid;
+        gap: 9px;
+      }
+
+      .preview-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 9px 0;
+        border-bottom: 1px solid var(--line);
+        font-size: 14px;
+      }
+
+      .preview-row:last-child {
+        border-bottom: 0;
+      }
+
+      .preview-row span {
+        color: var(--muted);
+      }
+
+      .preview-row strong {
+        text-align: right;
+      }
+
+      .status-card {
+        display: none;
+        border: 1px solid rgba(31, 150, 97, 0.18);
+        background:
+          radial-gradient(circle at 90% 0%, rgba(31, 150, 97, 0.14), transparent 28%),
+          linear-gradient(145deg, #fff, #f3fff8);
+      }
+
+      .status-card.show {
+        display: block;
+      }
+
+      .success-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #0b7350;
+        font-size: 18px;
+        font-weight: 900;
+      }
+
+      .success-title svg {
+        width: 22px;
+        height: 22px;
+      }
+
+      .bottom-bar {
+        position: fixed;
+        z-index: 20;
+        left: 50%;
+        bottom: 0;
+        width: min(100vw, 430px);
+        transform: translateX(-50%);
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0));
+        background: rgba(255, 255, 255, 0.97);
+        border-top: 1px solid rgba(10, 26, 35, 0.08);
+        backdrop-filter: blur(12px);
+      }
+
+      .bottom-bar span {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .bottom-bar strong {
+        display: block;
+        margin-top: 3px;
+        font-size: 15px;
+      }
+
+      .submit-btn {
+        height: 46px;
+        min-width: 146px;
+        padding: 0 18px;
+        border-radius: 23px;
+        color: #fff;
+        background: linear-gradient(135deg, var(--accent), #f04b2f);
+        font-size: 16px;
+        font-weight: 900;
+        box-shadow: 0 10px 22px rgba(241, 90, 43, 0.22);
+      }
+
+      .toast {
+        position: fixed;
+        left: 50%;
+        bottom: calc(86px + env(safe-area-inset-bottom, 0));
+        z-index: 50;
+        width: max-content;
+        max-width: min(86vw, 360px);
+        transform: translate(-50%, 20px);
+        padding: 10px 14px;
+        border-radius: 999px;
+        color: #fff;
+        background: rgba(20, 31, 38, 0.9);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.18s ease, transform 0.18s ease;
+        font-size: 13px;
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="phone">
+      <section class="hero">
+        <div class="top-line">
+          <a class="back-link" href="index.html"><i data-lucide="chevron-left"></i>返回首页</a>
+          <span class="help-chip"><i data-lucide="headphones"></i>司机入驻</span>
+        </div>
+        <div class="hero-copy">
+          <h1>司机注册认证</h1>
+          <p>填写身份与车辆信息，审核通过后可生成车座推广码，绑定订单来源并计算推广提成。</p>
+        </div>
+        <div class="hero-card" aria-label="注册步骤">
+          <div class="metric"><strong>1</strong><span>提交身份信息</span></div>
+          <div class="metric"><strong>2</strong><span>绑定车辆车牌</span></div>
+          <div class="metric"><strong>3</strong><span>审核后生成二维码</span></div>
+        </div>
+      </section>
+
+      <form class="content" data-driver-form novalidate>
+        <section class="card">
+          <div class="section-head">
+            <h2>入驻进度</h2>
+            <span>drivers / vehicles</span>
+          </div>
+          <div class="step-row">
+            <div class="step active">身份信息</div>
+            <div class="step active">车辆信息</div>
+            <div class="step">等待审核</div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <h2>司机身份</h2>
+            <span>必填</span>
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label for="driver-name">真实姓名</label>
+              <input id="driver-name" name="name" autocomplete="name" placeholder="请输入与身份证一致的姓名" required />
+            </div>
+            <div class="field">
+              <label for="driver-phone">手机号</label>
+              <input id="driver-phone" name="phone" inputmode="tel" maxlength="11" autocomplete="tel" placeholder="用于登录和接收审核通知" required />
+            </div>
+            <div class="field">
+              <label for="driver-id-card">身份证号</label>
+              <input id="driver-id-card" name="idCard" inputmode="text" maxlength="18" placeholder="请输入18位身份证号码" required />
+              <small>正式系统中身份证号应加密存储，对应数据库 drivers.id_card_no。</small>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <h2>车辆信息</h2>
+            <span>必填</span>
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label for="plate-no">车牌号</label>
+              <input id="plate-no" name="plateNo" maxlength="8" placeholder="例如：粤C12345" required />
+            </div>
+            <div class="inline-fields">
+              <div class="field">
+                <label for="vehicle-model">车型</label>
+                <input id="vehicle-model" name="model" placeholder="如 比亚迪秦EV" required />
+              </div>
+              <div class="field">
+                <label for="vehicle-seats">座位数</label>
+                <select id="vehicle-seats" name="seats" required>
+                  <option value="">选择</option>
+                  <option value="4">4座</option>
+                  <option value="5">5座</option>
+                  <option value="6">6座</option>
+                  <option value="7">7座</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label for="service-city">主要服务区域</label>
+              <select id="service-city" name="serviceCity" required>
+                <option value="">请选择区域</option>
+                <option value="香洲区">香洲区</option>
+                <option value="横琴粤澳深度合作区">横琴粤澳深度合作区</option>
+                <option value="金湾区">金湾区</option>
+                <option value="斗门区">斗门区</option>
+                <option value="高新区">高新区</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <h2>证照上传</h2>
+            <span>原型占位</span>
+          </div>
+          <div class="upload-grid">
+            <button class="upload-card" type="button" data-upload="身份证正面">
+              <i data-lucide="id-card"></i>
+              <span>身份证正面</span>
+            </button>
+            <button class="upload-card" type="button" data-upload="驾驶证">
+              <i data-lucide="badge-check"></i>
+              <span>驾驶证</span>
+            </button>
+            <button class="upload-card" type="button" data-upload="行驶证">
+              <i data-lucide="file-badge"></i>
+              <span>行驶证</span>
+            </button>
+            <button class="upload-card" type="button" data-upload="车辆照片">
+              <i data-lucide="car-front"></i>
+              <span>车辆照片</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <h2>提交预览</h2>
+            <span>审核后台可见</span>
+          </div>
+          <div class="preview">
+            <div class="preview-row"><span>司机</span><strong data-preview="name">未填写</strong></div>
+            <div class="preview-row"><span>手机号</span><strong data-preview="phone">未填写</strong></div>
+            <div class="preview-row"><span>身份证</span><strong data-preview="idCard">未填写</strong></div>
+            <div class="preview-row"><span>车牌号</span><strong data-preview="plateNo">未填写</strong></div>
+            <div class="preview-row"><span>车辆</span><strong data-preview="vehicle">未填写</strong></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <label class="agreement">
+            <input type="checkbox" name="agreement" required />
+            <span>我确认提交的信息真实有效，同意平台用于司机身份审核、车辆绑定、推广码生成和佣金结算。</span>
+          </label>
+        </section>
+
+        <section class="card status-card" data-status-card>
+          <div class="success-title"><i data-lucide="circle-check"></i>注册申请已提交</div>
+          <div class="preview" style="margin-top: 10px">
+            <div class="preview-row"><span>司机编号</span><strong data-result="driverNo">DR-ZH-0000</strong></div>
+            <div class="preview-row"><span>审核状态</span><strong>待审核</strong></div>
+            <div class="preview-row"><span>下一步</span><strong>后台审核后生成车座二维码</strong></div>
+          </div>
+        </section>
+      </form>
+
+      <footer class="bottom-bar">
+        <div>
+          <span>注册后进入审核</span>
+          <strong>通过后可绑定车座推广码</strong>
+        </div>
+        <button class="submit-btn" type="button" data-submit-proxy>提交注册</button>
+      </footer>
+
+      <div class="toast" role="status" aria-live="polite"></div>
+    </main>
+
+    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+    <script>
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
+
+      const form = document.querySelector("[data-driver-form]");
+      const toast = document.querySelector(".toast");
+      let toastTimer;
+
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove("show"), 1500);
+      }
+
+      function value(name) {
+        return form.elements[name]?.value.trim() || "";
+      }
+
+      function maskPhone(phone) {
+        return phone.length === 11 ? `${phone.slice(0, 3)}****${phone.slice(7)}` : phone || "未填写";
+      }
+
+      function maskIdCard(idCard) {
+        return idCard.length >= 14 ? `${idCard.slice(0, 6)}********${idCard.slice(-4)}` : idCard || "未填写";
+      }
+
+      function setPreview(key, text) {
+        document.querySelectorAll(`[data-preview="${key}"]`).forEach((node) => {
+          node.textContent = text || "未填写";
+        });
+      }
+
+      function updatePreview() {
+        setPreview("name", value("name"));
+        setPreview("phone", maskPhone(value("phone")));
+        setPreview("idCard", maskIdCard(value("idCard").toUpperCase()));
+        setPreview("plateNo", value("plateNo").toUpperCase());
+        setPreview("vehicle", [value("model"), value("seats") ? `${value("seats")}座` : ""].filter(Boolean).join(" · "));
+      }
+
+      function validateForm() {
+        const phone = value("phone");
+        const idCard = value("idCard").toUpperCase();
+        const plateNo = value("plateNo").toUpperCase();
+
+        if (!value("name")) return "请填写真实姓名";
+        if (!/^1[3-9]\d{9}$/.test(phone)) return "请填写正确的11位手机号";
+        if (!/^\d{17}[\dX]$/.test(idCard)) return "请填写正确的18位身份证号码";
+        if (!/^[\u4e00-\u9fa5][A-Z][A-Z0-9]{5,6}$/.test(plateNo)) return "请填写正确的车牌号，例如粤C12345";
+        if (!value("model")) return "请填写车辆车型";
+        if (!value("seats")) return "请选择座位数";
+        if (!value("serviceCity")) return "请选择主要服务区域";
+        if (!form.elements.agreement.checked) return "请勾选信息真实性确认";
+        return "";
+      }
+
+      function submitRegister() {
+        const error = validateForm();
+        if (error) {
+          showToast(error);
+          return;
+        }
+
+        const driverNo = `DR-ZH-${String(Date.now()).slice(-6)}`;
+        document.querySelector("[data-result='driverNo']").textContent = driverNo;
+        document.querySelector("[data-status-card]").classList.add("show");
+        localStorage.setItem(
+          "zhuhai_driver_register_demo",
+          JSON.stringify({
+            driverNo,
+            name: value("name"),
+            phone: value("phone"),
+            idCard: value("idCard").toUpperCase(),
+            plateNo: value("plateNo").toUpperCase(),
+            model: value("model"),
+            seats: value("seats"),
+            serviceCity: value("serviceCity"),
+            status: "pending_review",
+          }),
+        );
+        showToast("注册申请已提交，等待后台审核");
+        document.querySelector("[data-status-card]").scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+
+      form.id = "driver-register-form";
+      form.addEventListener("input", (event) => {
+        if (event.target.name === "plateNo" || event.target.name === "idCard") {
+          event.target.value = event.target.value.toUpperCase();
+        }
+        updatePreview();
+      });
+      form.addEventListener("change", updatePreview);
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        submitRegister();
+      });
+
+      document.querySelector("[data-submit-proxy]").addEventListener("click", () => {
+        form.requestSubmit();
+      });
+
+      document.querySelectorAll("[data-upload]").forEach((button) => {
+        button.addEventListener("click", () => {
+          showToast(`${button.dataset.upload}上传功能预留`);
+        });
+      });
+
+      updatePreview();
+    </script>
+  </body>
+</html>
