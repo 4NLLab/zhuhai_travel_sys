@@ -1,0 +1,1096 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>香港一日游经典观光</title>
+    <link rel="icon" href="data:," />
+    <style>
+      :root {
+        --primary: #0f8dad;
+        --primary-dark: #086d89;
+        --accent: #f15a2b;
+        --gold: #f4b23f;
+        --ink: #17222b;
+        --muted: #6b7782;
+        --line: #e7eef2;
+        --page: #edf5f7;
+        --card: #fff;
+        --green: #1f9661;
+        --shadow: 0 12px 30px rgba(12, 48, 68, 0.1);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 12% 0%, rgba(244, 178, 63, 0.24), transparent 28%),
+          radial-gradient(circle at 92% 4%, rgba(15, 141, 173, 0.2), transparent 30%),
+          linear-gradient(180deg, #f7fbfc 0%, #dfedf0 100%);
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB",
+          "Microsoft YaHei", sans-serif;
+      }
+
+      button,
+      input,
+      select {
+        font: inherit;
+      }
+
+      button {
+        border: 0;
+        cursor: pointer;
+      }
+
+      .phone {
+        width: min(100vw, 430px);
+        min-height: 100vh;
+        margin: 0 auto;
+        position: relative;
+        overflow-x: hidden;
+        background: var(--page);
+        box-shadow: 0 0 0 1px rgba(20, 35, 45, 0.05), 0 24px 80px rgba(8, 45, 64, 0.18);
+      }
+
+      .hero {
+        height: 338px;
+        position: relative;
+        overflow: hidden;
+        color: #fff;
+        background: #0c5f79;
+      }
+
+      .hero-slide {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+      }
+
+      .hero-slide.active {
+        opacity: 1;
+      }
+
+      .hero-slide img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: cover;
+      }
+
+      .hero-slide::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(180deg, rgba(4, 20, 28, 0.16), rgba(4, 20, 28, 0.72)),
+          linear-gradient(105deg, rgba(4, 31, 42, 0.72), rgba(4, 31, 42, 0.08) 70%);
+      }
+
+      .top {
+        position: absolute;
+        z-index: 3;
+        top: env(safe-area-inset-top, 0);
+        left: 0;
+        right: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 14px 0;
+      }
+
+      .nav-chip {
+        min-height: 36px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 0 11px;
+        border-radius: 999px;
+        color: #fff;
+        background: rgba(255, 255, 255, 0.16);
+        backdrop-filter: blur(12px);
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 850;
+      }
+
+      .nav-chip svg {
+        width: 17px;
+        height: 17px;
+      }
+
+      .hero-copy {
+        position: absolute;
+        z-index: 2;
+        left: 16px;
+        right: 16px;
+        bottom: 28px;
+      }
+
+      .eyebrow {
+        width: fit-content;
+        margin-bottom: 10px;
+        padding: 5px 9px;
+        border-radius: 999px;
+        color: #fff7e2;
+        background: rgba(244, 178, 63, 0.22);
+        backdrop-filter: blur(10px);
+        font-size: 12px;
+        font-weight: 850;
+      }
+
+      .hero-copy h1 {
+        max-width: 310px;
+        margin: 0;
+        font-size: 32px;
+        line-height: 1.08;
+        letter-spacing: -0.8px;
+        text-shadow: 0 4px 18px rgba(0, 0, 0, 0.28);
+      }
+
+      .hero-copy p {
+        max-width: 315px;
+        margin: 10px 0 0;
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 13px;
+        line-height: 1.55;
+      }
+
+      .hero-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin-top: 14px;
+      }
+
+      .hero-tags span {
+        padding: 6px 9px;
+        border-radius: 999px;
+        color: rgba(255, 255, 255, 0.92);
+        background: rgba(255, 255, 255, 0.14);
+        font-size: 11px;
+        font-weight: 800;
+      }
+
+      .hero-dots {
+        display: flex;
+        gap: 6px;
+        margin-top: 14px;
+      }
+
+      .hero-dots button {
+        width: 18px;
+        height: 4px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.45);
+      }
+
+      .hero-dots button.active {
+        width: 32px;
+        background: #fff;
+      }
+
+      .content {
+        position: relative;
+        z-index: 4;
+        margin-top: -18px;
+        padding: 0 14px calc(104px + env(safe-area-inset-bottom, 0));
+      }
+
+      .card {
+        margin-bottom: 10px;
+        padding: 14px;
+        border-radius: 8px;
+        background: var(--card);
+        box-shadow: var(--shadow);
+      }
+
+      .booking-card {
+        padding: 0;
+        overflow: hidden;
+      }
+
+      .booking-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 14px;
+        color: #fff;
+        background:
+          linear-gradient(135deg, rgba(15, 141, 173, 0.96), rgba(8, 109, 137, 0.9)),
+          #0f8dad;
+      }
+
+      .booking-head strong {
+        display: block;
+        font-size: 17px;
+      }
+
+      .booking-head span {
+        display: block;
+        margin-top: 3px;
+        color: rgba(255, 255, 255, 0.78);
+        font-size: 12px;
+      }
+
+      .status-pill {
+        flex: 0 0 auto;
+        padding: 6px 9px;
+        border-radius: 999px;
+        color: #6a3e00;
+        background: #fff1c8;
+        font-size: 12px;
+        font-weight: 900;
+      }
+
+      .booking-form {
+        display: grid;
+        gap: 10px;
+        padding: 14px;
+      }
+
+      .field-row {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 9px;
+      }
+
+      .field {
+        min-width: 0;
+      }
+
+      .field label {
+        display: block;
+        margin-bottom: 6px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .control {
+        width: 100%;
+        height: 42px;
+        padding: 0 11px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: var(--ink);
+        background: #f8fbfc;
+        outline: none;
+        font-size: 14px;
+        font-weight: 800;
+      }
+
+      .counter-row {
+        display: grid;
+        gap: 8px;
+      }
+
+      .counter {
+        min-height: 46px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 8px 10px;
+        border-radius: 8px;
+        background: #f8fbfc;
+        box-shadow: inset 0 0 0 1px var(--line);
+      }
+
+      .counter b,
+      .counter small {
+        display: block;
+      }
+
+      .counter b {
+        font-size: 14px;
+      }
+
+      .counter small {
+        margin-top: 2px;
+        color: var(--muted);
+        font-size: 11px;
+      }
+
+      .counter-actions {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+      }
+
+      .counter-actions button {
+        width: 28px;
+        height: 28px;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        color: var(--primary-dark);
+        background: #e8f6f9;
+        font-size: 18px;
+        font-weight: 900;
+      }
+
+      .counter-actions span {
+        min-width: 18px;
+        text-align: center;
+        font-size: 15px;
+        font-weight: 900;
+      }
+
+      .form-note {
+        display: flex;
+        gap: 8px;
+        padding: 10px;
+        border-radius: 8px;
+        color: #825524;
+        background: #fff6e8;
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      .form-note svg {
+        flex: 0 0 auto;
+        width: 17px;
+        height: 17px;
+      }
+
+      .primary-btn {
+        width: 100%;
+        height: 46px;
+        border-radius: 999px;
+        color: #fff;
+        background: linear-gradient(135deg, var(--accent), #d88424);
+        box-shadow: 0 12px 24px rgba(241, 90, 43, 0.24);
+        font-size: 15px;
+        font-weight: 900;
+      }
+
+      .section-title {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+
+      .section-title h2 {
+        margin: 0;
+        font-size: 18px;
+        line-height: 1.2;
+      }
+
+      .section-title span {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .highlight-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .highlight {
+        min-height: 96px;
+        padding: 11px;
+        border-radius: 8px;
+        color: #23414b;
+        background:
+          linear-gradient(135deg, rgba(255, 255, 255, 0.85), rgba(231, 246, 250, 0.58)),
+          #eaf7fa;
+      }
+
+      .highlight:nth-child(2n) {
+        color: #72501e;
+        background:
+          linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(255, 243, 219, 0.68)),
+          #fff2d9;
+      }
+
+      .highlight svg {
+        width: 23px;
+        height: 23px;
+        margin-bottom: 9px;
+        stroke-width: 2.2;
+      }
+
+      .highlight b,
+      .highlight span {
+        display: block;
+      }
+
+      .highlight b {
+        font-size: 14px;
+      }
+
+      .highlight span {
+        margin-top: 5px;
+        color: rgba(47, 55, 61, 0.7);
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      .photo-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 9px;
+      }
+
+      .photo-card {
+        min-height: 150px;
+        position: relative;
+        overflow: hidden;
+        border-radius: 8px;
+        background: #c9dce2;
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.48);
+      }
+
+      .photo-card.tall {
+        grid-row: span 2;
+        min-height: 310px;
+      }
+
+      .photo-card.wide {
+        grid-column: 1 / -1;
+        min-height: 176px;
+      }
+
+      .photo-card img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: cover;
+      }
+
+      .photo-card::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, transparent 42%, rgba(2, 27, 38, 0.72));
+      }
+
+      .photo-card span {
+        position: absolute;
+        z-index: 1;
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        color: #fff;
+        font-size: 13px;
+        font-weight: 900;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+      }
+
+      .timeline {
+        position: relative;
+        display: grid;
+        gap: 10px;
+      }
+
+      .timeline::before {
+        content: "";
+        position: absolute;
+        top: 10px;
+        bottom: 10px;
+        left: 16px;
+        width: 2px;
+        border-radius: 999px;
+        background: #d9e8ec;
+      }
+
+      .timeline-item {
+        position: relative;
+        display: grid;
+        grid-template-columns: 34px minmax(0, 1fr);
+        gap: 9px;
+      }
+
+      .timeline-dot {
+        width: 34px;
+        height: 34px;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        color: #fff;
+        background: var(--primary);
+        box-shadow: 0 8px 16px rgba(15, 141, 173, 0.2);
+        font-size: 12px;
+        font-weight: 900;
+      }
+
+      .timeline-copy {
+        padding: 10px 11px;
+        border-radius: 8px;
+        background: #f8fbfc;
+        box-shadow: inset 0 0 0 1px var(--line);
+      }
+
+      .timeline-copy b,
+      .timeline-copy span {
+        display: block;
+      }
+
+      .timeline-copy b {
+        font-size: 14px;
+      }
+
+      .timeline-copy span {
+        margin-top: 5px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.5;
+      }
+
+      .cost-grid {
+        display: grid;
+        gap: 9px;
+      }
+
+      .cost-box {
+        padding: 12px;
+        border-radius: 8px;
+        background: #f8fbfc;
+        box-shadow: inset 0 0 0 1px var(--line);
+      }
+
+      .cost-box h3 {
+        margin: 0 0 8px;
+        font-size: 15px;
+      }
+
+      .cost-box ul {
+        margin: 0;
+        padding-left: 18px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.7;
+      }
+
+      .option-list {
+        display: grid;
+        gap: 8px;
+      }
+
+      .option {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 11px;
+        border-radius: 8px;
+        background: #f8fbfc;
+        box-shadow: inset 0 0 0 1px var(--line);
+      }
+
+      .option b,
+      .option span {
+        display: block;
+      }
+
+      .option b {
+        font-size: 14px;
+      }
+
+      .option span {
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .option em {
+        flex: 0 0 auto;
+        color: var(--accent);
+        font-size: 15px;
+        font-style: normal;
+        font-weight: 950;
+      }
+
+      .notice-list {
+        display: grid;
+        gap: 8px;
+      }
+
+      .notice {
+        display: grid;
+        grid-template-columns: 24px minmax(0, 1fr);
+        gap: 9px;
+        align-items: start;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.55;
+      }
+
+      .notice svg {
+        width: 20px;
+        height: 20px;
+        color: var(--primary);
+      }
+
+      .bottom-bar {
+        position: fixed;
+        z-index: 20;
+        left: 50%;
+        bottom: 0;
+        width: min(100vw, 430px);
+        transform: translateX(-50%);
+        display: grid;
+        grid-template-columns: 118px minmax(0, 1fr);
+        gap: 10px;
+        padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0));
+        background: rgba(255, 255, 255, 0.9);
+        border-top: 1px solid rgba(221, 232, 237, 0.85);
+        backdrop-filter: blur(14px);
+      }
+
+      .ghost-btn {
+        height: 46px;
+        border-radius: 999px;
+        color: var(--primary-dark);
+        background: #e8f6f9;
+        font-size: 14px;
+        font-weight: 900;
+      }
+
+      .toast {
+        position: fixed;
+        z-index: 40;
+        left: 50%;
+        bottom: calc(86px + env(safe-area-inset-bottom, 0));
+        max-width: min(360px, calc(100vw - 36px));
+        transform: translateX(-50%) translateY(18px);
+        padding: 10px 14px;
+        border-radius: 999px;
+        color: #fff;
+        background: rgba(15, 28, 38, 0.88);
+        opacity: 0;
+        pointer-events: none;
+        transition:
+          opacity 0.2s ease,
+          transform 0.2s ease;
+        font-size: 13px;
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="phone">
+      <section class="hero" aria-label="香港一日游经典观光">
+        <div class="hero-slide active">
+          <img src="assets/hongkong-k11-cover.jpg" alt="香港一日游封面" />
+        </div>
+        <div class="hero-slide">
+          <img src="assets/hongkong-west-kowloon.jpg" alt="西九文化区艺术公园" />
+        </div>
+        <div class="hero-slide">
+          <img src="assets/hongkong-peak.jpg" alt="太平山顶俯瞰维港" />
+        </div>
+
+        <div class="top">
+          <a class="nav-chip" href="index.html" aria-label="返回首页">
+            <i data-lucide="chevron-left" aria-hidden="true"></i>
+            首页
+          </a>
+          <span class="nav-chip"><i data-lucide="badge-check" aria-hidden="true"></i>经典拼团</span>
+        </div>
+
+        <div class="hero-copy">
+          <div class="eyebrow">香港一天观光 · 参考行程</div>
+          <h1>香港一日游 经典观光</h1>
+          <p>港珠澳大桥车观、黄大仙祠、西九文化区、天星小轮、金紫荆、太平山与尖沙咀 K11，一天串起香港经典地标。</p>
+          <div class="hero-tags">
+            <span>含午餐</span>
+            <span>专业导游</span>
+            <span>天星小轮</span>
+            <span>可选夜游维港</span>
+          </div>
+          <div class="hero-dots" aria-label="切换轮播图">
+            <button class="active" type="button" aria-label="第 1 张图"></button>
+            <button type="button" aria-label="第 2 张图"></button>
+            <button type="button" aria-label="第 3 张图"></button>
+          </div>
+        </div>
+      </section>
+
+      <section class="content">
+        <section class="card booking-card" aria-label="报名信息">
+          <div class="booking-head">
+            <div>
+              <strong>先填需求，再确认名额</strong>
+              <span id="bookingSummary">已选 1 位成人 · 深圳莲塘口岸集合</span>
+            </div>
+            <span class="status-pill">客服确认</span>
+          </div>
+          <form class="booking-form">
+            <div class="field-row">
+              <div class="field">
+                <label for="departure">集合地点</label>
+                <select class="control" id="departure">
+                  <option>深圳莲塘口岸</option>
+                  <option>珠海出发</option>
+                  <option>广州集合 +70/150</option>
+                  <option>东莞集合 +100/200</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="date">出行日期</label>
+                <input class="control" id="date" type="date" value="2026-07-18" />
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label for="contact">联系人手机号</label>
+                <input class="control" id="contact" inputmode="tel" placeholder="用于接收团号通知" />
+              </div>
+              <div class="field">
+                <label for="cert">出行证件</label>
+                <select class="control" id="cert">
+                  <option>港澳通行证 + 有效签注</option>
+                  <option>回乡证/其他证件</option>
+                  <option>稍后补充</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="counter-row" aria-label="出行人数">
+              <div class="counter" data-counter="adult">
+                <div><b>成人</b><small>18-64 岁</small></div>
+                <div class="counter-actions">
+                  <button type="button" data-action="minus">-</button>
+                  <span>1</span>
+                  <button type="button" data-action="plus">+</button>
+                </div>
+              </div>
+              <div class="counter" data-counter="child">
+                <div><b>儿童/青少年</b><small>18 岁以下需成人陪同</small></div>
+                <div class="counter-actions">
+                  <button type="button" data-action="minus">-</button>
+                  <span>0</span>
+                  <button type="button" data-action="plus">+</button>
+                </div>
+              </div>
+              <div class="counter" data-counter="elder">
+                <div><b>长者</b><small>65 岁以上需家属陪同</small></div>
+                <div class="counter-actions">
+                  <button type="button" data-action="minus">-</button>
+                  <span>0</span>
+                  <button type="button" data-action="plus">+</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-note">
+              <i data-lucide="info" aria-hidden="true"></i>
+              <span>文档未给固定团费，页面先按“提交需求-客服确认价格与余位-再支付”的报名链路设计。出团前一天 19:00-21:30 通知团号及集合时间。</span>
+            </div>
+            <button class="primary-btn" type="submit">提交报名需求</button>
+          </form>
+        </section>
+
+        <section class="card">
+          <div class="section-title">
+            <h2>为什么适合第一次去香港</h2>
+            <span>经典地标一日串联</span>
+          </div>
+          <div class="highlight-grid">
+            <div class="highlight">
+              <i data-lucide="route" aria-hidden="true"></i>
+              <b>线路完整</b>
+              <span>桥、祠、艺术区、商圈、维港、山顶、星光大道都覆盖。</span>
+            </div>
+            <div class="highlight">
+              <i data-lucide="ship-wheel" aria-hidden="true"></i>
+              <b>赠天星小轮</b>
+              <span>从海上看维港与中环天际线，体验感比纯坐车更好。</span>
+            </div>
+            <div class="highlight">
+              <i data-lucide="utensils" aria-hidden="true"></i>
+              <b>含香港午餐</b>
+              <span>中餐安排本地酒楼，晚餐留给尖沙咀自由活动。</span>
+            </div>
+            <div class="highlight">
+              <i data-lucide="shopping-bag" aria-hidden="true"></i>
+              <b>自由活动友好</b>
+              <span>DFS、K11、星光大道附近可购物、拍照、自由用餐。</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-title">
+            <h2>香港景点图集</h2>
+            <span>太平山、天星小轮、金紫荆与西九打卡</span>
+          </div>
+          <div class="photo-grid">
+            <div class="photo-card tall">
+              <img src="assets/hongkong-peak.jpg" alt="太平山顶" />
+              <span>太平山顶</span>
+            </div>
+            <div class="photo-card">
+              <img src="assets/hongkong-golden-bauhinia.jpg" alt="金紫荆广场" />
+              <span>金紫荆广场</span>
+            </div>
+            <div class="photo-card">
+              <img src="assets/hongkong-star-ferry.jpg" alt="天星小轮" />
+              <span>天星小轮</span>
+            </div>
+            <div class="photo-card">
+              <img src="assets/hongkong-clock-tower.jpg" alt="香港钟楼" />
+              <span>香港钟楼</span>
+            </div>
+            <div class="photo-card wide">
+              <img src="assets/hongkong-west-kowloon.jpg" alt="西九文化区艺术公园" />
+              <span>西九文化区之艺术公园</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-title">
+            <h2>参考行程</h2>
+            <span>顺序以当天导游安排为准</span>
+          </div>
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="timeline-dot">1</div>
+              <div class="timeline-copy">
+                <b>集合出发 · 港珠澳大桥车观</b>
+                <span>约 45 分钟车观世界级跨海大桥，可看风帆双塔、中国结双塔、东西人工岛等湾区景观。</span>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot">2</div>
+              <div class="timeline-copy">
+                <b>黄大仙祠 · 西九文化区</b>
+                <span>黄大仙祠约 30 分钟，之后前往西九艺术公园，外观香港故宫博物馆，适合拍照打卡。</span>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot">3</div>
+              <div class="timeline-copy">
+                <b>午餐 · 尖沙咀 DFS 自由活动</b>
+                <span>本地酒楼用午餐，随后在尖沙咀 DFS 商圈自由活动约 40 分钟，可自费体验敞篷观光巴士。</span>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot">4</div>
+              <div class="timeline-copy">
+                <b>天星小轮 · 金紫荆广场</b>
+                <span>搭乘天星小轮观维港，远观摩天轮；随后游览会展中心新翼及金紫荆广场外观。</span>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot">5</div>
+              <div class="timeline-copy">
+                <b>太平山顶 · 前九广铁路钟楼</b>
+                <span>山顶约 60 分钟俯瞰维港两岸，杜莎夫人蜡像馆为自费项目；之后前往尖沙咀钟楼。</span>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot">6</div>
+              <div class="timeline-copy">
+                <b>星光大道 / K11 MUSEA · 返回珠海</b>
+                <span>星光大道与 K11 自由活动，晚餐自理，可自费升级夜游维港；按约定时间集合返程。</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-title">
+            <h2>可选增值项目</h2>
+            <span>来自参考文档</span>
+          </div>
+          <div class="option-list">
+            <div class="option">
+              <div><b>广州集合接驳</b><span>海珠广场 / 冼村 / 番禺广场等集合点</span></div>
+              <em>70/150</em>
+            </div>
+            <div class="option">
+              <div><b>东莞集合接驳</b><span>体育馆、厚街、虎门、东城、寮步等集合点</span></div>
+              <em>100/200</em>
+            </div>
+            <div class="option">
+              <div><b>敞篷观光巴士</b><span>尖沙咀 DFS 自由活动期间可选</span></div>
+              <em>180</em>
+            </div>
+            <div class="option">
+              <div><b>杜莎夫人蜡像馆</b><span>太平山顶自由参观项目</span></div>
+              <em>200</em>
+            </div>
+            <div class="option">
+              <div><b>夜游维多利亚港</b><span>翠华号 / 洋紫荆号 / 东方之珠号等，以当天确认为准</span></div>
+              <em>咨询</em>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-title">
+            <h2>费用说明</h2>
+            <span>报名页展示重点</span>
+          </div>
+          <div class="cost-grid">
+            <div class="cost-box">
+              <h3>团费已含</h3>
+              <ul>
+                <li>团队午餐 1 正餐，个人原因不用餐费用不退。</li>
+                <li>专业香港导游随团服务。</li>
+                <li>行程标明景点第一道门票。</li>
+                <li>行程交通及当地旅游用车，保证一人一正座。</li>
+              </ul>
+            </div>
+            <div class="cost-box">
+              <h3>团费不含</h3>
+              <ul>
+                <li>自由活动期间或行程外个人消费。</li>
+                <li>园中园门票、自费项目及行程注明不含项目。</li>
+                <li>境外旅游意外保险，建议游客自行购买。</li>
+                <li>前往集合地点交通费及不可抗力产生的额外费用。</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-title">
+            <h2>报名须知</h2>
+            <span>出境游重点提醒</span>
+          </div>
+          <div class="notice-list">
+            <div class="notice">
+              <i data-lucide="badge-alert" aria-hidden="true"></i>
+              <span>请确认港澳通行证及有效签注准确有效；其他证件出入境风险需自行确认。</span>
+            </div>
+            <div class="notice">
+              <i data-lucide="users" aria-hidden="true"></i>
+              <span>18 岁以下未成年人、65 岁以上长者需有成年家属或监护人陪同参团。</span>
+            </div>
+            <div class="notice">
+              <i data-lucide="phone-call" aria-hidden="true"></i>
+              <span>出境游需自备手机并开通国际漫游功能，保持电话畅通以接收团号和集合通知。</span>
+            </div>
+            <div class="notice">
+              <i data-lucide="clock" aria-hidden="true"></i>
+              <span>尖沙咀无固定停车点，旅游巴士即停即走；未按约定时间集合视为自动放弃回程。</span>
+            </div>
+            <div class="notice">
+              <i data-lucide="shield-check" aria-hidden="true"></i>
+              <span>自由活动期间请注意人身及财产安全，贵重物品随身携带，建议购买旅游意外保险。</span>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <div class="bottom-bar" aria-label="报名操作">
+      <button class="ghost-btn" type="button" id="consultBtn">咨询客服</button>
+      <button class="primary-btn" type="button" id="bottomSubmit">立即报名</button>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script>
+      const slides = document.querySelectorAll(".hero-slide");
+      const dots = document.querySelectorAll(".hero-dots button");
+      const toast = document.querySelector("#toast");
+      const form = document.querySelector(".booking-form");
+      const departure = document.querySelector("#departure");
+      const bookingSummary = document.querySelector("#bookingSummary");
+      let slideIndex = 0;
+      let timer;
+
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add("show");
+        clearTimeout(showToast.timer);
+        showToast.timer = setTimeout(() => toast.classList.remove("show"), 2200);
+      }
+
+      function showSlide(nextIndex) {
+        slideIndex = (nextIndex + slides.length) % slides.length;
+        slides.forEach((slide, index) => slide.classList.toggle("active", index === slideIndex));
+        dots.forEach((dot, index) => dot.classList.toggle("active", index === slideIndex));
+      }
+
+      function startCarousel() {
+        clearInterval(timer);
+        timer = setInterval(() => showSlide(slideIndex + 1), 4200);
+      }
+
+      function getCounts() {
+        return [...document.querySelectorAll("[data-counter]")].reduce((result, item) => {
+          result[item.dataset.counter] = Number(item.querySelector("span").textContent);
+          return result;
+        }, {});
+      }
+
+      function updateSummary() {
+        const counts = getCounts();
+        const total = counts.adult + counts.child + counts.elder;
+        const parts = [];
+        if (counts.adult) parts.push(`${counts.adult} 位成人`);
+        if (counts.child) parts.push(`${counts.child} 位儿童/青少年`);
+        if (counts.elder) parts.push(`${counts.elder} 位长者`);
+        bookingSummary.textContent = `${parts.join("、") || "未选择人数"} · ${departure.value}集合`;
+        document.querySelector("#bottomSubmit").textContent = total > 0 ? `立即报名 · ${total}人` : "立即报名";
+      }
+
+      dots.forEach((dot, index) => {
+        dot.addEventListener("click", () => {
+          showSlide(index);
+          startCarousel();
+        });
+      });
+
+      document.querySelectorAll("[data-counter]").forEach((counter) => {
+        counter.addEventListener("click", (event) => {
+          const button = event.target.closest("button");
+          if (!button) return;
+          const valueNode = counter.querySelector(".counter-actions span");
+          const current = Number(valueNode.textContent);
+          const minimum = counter.dataset.counter === "adult" ? 1 : 0;
+          const nextValue =
+            button.dataset.action === "plus" ? Math.min(current + 1, 9) : Math.max(current - 1, minimum);
+          valueNode.textContent = nextValue;
+          updateSummary();
+        });
+      });
+
+      departure.addEventListener("change", updateSummary);
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const contact = document.querySelector("#contact").value.trim();
+        if (!contact) {
+          showToast("请先填写联系人手机号，方便确认团号和名额");
+          return;
+        }
+        showToast("报名需求已记录，下一步可接入后端订单和客服确认");
+      });
+
+      document.querySelector("#consultBtn").addEventListener("click", () => {
+        showToast("客服入口待接入，可用于确认团期、价格与签注要求");
+      });
+
+      document.querySelector("#bottomSubmit").addEventListener("click", () => {
+        form.requestSubmit();
+      });
+
+      updateSummary();
+      startCarousel();
+      if (window.lucide) lucide.createIcons();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,727 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>租车服务</title>
+    <link rel="icon" href="data:," />
+    <style>
+      :root {
+        --primary: #0f8dad;
+        --primary-dark: #086d89;
+        --accent: #f15a2b;
+        --gold: #f4b23f;
+        --green: #1f9661;
+        --ink: #16212a;
+        --muted: #687682;
+        --line: #e7eef2;
+        --page: #edf5f7;
+        --card: #fff;
+        --danger: #d94b3d;
+        --shadow: 0 12px 30px rgba(10, 49, 70, 0.1);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 20% 0%, rgba(15, 141, 173, 0.18), transparent 32%),
+          linear-gradient(180deg, #f7fbfc 0%, #dfeff2 100%);
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB",
+          "Microsoft YaHei", sans-serif;
+      }
+
+      button,
+      input,
+      select {
+        font: inherit;
+      }
+
+      button {
+        border: 0;
+        cursor: pointer;
+      }
+
+      .phone {
+        width: min(100vw, 430px);
+        min-height: 100vh;
+        margin: 0 auto;
+        position: relative;
+        overflow-x: hidden;
+        background: var(--page);
+        box-shadow: 0 0 0 1px rgba(20, 35, 45, 0.05), 0 24px 80px rgba(8, 45, 64, 0.18);
+      }
+
+      .hero {
+        position: relative;
+        height: 318px;
+        overflow: hidden;
+        color: #fff;
+        background: #0b5f78;
+      }
+
+      .hero-slide {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        transition: opacity 0.48s ease;
+      }
+
+      .hero-slide.active {
+        opacity: 1;
+      }
+
+      .hero-slide img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: cover;
+      }
+
+      .hero-slide::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(180deg, rgba(3, 22, 31, 0.2), rgba(3, 22, 31, 0.62)),
+          linear-gradient(90deg, rgba(3, 31, 42, 0.55), transparent 70%);
+      }
+
+      .top {
+        position: absolute;
+        z-index: 3;
+        top: env(safe-area-inset-top, 0);
+        left: 0;
+        right: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 14px 0;
+      }
+
+      .nav-chip {
+        min-height: 36px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 0 11px;
+        border-radius: 999px;
+        color: #fff;
+        background: rgba(255, 255, 255, 0.16);
+        backdrop-filter: blur(10px);
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 850;
+      }
+
+      .nav-chip svg {
+        width: 17px;
+        height: 17px;
+      }
+
+      .hero-copy {
+        position: absolute;
+        z-index: 2;
+        left: 16px;
+        right: 16px;
+        bottom: 28px;
+      }
+
+      .hero-copy b,
+      .hero-copy span {
+        display: block;
+      }
+
+      .hero-copy b {
+        max-width: 280px;
+        font-size: 30px;
+        line-height: 1.12;
+        letter-spacing: -0.7px;
+        text-shadow: 0 4px 18px rgba(0, 0, 0, 0.26);
+      }
+
+      .hero-copy span {
+        max-width: 300px;
+        margin-top: 9px;
+        color: rgba(255, 255, 255, 0.88);
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      .hero-dots {
+        display: flex;
+        gap: 6px;
+        margin-top: 14px;
+      }
+
+      .hero-dots button {
+        width: 18px;
+        height: 4px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.45);
+      }
+
+      .hero-dots button.active {
+        width: 32px;
+        background: #fff;
+      }
+
+      .content {
+        position: relative;
+        z-index: 4;
+        margin-top: -18px;
+        padding: 0 14px calc(96px + env(safe-area-inset-bottom, 0));
+      }
+
+      .card {
+        margin-bottom: 10px;
+        padding: 14px;
+        border-radius: 8px;
+        background: var(--card);
+        box-shadow: var(--shadow);
+      }
+
+      .section-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+
+      .section-head h2 {
+        margin: 0;
+        font-size: 18px;
+      }
+
+      .section-head span {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .booking-card {
+        border-radius: 18px 18px 8px 8px;
+      }
+
+      .trip-tabs {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 7px;
+        margin-bottom: 12px;
+      }
+
+      .trip-tabs button {
+        height: 34px;
+        border-radius: 999px;
+        color: var(--muted);
+        background: #f1fafb;
+        font-size: 13px;
+        font-weight: 850;
+      }
+
+      .trip-tabs button.active {
+        color: #fff;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      }
+
+      .form-grid {
+        display: grid;
+        gap: 9px;
+      }
+
+      .field {
+        display: grid;
+        gap: 6px;
+      }
+
+      .field label {
+        color: #4c5f69;
+        font-size: 12px;
+        font-weight: 850;
+      }
+
+      .field input,
+      .field select {
+        width: 100%;
+        height: 44px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 0 11px;
+        color: var(--ink);
+        background: #fbfdfe;
+        outline: 0;
+        font-size: 14px;
+      }
+
+      .inline-fields {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 9px;
+      }
+
+      .search-btn {
+        height: 44px;
+        border-radius: 22px;
+        color: #fff;
+        background: linear-gradient(135deg, #ff7a2f, #f04b2f);
+        font-size: 16px;
+        font-weight: 900;
+        box-shadow: 0 10px 22px rgba(241, 90, 43, 0.22);
+      }
+
+      .service-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .service {
+        min-height: 70px;
+        display: grid;
+        place-items: center;
+        gap: 7px;
+        border-radius: 8px;
+        color: #3f7281;
+        background: #eaf7fa;
+        font-size: 12px;
+        font-weight: 850;
+      }
+
+      .service:nth-child(2n) {
+        color: #875a32;
+        background: #fff0df;
+      }
+
+      .service svg {
+        width: 22px;
+        height: 22px;
+      }
+
+      .filter-row {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+
+      .filter-row::-webkit-scrollbar {
+        display: none;
+      }
+
+      .filter-row button {
+        flex: 0 0 auto;
+        height: 32px;
+        padding: 0 12px;
+        border-radius: 999px;
+        color: var(--muted);
+        background: #f1fafb;
+        font-size: 13px;
+        font-weight: 850;
+      }
+
+      .filter-row button.active {
+        color: var(--primary-dark);
+        background: #e4f8fb;
+      }
+
+      .car-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .car-card {
+        display: grid;
+        grid-template-columns: 112px minmax(0, 1fr);
+        gap: 12px;
+        padding: 10px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fbfdfe;
+      }
+
+      .car-media {
+        min-height: 96px;
+        display: grid;
+        place-items: center;
+        border-radius: 8px;
+        overflow: hidden;
+        background:
+          radial-gradient(circle at 70% 20%, rgba(244, 178, 63, 0.32), transparent 30%),
+          linear-gradient(135deg, #eaf7fa, #fff7ec);
+      }
+
+      .car-media img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .car-info h3 {
+        margin: 0;
+        font-size: 16px;
+      }
+
+      .car-info p {
+        margin: 6px 0 8px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.42;
+      }
+
+      .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+      }
+
+      .tags span {
+        padding: 3px 6px;
+        border-radius: 6px;
+        color: #52616a;
+        background: #eef4f6;
+        font-size: 11px;
+      }
+
+      .price-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-top: 9px;
+      }
+
+      .price {
+        color: var(--danger);
+        font-size: 13px;
+        font-weight: 850;
+      }
+
+      .price em {
+        font-size: 20px;
+        font-style: normal;
+      }
+
+      .reserve {
+        height: 30px;
+        padding: 0 11px;
+        border-radius: 15px;
+        color: #fff;
+        background: var(--accent);
+        font-size: 12px;
+        font-weight: 850;
+      }
+
+      .guarantee-list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .guarantee {
+        min-height: 72px;
+        padding: 10px;
+        border-radius: 8px;
+        background: #fbfdfe;
+        box-shadow: inset 0 0 0 1px var(--line);
+      }
+
+      .guarantee strong,
+      .guarantee span {
+        display: block;
+      }
+
+      .guarantee strong {
+        font-size: 14px;
+      }
+
+      .guarantee span {
+        margin-top: 5px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.4;
+      }
+
+      .bottom-bar {
+        position: fixed;
+        z-index: 20;
+        left: 50%;
+        bottom: 0;
+        width: min(100vw, 430px);
+        transform: translateX(-50%);
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0));
+        background: rgba(255, 255, 255, 0.97);
+        border-top: 1px solid rgba(10, 26, 35, 0.08);
+        backdrop-filter: blur(12px);
+      }
+
+      .bottom-bar button {
+        height: 44px;
+        border-radius: 22px;
+        font-size: 15px;
+        font-weight: 900;
+      }
+
+      .consult {
+        color: var(--primary-dark);
+        background: #e9f7fa;
+      }
+
+      .book {
+        color: #fff;
+        background: linear-gradient(135deg, #ff7a2f, #f04b2f);
+      }
+
+      .toast {
+        position: fixed;
+        left: 50%;
+        bottom: calc(78px + env(safe-area-inset-bottom, 0));
+        z-index: 50;
+        max-width: min(86vw, 360px);
+        transform: translate(-50%, 20px);
+        padding: 10px 14px;
+        border-radius: 999px;
+        color: #fff;
+        background: rgba(20, 31, 38, 0.9);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.18s ease, transform 0.18s ease;
+        font-size: 13px;
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="phone">
+      <section class="hero" aria-label="珠海租车服务">
+        <div class="hero-slide active" data-title="珠海机场接送与租车" data-subtitle="商务车、亲子出游、自驾租车，一站式安排">
+          <img src="assets/taxi-scan-illustration-web.jpg" alt="" />
+        </div>
+        <div class="hero-slide" data-title="港澳珠深跨城用车" data-subtitle="横琴、拱北、九洲港、机场码头都可预约">
+          <img src="assets/zhuhai-bay-home-hero-web.jpg" alt="" />
+        </div>
+        <div class="hero-slide" data-title="专车包车更省心" data-subtitle="司机接送、路线定制、多人行李友好">
+          <img src="assets/wechat_2026-06-20_150405_315.png" alt="" />
+        </div>
+        <div class="top">
+          <a class="nav-chip" href="index.html"><i data-lucide="chevron-left"></i>返回</a>
+          <span class="nav-chip"><i data-lucide="shield-check"></i>正规车辆</span>
+        </div>
+        <div class="hero-copy">
+          <b>珠海租车服务</b>
+          <span>接送机、跨城包车、自驾租车和商务出行，按时间、人数、行李快速匹配车型。</span>
+          <div class="hero-dots" aria-label="租车轮播">
+            <button class="active" type="button" aria-label="第 1 张"></button>
+            <button type="button" aria-label="第 2 张"></button>
+            <button type="button" aria-label="第 3 张"></button>
+          </div>
+        </div>
+      </section>
+
+      <section class="content">
+        <section class="card booking-card">
+          <div class="trip-tabs">
+            <button class="active" type="button">接送机</button>
+            <button type="button">日租包车</button>
+            <button type="button">自驾租车</button>
+          </div>
+          <div class="form-grid">
+            <div class="inline-fields">
+              <div class="field">
+                <label for="pickup">取车/上车点</label>
+                <input id="pickup" value="珠海金湾机场" />
+              </div>
+              <div class="field">
+                <label for="dropoff">还车/目的地</label>
+                <input id="dropoff" value="横琴口岸" />
+              </div>
+            </div>
+            <div class="inline-fields">
+              <div class="field">
+                <label for="date">用车日期</label>
+                <input id="date" type="date" value="2026-06-23" />
+              </div>
+              <div class="field">
+                <label for="time">用车时间</label>
+                <input id="time" type="time" value="10:30" />
+              </div>
+            </div>
+            <div class="inline-fields">
+              <div class="field">
+                <label for="people">乘车人数</label>
+                <select id="people">
+                  <option>1-2人</option>
+                  <option selected>3-4人</option>
+                  <option>5-6人</option>
+                  <option>7人以上</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="luggage">行李数量</label>
+                <select id="luggage">
+                  <option>无大件</option>
+                  <option selected>2件行李</option>
+                  <option>4件行李</option>
+                  <option>更多行李</option>
+                </select>
+              </div>
+            </div>
+            <button class="search-btn" type="button" data-action="search">查询可用车辆</button>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <h2>服务类型</h2>
+            <span>按场景选车</span>
+          </div>
+          <div class="service-grid">
+            <button class="service" type="button"><i data-lucide="plane-landing"></i><span>机场接送</span></button>
+            <button class="service" type="button"><i data-lucide="route"></i><span>跨城包车</span></button>
+            <button class="service" type="button"><i data-lucide="key-round"></i><span>自驾租车</span></button>
+            <button class="service" type="button"><i data-lucide="briefcase-business"></i><span>商务用车</span></button>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <h2>推荐车型</h2>
+            <span>可按需求调整</span>
+          </div>
+          <div class="filter-row">
+            <button class="active" type="button">全部</button>
+            <button type="button">经济型</button>
+            <button type="button">舒适型</button>
+            <button type="button">商务车</button>
+            <button type="button">新能源</button>
+          </div>
+        </section>
+
+        <section class="car-list">
+          <article class="car-card">
+            <div class="car-media"><img src="assets/taxi-scan-illustration-web.jpg" alt="舒适型轿车" /></div>
+            <div class="car-info">
+              <h3>舒适型轿车</h3>
+              <p>适合 1-4 人，机场/口岸/酒店接送，后备箱可放 2 件行李。</p>
+              <div class="tags"><span>4座</span><span>含基础保险</span><span>新能源优先</span></div>
+              <div class="price-row"><div class="price">¥<em>128</em>起</div><button class="reserve" type="button">预订</button></div>
+            </div>
+          </article>
+          <article class="car-card">
+            <div class="car-media"><img src="assets/preview-driver-orders.png" alt="商务七座车" /></div>
+            <div class="car-info">
+              <h3>商务七座车</h3>
+              <p>适合亲子、团队、商务接待，横琴/拱北/九洲港跨点接送更从容。</p>
+              <div class="tags"><span>7座</span><span>大行李</span><span>司机接送</span></div>
+              <div class="price-row"><div class="price">¥<em>268</em>起</div><button class="reserve" type="button">预订</button></div>
+            </div>
+          </article>
+          <article class="car-card">
+            <div class="car-media"><img src="assets/zhuhai-macau-reference.jpg" alt="跨境旅游包车" /></div>
+            <div class="car-info">
+              <h3>旅游包车定制</h3>
+              <p>适合一日游、多景点串联，可备注澳门游、海岛码头、长隆等行程。</p>
+              <div class="tags"><span>路线定制</span><span>半日/全天</span><span>中文司机</span></div>
+              <div class="price-row"><div class="price">¥<em>399</em>起</div><button class="reserve" type="button">预订</button></div>
+            </div>
+          </article>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <h2>服务保障</h2>
+            <span>下单前可确认</span>
+          </div>
+          <div class="guarantee-list">
+            <div class="guarantee"><strong>正规车辆</strong><span>车辆与司机资料审核后展示。</span></div>
+            <div class="guarantee"><strong>明码报价</strong><span>按路线、时长、车型预估费用。</span></div>
+            <div class="guarantee"><strong>行程备注</strong><span>可填写儿童座椅、行李、跨城需求。</span></div>
+            <div class="guarantee"><strong>客服跟进</strong><span>复杂行程可转人工确认。</span></div>
+          </div>
+        </section>
+      </section>
+
+      <footer class="bottom-bar">
+        <button class="consult" type="button" data-action="consult">联系客服</button>
+        <button class="book" type="button" data-action="book">提交用车需求</button>
+      </footer>
+
+      <div class="toast" role="status" aria-live="polite"></div>
+    </main>
+
+    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+    <script>
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
+
+      const slides = [...document.querySelectorAll(".hero-slide")];
+      const dots = [...document.querySelectorAll(".hero-dots button")];
+      const title = document.querySelector(".hero-copy b");
+      const subtitle = document.querySelector(".hero-copy span");
+      const toast = document.querySelector(".toast");
+      let activeIndex = 0;
+      let timer;
+
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add("show");
+        clearTimeout(showToast.timer);
+        showToast.timer = setTimeout(() => toast.classList.remove("show"), 1500);
+      }
+
+      function showSlide(index) {
+        activeIndex = (index + slides.length) % slides.length;
+        slides.forEach((slide, idx) => slide.classList.toggle("active", idx === activeIndex));
+        dots.forEach((dot, idx) => dot.classList.toggle("active", idx === activeIndex));
+        title.textContent = slides[activeIndex].dataset.title;
+        subtitle.textContent = slides[activeIndex].dataset.subtitle;
+      }
+
+      function startCarousel() {
+        clearInterval(timer);
+        timer = setInterval(() => showSlide(activeIndex + 1), 3800);
+      }
+
+      dots.forEach((dot, index) => {
+        dot.addEventListener("click", () => {
+          showSlide(index);
+          startCarousel();
+        });
+      });
+
+      document.querySelectorAll(".trip-tabs button, .filter-row button").forEach((button) => {
+        button.addEventListener("click", () => {
+          button.parentElement.querySelectorAll("button").forEach((item) => item.classList.remove("active"));
+          button.classList.add("active");
+        });
+      });
+
+      document.querySelectorAll(".service, .reserve, [data-action]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const action = button.dataset.action;
+          if (action === "search") showToast("已按当前条件查询可用车辆");
+          else if (action === "consult") showToast("客服咨询入口预留");
+          else if (action === "book") showToast("用车需求已记录，后续可接入下单接口");
+          else showToast(`已选择：${button.textContent.trim()}`);
+        });
+      });
+
+      startCarousel();
+    </script>
+  </body>
+</html>

@@ -440,6 +440,10 @@
         gap: 8px;
       }
 
+      .home-spotlight .spotlight-item:nth-child(n + 7) {
+        display: none;
+      }
+
       .spotlight-item {
         min-height: 88px;
         display: grid;
@@ -505,6 +509,82 @@
         margin-top: 4px;
         color: rgba(84, 74, 67, 0.68);
         font-size: 11px;
+      }
+
+      .category-modal[hidden] {
+        display: none;
+      }
+
+      .category-modal {
+        position: fixed;
+        z-index: 60;
+        inset: 0;
+        display: grid;
+        align-items: end;
+        background: rgba(9, 22, 30, 0.48);
+      }
+
+      .category-panel {
+        width: min(100vw, 430px);
+        max-height: 78vh;
+        margin: 0 auto;
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr);
+        overflow: hidden;
+        border-radius: 18px 18px 0 0;
+        background:
+          linear-gradient(180deg, rgba(255, 248, 237, 0.96), rgba(237, 245, 247, 0.98) 34%),
+          var(--page);
+        box-shadow: 0 -18px 50px rgba(5, 28, 42, 0.24);
+      }
+
+      .category-panel-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 16px 16px 10px;
+      }
+
+      .category-panel-head h3,
+      .category-panel-head p {
+        margin: 0;
+      }
+
+      .category-panel-head h3 {
+        font-size: 18px;
+        line-height: 1.2;
+      }
+
+      .category-panel-head p {
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .category-close {
+        width: 36px;
+        height: 36px;
+        flex: 0 0 auto;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        color: var(--ink);
+        background: rgba(255, 255, 255, 0.72);
+      }
+
+      .category-close svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      .category-scroll {
+        overflow-y: auto;
+        padding: 0 14px calc(16px + env(safe-area-inset-bottom, 0));
+      }
+
+      .category-grid {
+        padding-bottom: 2px;
       }
 
       .quick-item {
@@ -1737,32 +1817,76 @@
         <div class="quick-sheet">
           <div class="section-title">
             <h2>热门目的地</h2>
-            <a href="#all">全部分类</a>
+            <a href="#all" id="allCategoryTrigger">全部分类</a>
           </div>
-          <nav class="spotlight-grid" aria-label="珠海热门目的地">
-            <a class="spotlight-item" href="flow.html" data-direct-link data-name="九洲港船票">
+          <nav class="spotlight-grid home-spotlight" aria-label="珠海热门目的地">
+            <a class="spotlight-item" href="flow.html" data-direct-link data-name="澳门环岛游">
               <span class="spotlight-icon"><i data-lucide="ship" aria-hidden="true"></i></span>
-              <span class="spotlight-copy"><strong>九洲港船票</strong><span>蛇口航线</span></span>
+              <span class="spotlight-copy"><strong>澳门环岛游</strong><span>海上观光</span></span>
             </a>
-            <a class="spotlight-item" href="#" data-name="横琴长隆">
-              <span class="spotlight-icon"><i data-lucide="ticket" aria-hidden="true"></i></span>
-              <span class="spotlight-copy"><strong>横琴长隆</strong><span>亲子玩乐</span></span>
+            <a class="spotlight-item" href="flow.html" data-direct-link data-name="深圳香港船票">
+              <span class="spotlight-icon"><i data-lucide="sailboat" aria-hidden="true"></i></span>
+              <span class="spotlight-copy"><strong>深圳香港船票</strong><span>九洲蛇口</span></span>
             </a>
-            <a class="spotlight-item" href="#" data-name="海岛船票">
-              <span class="spotlight-icon"><i data-lucide="waves" aria-hidden="true"></i></span>
-              <span class="spotlight-copy"><strong>海岛船票</strong><span>东澳桂山</span></span>
+            <a class="spotlight-item" href="#" data-name="私人旅游订制">
+              <span class="spotlight-icon"><i data-lucide="sparkles" aria-hidden="true"></i></span>
+              <span class="spotlight-copy"><strong>私人旅游订制</strong><span>专属路线</span></span>
             </a>
-            <a class="spotlight-item" href="#" data-name="情侣路">
-              <span class="spotlight-icon"><i data-lucide="route" aria-hidden="true"></i></span>
-              <span class="spotlight-copy"><strong>情侣路漫游</strong><span>城市观景</span></span>
-            </a>
-            <a class="spotlight-item" href="#" data-name="珠海渔女">
-              <span class="spotlight-icon"><i data-lucide="map-pin" aria-hidden="true"></i></span>
-              <span class="spotlight-copy"><strong>珠海渔女</strong><span>地标打卡</span></span>
-            </a>
-            <a class="spotlight-item" href="#" data-name="港珠澳大桥">
+            <a class="spotlight-item" href="#" data-name="港珠澳大桥游">
               <span class="spotlight-icon"><i data-lucide="landmark" aria-hidden="true"></i></span>
-              <span class="spotlight-copy"><strong>港珠澳桥</strong><span>湾区观光</span></span>
+              <span class="spotlight-copy"><strong>港珠澳大桥游</strong><span>湾区观光</span></span>
+            </a>
+            <a class="spotlight-item" href="#" data-name="珠海长隆">
+              <span class="spotlight-icon"><i data-lucide="ticket" aria-hidden="true"></i></span>
+              <span class="spotlight-copy"><strong>珠海长隆</strong><span>亲子度假</span></span>
+            </a>
+            <a class="spotlight-item" href="macau.html" data-direct-link data-name="澳门游">
+              <span class="spotlight-icon"><i data-lucide="badge-dollar-sign" aria-hidden="true"></i></span>
+              <span class="spotlight-copy"><strong>澳门游</strong><span>轻松过关</span></span>
+            </a>
+            <a class="spotlight-item" href="hongkong.html" data-direct-link data-name="香港游">
+              <span class="spotlight-icon"><i data-lucide="building-2" aria-hidden="true"></i></span>
+              <span class="spotlight-copy"><strong>香港游</strong><span>都会假期</span></span>
+            </a>
+            <a class="spotlight-item" href="#" data-name="海岛游">
+              <span class="spotlight-icon"><i data-lucide="waves" aria-hidden="true"></i></span>
+              <span class="spotlight-copy"><strong>海岛游</strong><span>东澳桂山</span></span>
+            </a>
+            <a class="spotlight-item" href="#" data-name="机场接送/租车">
+              <span class="spotlight-icon"><i data-lucide="car-front" aria-hidden="true"></i></span>
+              <span class="spotlight-copy"><strong>机场接送/租车</strong><span>专车出行</span></span>
+            </a>
+            <a class="spotlight-item" href="car.html" data-direct-link data-name="租车服务">
+              <span class="spotlight-icon"><i data-lucide="key-round" aria-hidden="true"></i></span>
+              <span class="spotlight-copy"><strong>租车服务</strong><span>自驾包车</span></span>
+            </a>
+            <a class="spotlight-item" href="#" data-name="游艇">
+              <span class="spotlight-icon"><i data-lucide="anchor" aria-hidden="true"></i></span>
+              <span class="spotlight-copy"><strong>游艇</strong><span>海上派对</span></span>
+            </a>
+            <a class="spotlight-item" href="#" data-name="直升飞机观光">
+              <span class="spotlight-icon"><i data-lucide="plane" aria-hidden="true"></i></span>
+              <span class="spotlight-copy"><strong>直升飞机观光</strong><span>高空俯瞰</span></span>
+            </a>
+            <a class="spotlight-item" href="#" data-name="石景山索道">
+              <span class="spotlight-icon"><i data-lucide="mountain" aria-hidden="true"></i></span>
+              <span class="spotlight-copy"><strong>石景山索道</strong><span>城市山海</span></span>
+            </a>
+            <a class="spotlight-item" href="#" data-name="珠海酒店">
+              <span class="spotlight-icon"><i data-lucide="hotel" aria-hidden="true"></i></span>
+              <span class="spotlight-copy"><strong>珠海酒店</strong><span>湾区住宿</span></span>
+            </a>
+            <a class="spotlight-item" href="#" data-name="澳门酒店">
+              <span class="spotlight-icon"><i data-lucide="bed-double" aria-hidden="true"></i></span>
+              <span class="spotlight-copy"><strong>澳门酒店</strong><span>度假预订</span></span>
+            </a>
+            <a class="spotlight-item" href="#" data-name="休闲娱乐">
+              <span class="spotlight-icon"><i data-lucide="party-popper" aria-hidden="true"></i></span>
+              <span class="spotlight-copy"><strong>休闲娱乐</strong><span>本地玩乐</span></span>
+            </a>
+            <a class="spotlight-item" href="#" data-name="积分商城">
+              <span class="spotlight-icon"><i data-lucide="gift" aria-hidden="true"></i></span>
+              <span class="spotlight-copy"><strong>积分商城</strong><span>权益兑换</span></span>
             </a>
           </nav>
         </div>
@@ -2172,6 +2296,23 @@
       <div class="toast" role="status" aria-live="polite"></div>
     </main>
 
+    <section class="category-modal" id="categoryModal" hidden aria-label="全部分类">
+      <div class="category-panel" role="dialog" aria-modal="true" aria-labelledby="categoryModalTitle">
+        <div class="category-panel-head">
+          <div>
+            <h3 id="categoryModalTitle">全部分类</h3>
+            <p>海上观光、跨境游、租车酒店和本地玩乐都在这里</p>
+          </div>
+          <button class="category-close" type="button" id="categoryClose" aria-label="关闭全部分类">
+            <i data-lucide="x" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="category-scroll">
+          <nav class="spotlight-grid category-grid" id="allCategoryGrid" aria-label="全部热门目的地"></nav>
+        </div>
+      </div>
+    </section>
+
     <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
     <script>
       if (window.lucide) {
@@ -2179,6 +2320,10 @@
       }
 
       const toast = document.querySelector(".toast");
+      const allCategoryTrigger = document.querySelector("#allCategoryTrigger");
+      const categoryModal = document.querySelector("#categoryModal");
+      const categoryClose = document.querySelector("#categoryClose");
+      const allCategoryGrid = document.querySelector("#allCategoryGrid");
       let toastTimer;
 
       function showToast(message) {
@@ -2242,15 +2387,44 @@
         showToast(value ? `搜索：${value}` : "请输入要查询的商品或服务");
       });
 
+      function openCategoryModal() {
+        categoryModal.hidden = false;
+      }
+
+      function closeCategoryModal() {
+        categoryModal.hidden = true;
+      }
+
+      document.querySelectorAll(".home-spotlight .spotlight-item").forEach((item) => {
+        allCategoryGrid.appendChild(item.cloneNode(true));
+      });
+
+      allCategoryTrigger.addEventListener("click", (event) => {
+        event.preventDefault();
+        openCategoryModal();
+      });
+
+      categoryClose.addEventListener("click", closeCategoryModal);
+
+      categoryModal.addEventListener("click", (event) => {
+        if (event.target === categoryModal) closeCategoryModal();
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && !categoryModal.hidden) closeCategoryModal();
+      });
+
       document.querySelectorAll(".quick-item, .spotlight-item").forEach((item) => {
         item.addEventListener("click", (event) => {
           if (item.dataset.directLink !== undefined) return;
           event.preventDefault();
           if (item.dataset.pageLink) {
             switchPage(item.dataset.pageLink);
+            closeCategoryModal();
             return;
           }
           showToast(`进入：${item.dataset.name}`);
+          if (item.closest("#categoryModal")) closeCategoryModal();
         });
       });
 
