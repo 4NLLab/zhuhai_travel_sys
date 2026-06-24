@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>珠海酒店选择</title>
+    <link rel="icon" href="data:," />
+    <style>
+      :root {
+        --blue: #0878f8;
+        --ink: #101820;
+        --muted: #687482;
+        --line: #e8eef6;
+        --page: #eef3fa;
+        --card: #fff;
+        --orange: #e87a2f;
+        --green: #16805f;
+        --shadow: 0 10px 28px rgba(31, 59, 92, 0.11);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--ink);
+        background: linear-gradient(180deg, #f8fbff 0%, #e7eef8 100%);
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB",
+          "Microsoft YaHei", sans-serif;
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      button {
+        border: 0;
+        cursor: pointer;
+      }
+
+      .phone {
+        width: min(100vw, 420px);
+        min-height: 100vh;
+        margin: 0 auto;
+        overflow-x: hidden;
+        background: var(--page);
+        box-shadow: 0 0 0 1px rgba(20, 35, 45, 0.05), 0 24px 80px rgba(8, 45, 64, 0.18);
+      }
+
+      .top {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        padding: calc(12px + env(safe-area-inset-top, 0)) 14px 12px;
+        background: rgba(255, 255, 255, 0.96);
+        backdrop-filter: blur(14px);
+        box-shadow: 0 8px 20px rgba(34, 61, 88, 0.08);
+      }
+
+      .nav {
+        display: grid;
+        grid-template-columns: 38px 1fr 38px;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .icon-btn {
+        width: 38px;
+        height: 38px;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        color: #13202c;
+        background: #f2f6fb;
+        text-decoration: none;
+      }
+
+      .icon-btn svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      .title {
+        min-width: 0;
+        font-size: 18px;
+        font-weight: 950;
+        text-align: center;
+      }
+
+      .search-card {
+        margin-top: 12px;
+        padding: 12px;
+        border-radius: 8px;
+        background: var(--card);
+        box-shadow: var(--shadow);
+      }
+
+      .search-row {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        align-items: center;
+        gap: 8px;
+        min-height: 40px;
+        padding: 0 10px;
+        border-radius: 6px;
+        background: #f4f7fb;
+        color: var(--muted);
+      }
+
+      .search-row input {
+        min-width: 0;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: var(--ink);
+        font-weight: 800;
+      }
+
+      .date-row {
+        display: grid;
+        grid-template-columns: 1fr 62px 1fr;
+        align-items: end;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .date-block span,
+      .guest-block span {
+        display: block;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .date-block strong {
+        display: block;
+        margin-top: 2px;
+        font-size: 24px;
+        line-height: 1.05;
+        font-weight: 950;
+      }
+
+      .night-count {
+        justify-self: center;
+        padding-bottom: 2px;
+        font-size: 14px;
+        font-weight: 850;
+      }
+
+      .guest-block {
+        text-align: right;
+      }
+
+      .guest-block strong {
+        display: block;
+        margin-top: 5px;
+        font-size: 21px;
+        line-height: 1;
+        font-weight: 950;
+      }
+
+      .filter-row {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding: 12px 0 0;
+        scrollbar-width: none;
+      }
+
+      .filter-row::-webkit-scrollbar {
+        display: none;
+      }
+
+      .filter-row button {
+        flex: 0 0 auto;
+        min-height: 34px;
+        padding: 0 12px;
+        border-radius: 999px;
+        color: #182531;
+        background: #eef3f8;
+        font-size: 13px;
+        font-weight: 850;
+      }
+
+      .filter-row button.active {
+        color: var(--blue);
+        background: #e6f1ff;
+      }
+
+      .content {
+        padding: 12px 10px calc(28px + env(safe-area-inset-bottom, 0));
+      }
+
+      .list-head {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 12px;
+        margin: 4px 4px 10px;
+      }
+
+      .list-head h1 {
+        margin: 0;
+        font-size: 20px;
+        line-height: 1.2;
+      }
+
+      .list-head span {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 800;
+        white-space: nowrap;
+      }
+
+      .hotel-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .hotel-card {
+        display: grid;
+        grid-template-columns: 126px 1fr;
+        gap: 12px;
+        padding: 10px;
+        border-radius: 8px;
+        color: inherit;
+        background: #fff;
+        box-shadow: var(--shadow);
+        text-decoration: none;
+      }
+
+      .hotel-cover {
+        position: relative;
+        min-height: 142px;
+        overflow: hidden;
+        border-radius: 6px;
+        background: #dce5ee;
+      }
+
+      .hotel-cover img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: cover;
+      }
+
+      .photo-badge {
+        position: absolute;
+        left: 8px;
+        bottom: 8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 7px;
+        border-radius: 999px;
+        color: #fff;
+        background: rgba(0, 0, 0, 0.48);
+        font-size: 11px;
+        font-weight: 850;
+      }
+
+      .hotel-info {
+        min-width: 0;
+        display: grid;
+        align-content: start;
+        gap: 6px;
+      }
+
+      .hotel-info h2 {
+        margin: 0;
+        font-size: 18px;
+        line-height: 1.2;
+      }
+
+      .diamonds {
+        color: #f2b22a;
+        font-size: 13px;
+        white-space: nowrap;
+      }
+
+      .summary {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 5px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 750;
+      }
+
+      .score {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        color: var(--blue);
+        font-size: 13px;
+        font-weight: 900;
+      }
+
+      .score b {
+        padding: 3px 6px;
+        border-radius: 5px;
+        color: #fff;
+        background: var(--blue);
+      }
+
+      .quote {
+        margin: 0;
+        color: #293746;
+        font-size: 13px;
+        line-height: 1.35;
+        font-weight: 800;
+      }
+
+      .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+      }
+
+      .tags span {
+        padding: 3px 6px;
+        border-radius: 4px;
+        color: #426170;
+        background: #eef8fb;
+        font-size: 11px;
+        font-weight: 800;
+      }
+
+      .card-bottom {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 8px;
+        margin-top: 2px;
+      }
+
+      .distance {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.35;
+      }
+
+      .price {
+        color: var(--orange);
+        text-align: right;
+        font-weight: 950;
+        white-space: nowrap;
+      }
+
+      .price b {
+        font-size: 25px;
+      }
+
+      .price span {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .reserve {
+        min-height: 34px;
+        padding: 0 13px;
+        border-radius: 6px;
+        color: #fff;
+        background: var(--blue);
+        font-size: 14px;
+        font-weight: 900;
+      }
+
+      .toast {
+        position: fixed;
+        z-index: 30;
+        left: 50%;
+        bottom: calc(22px + env(safe-area-inset-bottom, 0));
+        max-width: 320px;
+        transform: translateX(-50%) translateY(14px);
+        padding: 10px 14px;
+        border-radius: 999px;
+        color: #fff;
+        background: rgba(16, 24, 32, 0.86);
+        opacity: 0;
+        pointer-events: none;
+        transition: 0.2s ease;
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+
+      @media (max-width: 374px) {
+        .hotel-card {
+          grid-template-columns: 112px 1fr;
+        }
+
+        .hotel-cover {
+          min-height: 132px;
+        }
+
+        .hotel-info h2 {
+          font-size: 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="phone">
+      <header class="top">
+        <nav class="nav">
+          <a class="icon-btn" href="index.html" aria-label="返回首页"><i data-lucide="chevron-left"></i></a>
+          <div class="title">珠海酒店</div>
+          <button class="icon-btn" type="button" data-toast="地图筛选入口预留"><i data-lucide="map"></i></button>
+        </nav>
+
+        <section class="search-card" aria-label="酒店查询条件">
+          <label class="search-row">
+            <i data-lucide="search"></i>
+            <input type="search" value="珠海 香洲 拱北" aria-label="搜索酒店或商圈" />
+          </label>
+          <div class="date-row">
+            <div class="date-block"><span>今天</span><strong>6月24日</strong></div>
+            <div class="night-count">共 1 晚</div>
+            <div class="guest-block"><span>间数人数</span><strong>1间 1人</strong></div>
+          </div>
+          <div class="filter-row" aria-label="酒店筛选">
+            <button class="active" type="button">推荐排序</button>
+            <button type="button">免费停车</button>
+            <button type="button">近口岸</button>
+            <button type="button">亲子友好</button>
+            <button type="button">低价优先</button>
+          </div>
+        </section>
+      </header>
+
+      <section class="content">
+        <div class="list-head">
+          <h1>可预订酒店</h1>
+          <span>2 家可选</span>
+        </div>
+
+        <section class="hotel-list" aria-label="酒店列表">
+          <a class="hotel-card" href="hotel.html?id=cheermay" aria-label="查看潮漫酒店房型">
+            <div class="hotel-cover">
+              <img src="assets/hotel-cheermay-cover.jpg" alt="潮漫酒店外观" />
+              <span class="photo-badge"><i data-lucide="image"></i>相册</span>
+            </div>
+            <div class="hotel-info">
+              <h2>潮漫酒店(珠海香洲区柠溪路店) <span class="diamonds">◆◆◆</span></h2>
+              <div class="summary"><span>2024年开业</span><span>家庭房</span><span>智能客控</span></div>
+              <div class="score"><b>4.7</b><strong>超棒 775 条</strong></div>
+              <p class="quote">“出行很方便周边好玩的地方很多”</p>
+              <div class="tags"><span>免费停车场</span><span>洗衣房</span><span>自营影音房</span></div>
+              <div class="card-bottom">
+                <div class="distance">距香洲长途站驾车2.6公里<br />香洲区柠溪路189号</div>
+                <div>
+                  <div class="price">¥<b>168</b><span>起</span></div>
+                  <button class="reserve" type="button">查看房型</button>
+                </div>
+              </div>
+            </div>
+          </a>
+
+          <a class="hotel-card" href="hotel.html?id=jinjiang" aria-label="查看锦江都城酒店房型">
+            <div class="hotel-cover">
+              <img src="assets/hotel-jinjiang-cover.jpg" alt="锦江都城酒店外观" />
+              <span class="photo-badge"><i data-lucide="image"></i>相册</span>
+            </div>
+            <div class="hotel-info">
+              <h2>锦江都城酒店(珠海拱北高铁站国际会展中心店) <span class="diamonds">◆◆◆◆</span></h2>
+              <div class="summary"><span>2022年开业</span><span>迷人江景</span><span>充电桩</span></div>
+              <div class="score"><b>4.6</b><strong>很好 1971 条</strong></div>
+              <p class="quote">“床很舒服，停车方便还能充电”</p>
+              <div class="tags"><span>免费停车场</span><span>自助早餐</span><span>洗衣房</span></div>
+              <div class="card-bottom">
+                <div class="distance">距湾仔北站步行1.1公里<br />香洲区南湾南路6004号</div>
+                <div>
+                  <div class="price">¥<b>232</b><span>起</span></div>
+                  <button class="reserve" type="button">查看房型</button>
+                </div>
+              </div>
+            </div>
+          </a>
+        </section>
+      </section>
+
+      <div class="toast" role="status" aria-live="polite"></div>
+    </main>
+
+    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+    <script>
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
+
+      const toast = document.querySelector(".toast");
+
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add("show");
+        clearTimeout(showToast.timer);
+        showToast.timer = setTimeout(() => toast.classList.remove("show"), 1500);
+      }
+
+      document.querySelectorAll("[data-toast]").forEach((item) => {
+        item.addEventListener("click", () => showToast(item.dataset.toast));
+      });
+
+      document.querySelectorAll(".filter-row button").forEach((button) => {
+        button.addEventListener("click", () => {
+          button.parentElement.querySelectorAll("button").forEach((item) => item.classList.remove("active"));
+          button.classList.add("active");
+        });
+      });
+
+      document.querySelectorAll(".reserve").forEach((button) => {
+        button.addEventListener("click", (event) => {
+          event.preventDefault();
+          window.location.href = button.closest(".hotel-card").href;
+        });
+      });
+    </script>
+  </body>
+</html>
