@@ -51,6 +51,7 @@
         width: min(100vw, 430px);
         min-height: 100vh;
         margin: 0 auto;
+        position: relative;
         background: var(--page);
         overflow-x: hidden;
         box-shadow: 0 0 0 1px rgba(20, 35, 45, 0.05), 0 24px 80px rgba(8, 45, 64, 0.18);
@@ -59,7 +60,7 @@
       .top {
         position: sticky;
         top: 0;
-        z-index: 20;
+        z-index: 40;
         padding: calc(10px + env(safe-area-inset-top, 0)) 14px 10px;
         background: rgba(237, 245, 247, 0.94);
         backdrop-filter: blur(12px);
@@ -87,6 +88,15 @@
         height: 22px;
       }
 
+      .menu-btn {
+        transition: transform 0.2s ease, background 0.2s ease;
+      }
+
+      .menu-btn.active {
+        transform: rotate(90deg);
+        background: rgba(255, 255, 255, 0.72);
+      }
+
       .title {
         overflow: hidden;
         text-align: center;
@@ -98,6 +108,127 @@
 
       .content {
         padding: 0 14px calc(22px + env(safe-area-inset-bottom, 0));
+      }
+
+      .module-scrim {
+        position: fixed;
+        z-index: 30;
+        inset: 0;
+        width: min(100vw, 430px);
+        margin: 0 auto;
+        background: rgba(8, 18, 28, 0.22);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.22s ease;
+      }
+
+      .module-scrim.open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .module-menu {
+        position: fixed;
+        z-index: 35;
+        top: calc(62px + env(safe-area-inset-top, 0));
+        left: 50%;
+        width: min(100vw, 430px);
+        max-height: calc(100vh - 72px - env(safe-area-inset-top, 0));
+        padding: 12px 14px 18px;
+        transform: translateX(-50%) translateY(-18px);
+        overflow-y: auto;
+        background: rgba(247, 251, 252, 0.96);
+        border-radius: 0 0 24px 24px;
+        box-shadow: 0 24px 54px rgba(16, 38, 54, 0.22);
+        backdrop-filter: blur(22px);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.22s ease, transform 0.22s ease;
+      }
+
+      .module-menu.open {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateX(-50%) translateY(0);
+      }
+
+      .module-menu-head {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 4px 2px 12px;
+      }
+
+      .module-menu-head strong {
+        font-size: 22px;
+        line-height: 1.1;
+      }
+
+      .module-menu-head span {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .module-links {
+        display: grid;
+        gap: 8px;
+      }
+
+      .module-link {
+        width: 100%;
+        min-height: 68px;
+        display: grid;
+        grid-template-columns: 42px minmax(0, 1fr) 20px;
+        align-items: center;
+        gap: 10px;
+        padding: 11px 12px;
+        border-radius: 16px;
+        color: var(--ink);
+        background: rgba(255, 255, 255, 0.72);
+        text-align: left;
+      }
+
+      .module-link.active {
+        color: #fff;
+        background: linear-gradient(135deg, var(--primary-dark), var(--blue));
+        box-shadow: 0 12px 24px rgba(8, 109, 137, 0.18);
+      }
+
+      .module-link > i,
+      .module-link > svg {
+        width: 22px;
+        height: 22px;
+        justify-self: center;
+      }
+
+      .module-link strong,
+      .module-link span,
+      .module-link small {
+        display: block;
+      }
+
+      .module-link strong {
+        font-size: 16px;
+      }
+
+      .module-link small {
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.35;
+      }
+
+      .module-link.active small {
+        color: rgba(255, 255, 255, 0.76);
+      }
+
+      .module-link .chevron {
+        width: 18px;
+        height: 18px;
+        color: currentColor;
+        opacity: 0.58;
       }
 
       .hero {
@@ -150,42 +281,6 @@
       .sync-time {
         color: rgba(255, 255, 255, 0.82);
         font-size: 12px;
-      }
-
-      .tabs {
-        position: sticky;
-        top: 62px;
-        z-index: 15;
-        display: flex;
-        gap: 8px;
-        margin: 0 -14px 10px;
-        padding: 10px 14px;
-        overflow-x: auto;
-        background: rgba(237, 245, 247, 0.94);
-        backdrop-filter: blur(10px);
-        scrollbar-width: none;
-      }
-
-      .tabs::-webkit-scrollbar {
-        display: none;
-      }
-
-      .tab {
-        flex: 0 0 auto;
-        height: 34px;
-        padding: 0 13px;
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        color: var(--muted);
-        background: #fff;
-        font-size: 14px;
-      }
-
-      .tab.active {
-        color: #fff;
-        background: var(--primary-dark);
-        border-color: var(--primary-dark);
-        font-weight: 850;
       }
 
       .section {
@@ -792,9 +887,46 @@
         <nav class="nav">
           <button class="icon-btn" type="button" aria-label="返回"><i data-lucide="chevron-left"></i></button>
           <div class="title">超级管理员控制台</div>
-          <button class="icon-btn" type="button" aria-label="通知"><i data-lucide="bell"></i></button>
+          <button class="icon-btn menu-btn" type="button" id="moduleMenuButton" aria-label="打开模块菜单" aria-expanded="false" aria-controls="moduleMenu">
+            <i data-lucide="menu"></i>
+          </button>
         </nav>
       </header>
+
+      <div class="module-scrim" id="moduleScrim" aria-hidden="true"></div>
+      <nav class="module-menu" id="moduleMenu" aria-label="超级管理员模块菜单" aria-hidden="true">
+        <div class="module-menu-head">
+          <strong>全部模块</strong>
+          <span id="currentModuleLabel">当前：运营看板</span>
+        </div>
+        <div class="module-links">
+          <button class="module-link active" type="button" data-target="dashboard" data-title="运营看板">
+            <i data-lucide="layout-dashboard"></i>
+            <span><strong>运营看板</strong><small>交易趋势、关键指标、今日经营概览</small></span>
+            <i class="chevron" data-lucide="chevron-right"></i>
+          </button>
+          <button class="module-link" type="button" data-target="params" data-title="系统参数">
+            <i data-lucide="sliders-horizontal"></i>
+            <span><strong>系统参数</strong><small>司机提成、服务费、退款冻结规则</small></span>
+            <i class="chevron" data-lucide="chevron-right"></i>
+          </button>
+          <button class="module-link" type="button" data-target="banners" data-title="页面配置">
+            <i data-lucide="image-plus"></i>
+            <span><strong>页面配置</strong><small>首页轮播、专题入口、商品跳转</small></span>
+            <i class="chevron" data-lucide="chevron-right"></i>
+          </button>
+          <button class="module-link" type="button" data-target="payouts" data-title="提成发放">
+            <i data-lucide="wallet-cards"></i>
+            <span><strong>提成发放</strong><small>司机推广收益、批次明细、异常处理</small></span>
+            <i class="chevron" data-lucide="chevron-right"></i>
+          </button>
+          <button class="module-link" type="button" data-target="orders" data-title="订单管理">
+            <i data-lucide="receipt-text"></i>
+            <span><strong>订单管理</strong><small>成功交易、退款售后、核销状态追踪</small></span>
+            <i class="chevron" data-lucide="chevron-right"></i>
+          </button>
+        </div>
+      </nav>
 
       <div class="content">
         <section class="hero">
@@ -805,14 +937,6 @@
             <span class="sync-time">今日 14:30 更新</span>
           </div>
         </section>
-
-        <nav class="tabs" aria-label="后台模块">
-          <button class="tab active" type="button" data-target="dashboard">看板</button>
-          <button class="tab" type="button" data-target="params">参数</button>
-          <button class="tab" type="button" data-target="banners">页面配置</button>
-          <button class="tab" type="button" data-target="payouts">提成</button>
-          <button class="tab" type="button" data-target="orders">订单</button>
-        </nav>
 
         <section class="section active" data-section="dashboard">
           <section class="card">
@@ -1220,6 +1344,10 @@
       }
 
       const toast = document.querySelector(".toast");
+      const moduleMenuButton = document.querySelector("#moduleMenuButton");
+      const moduleMenu = document.querySelector("#moduleMenu");
+      const moduleScrim = document.querySelector("#moduleScrim");
+      const currentModuleLabel = document.querySelector("#currentModuleLabel");
       let toastTimer;
 
       function showToast(message) {
@@ -1229,13 +1357,39 @@
         toastTimer = setTimeout(() => toast.classList.remove("show"), 1400);
       }
 
-      document.querySelectorAll(".tab").forEach((tab) => {
-        tab.addEventListener("click", () => {
-          document.querySelectorAll(".tab").forEach((item) => item.classList.remove("active"));
-          document.querySelectorAll(".section").forEach((section) => section.classList.remove("active"));
-          tab.classList.add("active");
-          document.querySelector(`[data-section="${tab.dataset.target}"]`).classList.add("active");
-          window.scrollTo({ top: 0, behavior: "smooth" });
+      function setModuleMenu(open) {
+        moduleMenu.classList.toggle("open", open);
+        moduleScrim.classList.toggle("open", open);
+        moduleMenuButton.classList.toggle("active", open);
+        moduleMenuButton.setAttribute("aria-expanded", String(open));
+        moduleMenu.setAttribute("aria-hidden", String(!open));
+      }
+
+      function switchModule(target, title) {
+        document.querySelectorAll(".module-link").forEach((item) => {
+          item.classList.toggle("active", item.dataset.target === target);
+        });
+        document.querySelectorAll(".section").forEach((section) => {
+          section.classList.toggle("active", section.dataset.section === target);
+        });
+        currentModuleLabel.textContent = `当前：${title}`;
+        setModuleMenu(false);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      moduleMenuButton.addEventListener("click", () => {
+        setModuleMenu(!moduleMenu.classList.contains("open"));
+      });
+
+      moduleScrim.addEventListener("click", () => setModuleMenu(false));
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") setModuleMenu(false);
+      });
+
+      document.querySelectorAll(".module-link").forEach((link) => {
+        link.addEventListener("click", () => {
+          switchModule(link.dataset.target, link.dataset.title);
         });
       });
 
@@ -1247,7 +1401,7 @@
         });
       });
 
-      document.querySelectorAll("button:not(.tab):not(.detail-toggle)").forEach((button) => {
+      document.querySelectorAll("button:not(.module-link):not(.menu-btn):not(.detail-toggle)").forEach((button) => {
         button.addEventListener("click", () => {
           const text = button.textContent.trim() || button.getAttribute("aria-label") || "操作";
           showToast(`${text}功能预留`);
