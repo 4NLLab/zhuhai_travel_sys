@@ -1,0 +1,982 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>澳门环岛游导购</title>
+    <link rel="icon" href="data:," />
+    <style>
+      :root {
+        --sea: #0d8fab;
+        --sea-dark: #075d78;
+        --coral: #f26a3d;
+        --gold: #f3b84b;
+        --green: #27966f;
+        --ink: #12232f;
+        --muted: #687986;
+        --line: #dceaf0;
+        --page: #eef7f8;
+        --card: #ffffff;
+        --shadow: 0 14px 36px rgba(10, 54, 72, 0.14);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 10% 0%, rgba(242, 106, 61, 0.16), transparent 26%),
+          linear-gradient(180deg, #f8fcfd 0%, var(--page) 54%, #e4f1f4 100%);
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB",
+          "Microsoft YaHei", sans-serif;
+      }
+
+      button,
+      input,
+      select {
+        font: inherit;
+      }
+
+      button {
+        border: 0;
+        cursor: pointer;
+      }
+
+      .phone {
+        width: min(100vw, 430px);
+        min-height: 100vh;
+        margin: 0 auto;
+        position: relative;
+        overflow-x: hidden;
+        background: var(--page);
+        box-shadow: 0 0 0 1px rgba(12, 52, 64, 0.05), 0 24px 80px rgba(8, 45, 64, 0.18);
+      }
+
+      .top {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        padding: calc(10px + env(safe-area-inset-top, 0)) 14px 10px;
+        background: rgba(247, 252, 253, 0.9);
+        backdrop-filter: blur(14px);
+      }
+
+      .nav {
+        height: 42px;
+        display: grid;
+        grid-template-columns: 42px minmax(0, 1fr) 42px;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .icon-btn {
+        width: 38px;
+        height: 38px;
+        display: grid;
+        place-items: center;
+        border-radius: 999px;
+        color: var(--ink);
+        background: rgba(255, 255, 255, 0.74);
+      }
+
+      .icon-btn svg,
+      .small-icon {
+        width: 21px;
+        height: 21px;
+      }
+
+      .title {
+        min-width: 0;
+        text-align: center;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 17px;
+        font-weight: 800;
+      }
+
+      .hero {
+        padding: 0 14px 14px;
+      }
+
+      .video-card {
+        position: relative;
+        min-height: 248px;
+        overflow: hidden;
+        border-radius: 0 0 20px 20px;
+        color: #fff;
+        background: #083849;
+        box-shadow: var(--shadow);
+      }
+
+      .video-card img {
+        width: 100%;
+        height: 248px;
+        display: block;
+        object-fit: cover;
+      }
+
+      .video-card::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(2, 25, 35, 0.04), rgba(2, 22, 31, 0.75));
+      }
+
+      .video-placeholder {
+        position: absolute;
+        z-index: 2;
+        inset: 14px 14px auto auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 10px;
+        border-radius: 999px;
+        background: rgba(8, 32, 42, 0.64);
+        color: rgba(255, 255, 255, 0.92);
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .play-button {
+        position: absolute;
+        z-index: 2;
+        left: 50%;
+        top: 42%;
+        width: 58px;
+        height: 58px;
+        display: grid;
+        place-items: center;
+        border-radius: 999px;
+        transform: translate(-50%, -50%);
+        color: #fff;
+        background: rgba(255, 255, 255, 0.22);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.42);
+        backdrop-filter: blur(8px);
+      }
+
+      .play-button svg {
+        width: 30px;
+        height: 30px;
+        margin-left: 3px;
+        fill: currentColor;
+      }
+
+      .hero-copy {
+        position: absolute;
+        z-index: 2;
+        left: 18px;
+        right: 18px;
+        bottom: 18px;
+      }
+
+      .hero-copy h1 {
+        margin: 0;
+        font-size: 27px;
+        line-height: 1.12;
+        letter-spacing: 0;
+      }
+
+      .hero-copy p {
+        margin: 9px 0 0;
+        max-width: 280px;
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 13px;
+        line-height: 1.45;
+      }
+
+      .hero-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin-top: 12px;
+      }
+
+      .hero-badges span {
+        padding: 6px 8px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.18);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .content {
+        padding: 0 14px 106px;
+      }
+
+      .quick-metrics {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+        margin: 0 0 10px;
+      }
+
+      .metric {
+        min-height: 78px;
+        padding: 10px;
+        border-radius: 8px;
+        background: var(--card);
+        box-shadow: 0 8px 22px rgba(10, 54, 72, 0.08);
+      }
+
+      .metric span {
+        display: block;
+        color: var(--muted);
+        font-size: 11px;
+      }
+
+      .metric strong {
+        display: block;
+        margin-top: 7px;
+        font-size: 16px;
+        line-height: 1.2;
+      }
+
+      .card {
+        margin-bottom: 10px;
+        padding: 14px;
+        border-radius: 8px;
+        background: var(--card);
+        box-shadow: 0 8px 22px rgba(10, 54, 72, 0.08);
+      }
+
+      .section-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+
+      .section-head h2 {
+        margin: 0;
+        font-size: 18px;
+      }
+
+      .section-head span,
+      .muted {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .story-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      .story-item {
+        min-height: 104px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 12px;
+        border-radius: 8px;
+        color: #fff;
+        background: linear-gradient(135deg, var(--sea), #34a6ba);
+      }
+
+      .story-item:nth-child(2) {
+        background: linear-gradient(135deg, var(--coral), #f6a14e);
+      }
+
+      .story-item:nth-child(3) {
+        background: linear-gradient(135deg, #246fb2, #3da6c3);
+      }
+
+      .story-item:nth-child(4) {
+        background: linear-gradient(135deg, var(--green), #70b86c);
+      }
+
+      .story-item i,
+      .story-item svg {
+        width: 24px;
+        height: 24px;
+      }
+
+      .story-item strong {
+        display: block;
+        margin-top: 12px;
+        font-size: 15px;
+      }
+
+      .story-item span {
+        display: block;
+        margin-top: 4px;
+        color: rgba(255, 255, 255, 0.84);
+        font-size: 12px;
+        line-height: 1.35;
+      }
+
+      .query-grid {
+        display: grid;
+        grid-template-columns: 1fr 0.76fr;
+        gap: 8px;
+      }
+
+      .field {
+        display: grid;
+        gap: 6px;
+      }
+
+      .field label {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .field input,
+      .field select {
+        width: 100%;
+        min-height: 44px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 0 11px;
+        outline: 0;
+        color: var(--ink);
+        background: #f8fcfd;
+      }
+
+      .route-row {
+        display: grid;
+        grid-template-columns: 1fr 38px 1fr;
+        align-items: end;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      .route-link {
+        height: 44px;
+        display: grid;
+        place-items: center;
+        border-radius: 999px;
+        color: var(--sea-dark);
+        background: #e3f5f8;
+      }
+
+      .primary {
+        width: 100%;
+        min-height: 46px;
+        margin-top: 12px;
+        border-radius: 8px;
+        color: #fff;
+        background: linear-gradient(135deg, var(--coral), #f18d42);
+        font-weight: 900;
+        box-shadow: 0 10px 20px rgba(242, 106, 61, 0.24);
+      }
+
+      .status {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        margin-top: 10px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .status.ok {
+        color: var(--green);
+      }
+
+      .voyage-list {
+        display: grid;
+        gap: 9px;
+      }
+
+      .voyage-card {
+        width: 100%;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 10px;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        text-align: left;
+        color: var(--ink);
+        background: #fbfeff;
+      }
+
+      .voyage-card.active {
+        border-color: rgba(13, 143, 171, 0.62);
+        box-shadow: 0 0 0 3px rgba(13, 143, 171, 0.1);
+      }
+
+      .voyage-main strong {
+        display: block;
+        font-size: 16px;
+      }
+
+      .voyage-main span {
+        display: block;
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.35;
+      }
+
+      .voyage-side {
+        min-width: 82px;
+        text-align: right;
+      }
+
+      .voyage-side em {
+        display: block;
+        color: var(--coral);
+        font-style: normal;
+        font-size: 18px;
+        font-weight: 900;
+      }
+
+      .voyage-side span {
+        display: block;
+        margin-top: 6px;
+        color: var(--green);
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .empty {
+        padding: 18px 12px;
+        border: 1px dashed #bfd6df;
+        border-radius: 8px;
+        color: var(--muted);
+        text-align: center;
+        font-size: 13px;
+        background: #f8fcfd;
+      }
+
+      .notice-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .notice {
+        display: grid;
+        grid-template-columns: 28px minmax(0, 1fr);
+        gap: 9px;
+        align-items: start;
+      }
+
+      .notice i,
+      .notice svg {
+        width: 22px;
+        height: 22px;
+        color: var(--sea);
+      }
+
+      .notice strong {
+        display: block;
+        font-size: 14px;
+      }
+
+      .notice span {
+        display: block;
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      .bottom-bar {
+        position: fixed;
+        left: 50%;
+        bottom: 0;
+        z-index: 25;
+        width: min(100vw, 430px);
+        padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0));
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 150px;
+        gap: 10px;
+        transform: translateX(-50%);
+        background: rgba(255, 255, 255, 0.92);
+        border-top: 1px solid rgba(220, 234, 240, 0.9);
+        backdrop-filter: blur(14px);
+      }
+
+      .price-box span {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .price-box strong {
+        display: block;
+        margin-top: 3px;
+        color: var(--coral);
+        font-size: 22px;
+      }
+
+      .book {
+        border-radius: 8px;
+        color: #fff;
+        background: var(--sea);
+        font-weight: 900;
+      }
+
+      .toast {
+        position: fixed;
+        left: 50%;
+        bottom: 94px;
+        z-index: 40;
+        max-width: 300px;
+        padding: 10px 14px;
+        border-radius: 999px;
+        color: #fff;
+        background: rgba(14, 30, 38, 0.86);
+        opacity: 0;
+        transform: translate(-50%, 10px);
+        pointer-events: none;
+        transition: 0.2s ease;
+        font-size: 13px;
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
+
+      @media (max-width: 360px) {
+        .hero-copy h1 {
+          font-size: 24px;
+        }
+
+        .bottom-bar {
+          grid-template-columns: 1fr 132px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="phone">
+      <header class="top">
+        <nav class="nav" aria-label="页面导航">
+          <button class="icon-btn" type="button" id="backButton" aria-label="返回">
+            <i data-lucide="chevron-left" aria-hidden="true"></i>
+          </button>
+          <div class="title">澳门环岛游</div>
+          <button class="icon-btn" type="button" id="shareButton" aria-label="分享">
+            <i data-lucide="share-2" aria-hidden="true"></i>
+          </button>
+        </nav>
+      </header>
+
+      <section class="hero" aria-label="澳门环岛游视频导览">
+        <div class="video-card">
+          <img src="assets/macau-cruise-night-banner-web.jpg" alt="澳门环岛游夜景" />
+          <span class="video-placeholder"><i data-lucide="video" aria-hidden="true"></i>视频待上传</span>
+          <button class="play-button" type="button" id="videoPlaceholder" aria-label="播放导览视频">
+            <i data-lucide="play" aria-hidden="true"></i>
+          </button>
+          <div class="hero-copy">
+            <h1>澳门环岛游</h1>
+            <p>湾仔码头登船，海上看澳门天际线、葡京灯影与珠澳湾区夜色。</p>
+            <div class="hero-badges">
+              <span>约 60 分钟</span>
+              <span>电子票</span>
+              <span>实时班次</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="content">
+        <div class="quick-metrics" aria-label="产品概览">
+          <div class="metric"><span>上船码头</span><strong>湾仔码头</strong></div>
+          <div class="metric"><span>推荐时段</span><strong>傍晚夜游</strong></div>
+          <div class="metric"><span>适合人群</span><strong>亲友旅拍</strong></div>
+        </div>
+
+        <section class="card">
+          <div class="section-head">
+            <h2>海上看点</h2>
+            <span>珠澳城市线</span>
+          </div>
+          <div class="story-grid">
+            <div class="story-item">
+              <i data-lucide="landmark" aria-hidden="true"></i>
+              <div><strong>澳门地标</strong><span>从海面观赏城市轮廓与经典建筑灯影。</span></div>
+            </div>
+            <div class="story-item">
+              <i data-lucide="sparkles" aria-hidden="true"></i>
+              <div><strong>夜景航线</strong><span>黄昏到夜晚的光线更适合拍照打卡。</span></div>
+            </div>
+            <div class="story-item">
+              <i data-lucide="ship" aria-hidden="true"></i>
+              <div><strong>舒适登船</strong><span>湾仔旅游码头出发，电子票检票登船。</span></div>
+            </div>
+            <div class="story-item">
+              <i data-lucide="camera" aria-hidden="true"></i>
+              <div><strong>旅拍友好</strong><span>海风、桥影、城市灯光组成完整背景。</span></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card" aria-label="班次查询">
+          <div class="section-head">
+            <h2>选择班次</h2>
+            <span id="apiStatusText">对接环岛游接口</span>
+          </div>
+          <div class="query-grid">
+            <div class="field">
+              <label for="travelDate">游玩日期</label>
+              <input id="travelDate" type="date" />
+            </div>
+            <div class="field">
+              <label for="peopleNum">人数</label>
+              <select id="peopleNum">
+                <option value="1">1 人</option>
+                <option value="2">2 人</option>
+                <option value="3">3 人</option>
+                <option value="4">4 人</option>
+                <option value="5">5 人</option>
+              </select>
+            </div>
+          </div>
+          <div class="route-row">
+            <div class="field">
+              <label for="upPort">上船</label>
+              <select id="upPort">
+                <option value="2312">湾仔码头</option>
+                <option value="3031">九洲港（珠澳海湾游）</option>
+              </select>
+            </div>
+            <span class="route-link"><i data-lucide="arrow-right" aria-hidden="true"></i></span>
+            <div class="field">
+              <label for="downPort">航线</label>
+              <select id="downPort">
+                <option value="2332">澳门环岛游A</option>
+                <option value="2317">珠澳夜游A</option>
+              </select>
+            </div>
+          </div>
+          <button class="primary" type="button" id="queryButton">查询可售班次</button>
+          <div class="status" id="queryStatus"><i data-lucide="radio" aria-hidden="true"></i><span>请选择日期后查询</span></div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <h2>可售班次</h2>
+            <span id="voyageCount">待查询</span>
+          </div>
+          <div class="voyage-list" id="voyageList">
+            <div class="empty">正在准备环岛游班次</div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <h2>预订须知</h2>
+            <span>下单前确认</span>
+          </div>
+          <div class="notice-list">
+            <div class="notice">
+              <i data-lucide="id-card" aria-hidden="true"></i>
+              <div><strong>实名购票</strong><span>后续下单页需填写联系人和出游人证件信息，字段按分销接口要求提交。</span></div>
+            </div>
+            <div class="notice">
+              <i data-lucide="clock" aria-hidden="true"></i>
+              <div><strong>提前到达</strong><span>建议开航前 20 分钟到达湾仔旅游码头，节假日预留更多排队时间。</span></div>
+            </div>
+            <div class="notice">
+              <i data-lucide="shield-check" aria-hidden="true"></i>
+              <div><strong>接口状态</strong><span>当前页面已接港务分销测试环境，班次和票价以接口返回为准。</span></div>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <div class="bottom-bar">
+        <div class="price-box">
+          <span id="selectedLabel">选择班次后显示票价</span>
+          <strong id="selectedPrice">¥--</strong>
+        </div>
+        <button class="book" type="button" id="bookButton">立即预订</button>
+      </div>
+      <div class="toast" id="toast"></div>
+    </main>
+
+    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+    <script>
+      if (window.lucide) window.lucide.createIcons();
+
+      const API_BASE = "/api/v1/island-cruise";
+      const DEFAULT_PORTS = [
+        { portId: 2312, portName: "湾仔码头" },
+        { portId: 3031, portName: "九洲港（珠澳海湾游）" },
+        { portId: 2332, portName: "澳门环岛游A" },
+        { portId: 2317, portName: "珠澳夜游A" },
+      ];
+      const FALLBACK_VOYAGES = [
+        {
+          voyageId: 233201,
+          voyageName: "澳门环岛游A",
+          voyageNo: "HD-A-1930",
+          departureTime: "19:30",
+          endTime: "20:30",
+          seatNum: 96,
+          minPrice: 128,
+        },
+        {
+          voyageId: 233202,
+          voyageName: "珠澳夜游A",
+          voyageNo: "ZY-A-2030",
+          departureTime: "20:30",
+          endTime: "21:30",
+          seatNum: 82,
+          minPrice: 138,
+        },
+      ];
+
+      const travelDate = document.querySelector("#travelDate");
+      const peopleNum = document.querySelector("#peopleNum");
+      const upPort = document.querySelector("#upPort");
+      const downPort = document.querySelector("#downPort");
+      const queryButton = document.querySelector("#queryButton");
+      const queryStatus = document.querySelector("#queryStatus");
+      const apiStatusText = document.querySelector("#apiStatusText");
+      const voyageList = document.querySelector("#voyageList");
+      const voyageCount = document.querySelector("#voyageCount");
+      const selectedLabel = document.querySelector("#selectedLabel");
+      const selectedPrice = document.querySelector("#selectedPrice");
+      const bookButton = document.querySelector("#bookButton");
+      const toast = document.querySelector("#toast");
+      let toastTimer;
+      let selectedVoyage = null;
+
+      function formatDate(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      }
+
+      function setDefaultDate() {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        travelDate.value = formatDate(tomorrow);
+        travelDate.min = formatDate(new Date());
+      }
+
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove("show"), 1700);
+      }
+
+      function setStatus(message, ok = false) {
+        queryStatus.classList.toggle("ok", ok);
+        queryStatus.querySelector("span").textContent = message;
+      }
+
+      function unwrapResponse(json) {
+        const outer = json && json.data ? json.data : json;
+        return outer && outer.data !== undefined ? outer.data : outer;
+      }
+
+      function arrayData(json) {
+        const data = unwrapResponse(json);
+        if (Array.isArray(data)) return data;
+        if (data && Array.isArray(data.list)) return data.list;
+        if (data && Array.isArray(data.records)) return data.records;
+        return [];
+      }
+
+      function field(item, names, fallback = "") {
+        for (const name of names) {
+          if (item && item[name] !== undefined && item[name] !== null && item[name] !== "") return item[name];
+        }
+        return fallback;
+      }
+
+      function priceFrom(value) {
+        const data = unwrapResponse(value);
+        const list = Array.isArray(data) ? data : data && Array.isArray(data.priceList) ? data.priceList : [];
+        const candidates = [];
+        const collectPrices = (item) => {
+          ["salePrice", "price", "settlePrice", "originalPrice", "adultPrice"].forEach((key) => {
+            const number = Number(item[key]);
+            if (number > 0) candidates.push(number);
+          });
+          if (Array.isArray(item.cabinPriceList)) {
+            item.cabinPriceList.forEach((cabin) => {
+              (cabin.fareTypeList || []).forEach(collectPrices);
+            });
+          }
+        };
+        if (data && typeof data === "object") {
+          collectPrices(data);
+        }
+        list.forEach(collectPrices);
+        return candidates.length ? Math.min(...candidates) : 0;
+      }
+
+      function stockFrom(voyage) {
+        const directStock = field(voyage, ["seatNum", "stock", "surplusTicketNum", "remainNum"], "");
+        if (directStock !== "") return directStock;
+        if (!Array.isArray(voyage.cabinPriceList)) return "";
+        const counts = voyage.cabinPriceList
+          .map((cabin) => Number(cabin.count))
+          .filter((count) => Number.isFinite(count) && count >= 0);
+        return counts.length ? Math.max(...counts) : "";
+      }
+
+      function escapeHTML(value) {
+        return String(value)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#39;");
+      }
+
+      async function requestJSON(url) {
+        const response = await fetch(url, { headers: { Accept: "application/json" } });
+        const json = await response.json();
+        if (!response.ok || Number(json.code) >= 400) {
+          throw new Error(json.message || "接口请求失败");
+        }
+        return json;
+      }
+
+      function renderPortOptions(ports) {
+        const upPortIds = new Set(["2312", "3031"]);
+        const downPortIds = new Set(["2332", "2504", "2317", "2505", "2598"]);
+        const upPorts = ports.filter((port) => upPortIds.has(String(port.portId)));
+        const downPorts = ports.filter((port) => downPortIds.has(String(port.portId)));
+        if (upPorts.length) {
+          upPort.innerHTML = upPorts
+            .map((port) => `<option value="${escapeHTML(port.portId)}">${escapeHTML(port.portName)}</option>`)
+            .join("");
+        }
+        if (downPorts.length) {
+          downPort.innerHTML = downPorts
+            .map((port) => `<option value="${escapeHTML(port.portId)}">${escapeHTML(port.portName)}</option>`)
+            .join("");
+        }
+        upPort.value = upPorts.some((port) => String(port.portId) === "2312") ? "2312" : upPort.value;
+        downPort.value = downPorts.some((port) => String(port.portId) === "2332") ? "2332" : downPort.value;
+      }
+
+      async function loadPorts() {
+        try {
+          const json = await requestJSON(`${API_BASE}/ports`);
+          const ports = arrayData(json);
+          if (ports.length) renderPortOptions(ports);
+        } catch (error) {
+          renderPortOptions(DEFAULT_PORTS);
+        }
+      }
+
+      async function queryVoyages() {
+        selectedVoyage = null;
+        selectedLabel.textContent = "选择班次后显示票价";
+        selectedPrice.textContent = "¥--";
+        voyageList.innerHTML = '<div class="empty">正在查询环岛游班次...</div>';
+        voyageCount.textContent = "查询中";
+        setStatus("正在连接港务分销测试环境");
+
+        const params = new URLSearchParams({
+          departure_date: travelDate.value,
+          up_port_id: upPort.value,
+          down_port_id: downPort.value,
+          people_num: peopleNum.value,
+        });
+
+        try {
+          const json = await requestJSON(`${API_BASE}/voyages?${params.toString()}`);
+          const voyages = arrayData(json);
+          apiStatusText.textContent = "接口已连接";
+          setStatus("已同步测试环境班次", true);
+          renderVoyages(voyages, false);
+        } catch (error) {
+          apiStatusText.textContent = "使用演示班次";
+          setStatus(error.message || "接口暂不可用，已显示演示班次");
+          renderVoyages(FALLBACK_VOYAGES, true);
+        }
+      }
+
+      function renderVoyages(voyages, fallback) {
+        if (!voyages.length) {
+          voyageCount.textContent = "0 个班次";
+          voyageList.innerHTML = '<div class="empty">当前日期暂无可售班次，请更换日期或航线</div>';
+          return;
+        }
+        voyageCount.textContent = `${voyages.length} 个班次`;
+        voyageList.innerHTML = "";
+        voyages.forEach((voyage, index) => {
+          const id = field(voyage, ["voyageId", "id"], `demo-${index}`);
+          const name = field(voyage, ["voyageName", "routeName", "shipName"], "澳门环岛游A");
+          const no = field(voyage, ["voyageNo", "shipNo"], "");
+          const start = field(voyage, ["departureTime", "startTime", "goTime"], "待定");
+          const end = field(voyage, ["endTime", "arrivalTime"], "");
+          const stock = stockFrom(voyage);
+          const price = priceFrom(voyage) || Number(field(voyage, ["minPrice", "salePrice", "price"], 0));
+          const button = document.createElement("button");
+          button.className = "voyage-card";
+          button.type = "button";
+          button.innerHTML = `
+            <div class="voyage-main">
+              <strong>${escapeHTML(start)}${end ? ` - ${escapeHTML(end)}` : ""}</strong>
+              <span>${escapeHTML(name)}${no ? ` · ${escapeHTML(no)}` : ""}</span>
+            </div>
+            <div class="voyage-side">
+              <em>${price > 0 ? `¥${price}` : "查价"}</em>
+              <span>${stock !== "" ? `余票 ${escapeHTML(stock)}` : "售票中"}</span>
+            </div>
+          `;
+          button.addEventListener("click", () => selectVoyage(button, { ...voyage, voyageId: id, start, name, fallbackPrice: price, fallback }));
+          voyageList.appendChild(button);
+        });
+      }
+
+      async function selectVoyage(button, voyage) {
+        selectedVoyage = voyage;
+        document.querySelectorAll(".voyage-card").forEach((item) => item.classList.remove("active"));
+        button.classList.add("active");
+        selectedLabel.textContent = `${voyage.start} · ${voyage.name}`;
+        selectedPrice.textContent = voyage.fallbackPrice > 0 ? `¥${voyage.fallbackPrice}` : "查价中";
+
+        if (voyage.fallback || String(voyage.voyageId).startsWith("demo-")) return;
+
+        try {
+          const params = new URLSearchParams({
+            voyage_id: voyage.voyageId,
+            up_port_id: upPort.value,
+            down_port_id: downPort.value,
+          });
+          const json = await requestJSON(`${API_BASE}/price?${params.toString()}`);
+          const price = priceFrom(json);
+          if (price > 0) selectedPrice.textContent = `¥${price}`;
+        } catch (error) {
+          if (voyage.fallbackPrice <= 0) selectedPrice.textContent = "待确认";
+        }
+      }
+
+      document.querySelector("#backButton").addEventListener("click", () => {
+        if (history.length > 1) history.back();
+        else window.location.href = "index.html";
+      });
+
+      document.querySelector("#shareButton").addEventListener("click", () => showToast("分享功能预留"));
+      document.querySelector("#videoPlaceholder").addEventListener("click", () => showToast("视频文件上传后接入播放"));
+      queryButton.addEventListener("click", queryVoyages);
+      bookButton.addEventListener("click", () => {
+        if (!selectedVoyage) {
+          showToast("请先选择可售班次");
+          return;
+        }
+        showToast("下单页待接锁票与支付流程");
+      });
+
+      setDefaultDate();
+      loadPorts().finally(queryVoyages);
+    </script>
+  </body>
+</html>

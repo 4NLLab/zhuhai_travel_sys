@@ -31,6 +31,9 @@ func SetupRouter() *gin.Engine {
 		api.GET("/products/:id", handlers.ProductDetail)
 		api.GET("/categories", handlers.CategoryList)
 		api.GET("/banners", handlers.BannerList)
+		api.GET("/island-cruise/ports", handlers.IslandCruisePorts)
+		api.GET("/island-cruise/voyages", handlers.IslandCruiseVoyages)
+		api.GET("/island-cruise/price", handlers.IslandCruisePrice)
 
 		// 支付回调由支付平台调用，使用独立签名校验。
 		api.POST("/payments/callback", handlers.PaymentCallback)
