@@ -21,6 +21,7 @@ func DriverRegister(c *gin.Context) {
 	var req struct {
 		Name        string `json:"name" binding:"required"`
 		Phone       string `json:"phone" binding:"required"`
+		Password    string `json:"password" binding:"required,min=6"`
 		IDCardNo    string `json:"id_card_no" binding:"required"`
 		PlateNo     string `json:"plate_no" binding:"required"`
 		Model       string `json:"model" binding:"required"`
@@ -44,12 +45,19 @@ func DriverRegister(c *gin.Context) {
 		return
 	}
 
+	passwordHash, err := security.HashPassword(req.Password)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, dto.Fail(500, "生成登录密码失败"))
+		return
+	}
+
 	tx := database.DB.Begin()
 	driverNo := fmt.Sprintf("DR-ZH-%s%04d", time.Now().Format("0102"), rand.Intn(10000))
 	driver := models.Driver{
 		DriverNo:       driverNo,
 		Name:           req.Name,
 		Phone:          req.Phone,
+		PasswordHash:   passwordHash,
 		IdCardNo:       &req.IDCardNo,
 		Status:         "pending_review",
 		CommissionRate: 0.08,
@@ -77,18 +85,19 @@ func DriverRegister(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, dto.Success(gin.H{
-		"driver_id": driver.ID,
-		"driver_no": driverNo,
+		"driver_id":  driver.ID,
+		"driver_no":  driverNo,
 		"vehicle_id": vehicle.ID,
-		"status":    "pending_review",
-		"message":   "注册申请已提交，等待后台审核",
+		"status":     "pending_review",
+		"message":    "注册申请已提交，等待后台审核",
 	}))
 }
 
-// DriverLogin 司机登录（手机号验证，生产环境需加验证码/密码）
+// DriverLogin 司机登录
 func DriverLogin(c *gin.Context) {
 	var req struct {
-		Phone string `json:"phone" binding:"required"`
+		Phone    string `json:"phone" binding:"required"`
+		Password string `json:"password" binding:"required"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, dto.Fail(400, "参数错误"))
@@ -96,8 +105,16 @@ func DriverLogin(c *gin.Context) {
 	}
 
 	var driver models.Driver
-	if err := database.DB.Where("phone = ? AND status = ?", req.Phone, "active").First(&driver).Error; err != nil {
-		c.JSON(http.StatusUnauthorized, dto.Fail(401, "司机不存在或已禁用"))
+	if err := database.DB.Where("phone = ?", req.Phone).First(&driver).Error; err != nil {
+		c.JSON(http.StatusUnauthorized, dto.Fail(401, "司机不存在"))
+		return
+	}
+	if driver.Status != "active" {
+		c.JSON(http.StatusForbidden, dto.Fail(403, "司机账号未审核通过或已禁用"))
+		return
+	}
+	if !security.VerifyPassword(req.Password, driver.PasswordHash) {
+		c.JSON(http.StatusUnauthorized, dto.Fail(401, "手机号或密码错误"))
 		return
 	}
 
@@ -115,6 +132,34 @@ func DriverLogin(c *gin.Context) {
 		"access_token":    token,
 		"token_type":      "Bearer",
 		"expires_in":      int(tokenTTL().Seconds()),
+	}))
+}
+
+// DriverProfile 返回当前司机登录态，用于前端刷新后的 token 校验。
+func DriverProfile(c *gin.Context) {
+	driverID := currentActorID(c)
+
+	var driver models.Driver
+	if err := database.DB.Where("id = ? AND status = ?", driverID, "active").First(&driver).Error; err != nil {
+		c.JSON(http.StatusUnauthorized, dto.Fail(401, "司机账号已停用或不存在"))
+		return
+	}
+
+	var vehicle models.Vehicle
+	database.DB.Where("driver_id = ? AND status = ?", driverID, "active").First(&vehicle)
+
+	var qr models.DriverQRCode
+	database.DB.Where("driver_id = ? AND status = ?", driverID, "active").First(&qr)
+
+	c.JSON(http.StatusOK, dto.Success(gin.H{
+		"driver_id":       driver.ID,
+		"driver_no":       driver.DriverNo,
+		"name":            driver.Name,
+		"phone":           security.MaskPhone(driver.Phone),
+		"commission_rate": driver.CommissionRate,
+		"status":          driver.Status,
+		"vehicle":         vehicle,
+		"qr_code":         qr.Code,
 	}))
 }
 
@@ -185,8 +230,8 @@ func DriverViewCommissionList(c *gin.Context) {
 func DriverWithdraw(c *gin.Context) {
 	var req struct {
 		Amount   float64 `json:"amount" binding:"required,min=0.01"`
-		Channel  string  `json:"channel"`  // alipay / wechat
-		Account  string  `json:"account"`  // 支付宝账号
+		Channel  string  `json:"channel"`   // alipay / wechat
+		Account  string  `json:"account"`   // 支付宝账号
 		RealName string  `json:"real_name"` // 实名
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {

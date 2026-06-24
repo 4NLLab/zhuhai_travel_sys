@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>司机端注册</title>
+    <title>司机端登录与注册</title>
     <link rel="icon" href="data:," />
     <style>
       :root {
@@ -346,6 +346,137 @@
         display: block;
       }
 
+      .hidden {
+        display: none !important;
+      }
+
+      .mode-tabs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+
+      .mode-tab {
+        height: 42px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: var(--muted);
+        background: #fff;
+        font-weight: 900;
+      }
+
+      .mode-tab.active {
+        color: #fff;
+        border-color: var(--primary-dark);
+        background: var(--primary-dark);
+      }
+
+      .login-panel {
+        display: grid;
+        gap: 10px;
+      }
+
+      .login-btn,
+      .logout-btn,
+      .withdraw-btn {
+        height: 46px;
+        border-radius: 8px;
+        color: #fff;
+        background: var(--primary-dark);
+        font-size: 16px;
+        font-weight: 900;
+      }
+
+      .login-btn:disabled,
+      .withdraw-btn:disabled {
+        cursor: not-allowed;
+        opacity: 0.72;
+      }
+
+      .logout-btn {
+        height: 38px;
+        padding: 0 12px;
+        background: #526671;
+        font-size: 13px;
+      }
+
+      .driver-console {
+        padding-bottom: calc(28px + env(safe-area-inset-bottom, 0));
+      }
+
+      .console-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .console-head h2 {
+        margin: 0;
+        font-size: 20px;
+      }
+
+      .console-head span {
+        display: block;
+        margin-top: 5px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .wallet-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .wallet-item {
+        min-height: 86px;
+        padding: 12px;
+        border-radius: 8px;
+        background: #f2f8fa;
+      }
+
+      .wallet-item span {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .wallet-item strong {
+        display: block;
+        margin-top: 8px;
+        font-size: 22px;
+      }
+
+      .commission-list {
+        display: grid;
+        gap: 8px;
+      }
+
+      .commission-item {
+        padding: 11px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fbfdfe;
+      }
+
+      .commission-item strong,
+      .commission-item span {
+        display: block;
+      }
+
+      .commission-item span {
+        margin-top: 5px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .withdraw-form {
+        display: grid;
+        gap: 10px;
+      }
+
       .success-title {
         display: flex;
         align-items: center;
@@ -433,8 +564,8 @@
           <span class="help-chip"><i data-lucide="headphones"></i>司机入驻</span>
         </div>
         <div class="hero-copy">
-          <h1>司机注册认证</h1>
-          <p>填写身份与车辆信息，审核通过后可生成车座推广码，绑定订单来源并计算推广提成。</p>
+          <h1>司机登录与注册</h1>
+          <p>审核通过的司机可登录查看钱包、佣金和提现记录；新司机先提交身份与车辆信息等待后台审核。</p>
         </div>
         <div class="hero-card" aria-label="注册步骤">
           <div class="metric"><strong>1</strong><span>提交身份信息</span></div>
@@ -443,7 +574,34 @@
         </div>
       </section>
 
-      <form class="content" data-driver-form novalidate>
+      <section class="content" data-public-auth>
+        <div class="mode-tabs" aria-label="司机入口">
+          <button class="mode-tab active" type="button" data-mode="login">司机登录</button>
+          <button class="mode-tab" type="button" data-mode="register">司机注册</button>
+        </div>
+      </section>
+
+      <section class="content" data-login-panel>
+        <section class="card login-panel">
+          <div class="section-head">
+            <h2>司机登录</h2>
+            <span>active drivers</span>
+          </div>
+          <form class="form-grid" data-driver-login-form novalidate>
+            <div class="field">
+              <label for="login-phone">手机号</label>
+              <input id="login-phone" name="phone" inputmode="tel" maxlength="11" autocomplete="tel" placeholder="请输入已审核司机手机号" required />
+            </div>
+            <div class="field">
+              <label for="login-password">登录密码</label>
+              <input id="login-password" name="password" type="password" autocomplete="current-password" placeholder="请输入登录密码" required />
+            </div>
+            <button class="login-btn" type="submit">登录司机端</button>
+          </form>
+        </section>
+      </section>
+
+      <form class="content hidden" data-driver-form data-register-panel novalidate>
         <section class="card">
           <div class="section-head">
             <h2>入驻进度</h2>
@@ -469,6 +627,10 @@
             <div class="field">
               <label for="driver-phone">手机号</label>
               <input id="driver-phone" name="phone" inputmode="tel" maxlength="11" autocomplete="tel" placeholder="用于登录和接收审核通知" required />
+            </div>
+            <div class="field">
+              <label for="driver-password">登录密码</label>
+              <input id="driver-password" name="password" type="password" autocomplete="new-password" placeholder="至少6位，用于审核通过后登录" required />
             </div>
             <div class="field">
               <label for="driver-id-card">身份证号</label>
@@ -574,7 +736,64 @@
         </section>
       </form>
 
-      <footer class="bottom-bar">
+      <section class="content driver-console hidden" data-driver-console>
+        <section class="card">
+          <div class="console-head">
+            <div>
+              <h2 data-driver-name>司机工作台</h2>
+              <span data-driver-meta>登录态校验中</span>
+            </div>
+            <button class="logout-btn" type="button" data-driver-logout>退出</button>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <h2>钱包余额</h2>
+            <span data-wallet-sync>待同步</span>
+          </div>
+          <div class="wallet-grid">
+            <div class="wallet-item"><span>可提现</span><strong data-wallet="available">¥0.00</strong></div>
+            <div class="wallet-item"><span>待结算</span><strong data-wallet="pending_total">¥0.00</strong></div>
+            <div class="wallet-item"><span>已结算</span><strong data-wallet="settled_total">¥0.00</strong></div>
+            <div class="wallet-item"><span>已提现</span><strong data-wallet="withdrawn_total">¥0.00</strong></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <h2>最近佣金</h2>
+            <span>driver_commissions</span>
+          </div>
+          <div class="commission-list" data-commission-list>
+            <div class="commission-item"><strong>暂无佣金记录</strong><span>订单核销后自动计算</span></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <h2>申请提现</h2>
+            <span>settled balance</span>
+          </div>
+          <form class="withdraw-form" data-withdraw-form novalidate>
+            <div class="field">
+              <label for="withdraw-amount">提现金额</label>
+              <input id="withdraw-amount" name="amount" inputmode="decimal" placeholder="请输入提现金额" />
+            </div>
+            <div class="field">
+              <label for="withdraw-account">收款账号</label>
+              <input id="withdraw-account" name="account" placeholder="支付宝或微信收款账号" />
+            </div>
+            <div class="field">
+              <label for="withdraw-real-name">实名姓名</label>
+              <input id="withdraw-real-name" name="realName" placeholder="请输入收款实名" />
+            </div>
+            <button class="withdraw-btn" type="submit">提交提现</button>
+          </form>
+        </section>
+      </section>
+
+      <footer class="bottom-bar hidden" data-register-footer>
         <div>
           <span>注册后进入审核</span>
           <strong>通过后可绑定车座推广码</strong>
@@ -591,19 +810,162 @@
         window.lucide.createIcons();
       }
 
-      const form = document.querySelector("[data-driver-form]");
+      const API_BASE = window.ZHUHAI_API_BASE || "/api/v1";
+      const DRIVER_TOKEN_KEY = "zhuhai_driver_token";
+      const DRIVER_PROFILE_KEY = "zhuhai_driver_profile";
+      const registerForm = document.querySelector("[data-driver-form]");
+      const loginForm = document.querySelector("[data-driver-login-form]");
+      const withdrawForm = document.querySelector("[data-withdraw-form]");
+      const publicAuth = document.querySelector("[data-public-auth]");
+      const loginPanel = document.querySelector("[data-login-panel]");
+      const registerPanel = document.querySelector("[data-register-panel]");
+      const registerFooter = document.querySelector("[data-register-footer]");
+      const driverConsole = document.querySelector("[data-driver-console]");
       const toast = document.querySelector(".toast");
       let toastTimer;
+      let driverProfile = null;
 
       function showToast(message) {
         toast.textContent = message;
         toast.classList.add("show");
         clearTimeout(toastTimer);
-        toastTimer = setTimeout(() => toast.classList.remove("show"), 1500);
+        toastTimer = setTimeout(() => toast.classList.remove("show"), 1700);
+      }
+
+      function unwrap(json) {
+        if (!json || Number(json.code) >= 400) {
+          throw new Error(json?.message || "服务暂时不可用");
+        }
+        return json.data || {};
+      }
+
+      function token() {
+        return localStorage.getItem(DRIVER_TOKEN_KEY) || "";
+      }
+
+      async function requestJSON(path, options = {}, auth = true) {
+        const headers = {
+          "Content-Type": "application/json",
+          ...(options.headers || {}),
+        };
+        if (auth) {
+          const currentToken = token();
+          if (!currentToken) {
+            clearDriverSession("请先登录");
+            throw new Error("请先登录");
+          }
+          headers.Authorization = `Bearer ${currentToken}`;
+        }
+
+        const response = await fetch(`${API_BASE}${path}`, { ...options, headers });
+        const json = await response.json().catch(() => ({}));
+        if (auth && (response.status === 401 || response.status === 403)) {
+          clearDriverSession(json.message || "登录已过期，请重新登录");
+          throw new Error(json.message || "登录已过期，请重新登录");
+        }
+        if (!response.ok || Number(json.code) >= 400) {
+          throw new Error(json.message || "请求失败");
+        }
+        return unwrap(json);
+      }
+
+      function money(amount) {
+        return `¥${Number(amount || 0).toFixed(2)}`;
+      }
+
+      function escapeHTML(value) {
+        return String(value ?? "").replace(/[&<>"']/g, (char) => {
+          const map = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
+          return map[char];
+        });
+      }
+
+      function setMode(mode) {
+        const loggedIn = mode === "console";
+        publicAuth.classList.toggle("hidden", loggedIn);
+        loginPanel.classList.toggle("hidden", mode !== "login");
+        registerPanel.classList.toggle("hidden", mode !== "register");
+        registerFooter.classList.toggle("hidden", mode !== "register");
+        driverConsole.classList.toggle("hidden", !loggedIn);
+        document.querySelectorAll("[data-mode]").forEach((button) => {
+          button.classList.toggle("active", button.dataset.mode === mode);
+        });
+      }
+
+      function clearDriverSession(message) {
+        localStorage.removeItem(DRIVER_TOKEN_KEY);
+        localStorage.removeItem(DRIVER_PROFILE_KEY);
+        driverProfile = null;
+        setMode("login");
+        if (message) showToast(message);
+      }
+
+      function saveDriverSession(data) {
+        localStorage.setItem(DRIVER_TOKEN_KEY, data.access_token);
+        driverProfile = {
+          driver_id: data.driver_id,
+          driver_no: data.driver_no,
+          name: data.name,
+          commission_rate: data.commission_rate,
+        };
+        localStorage.setItem(DRIVER_PROFILE_KEY, JSON.stringify(driverProfile));
+        renderDriverProfile(driverProfile);
+        setMode("console");
+      }
+
+      function renderDriverProfile(profile) {
+        document.querySelector("[data-driver-name]").textContent = profile?.name || "司机工作台";
+        document.querySelector("[data-driver-meta]").textContent =
+          `${profile?.driver_no || "司机编号待同步"} · 提成 ${(Number(profile?.commission_rate || 0) * 100).toFixed(1)}%`;
+      }
+
+      async function validateDriverSession() {
+        if (!token()) {
+          setMode("login");
+          return;
+        }
+        try {
+          const profile = await requestJSON("/driver/me");
+          driverProfile = profile;
+          localStorage.setItem(DRIVER_PROFILE_KEY, JSON.stringify(profile));
+          renderDriverProfile(profile);
+          setMode("console");
+          loadDriverDashboard();
+        } catch (error) {
+          clearDriverSession(error.message);
+        }
+      }
+
+      async function loadDriverDashboard() {
+        try {
+          const wallet = await requestJSON("/driver/wallet");
+          Object.entries(wallet).forEach(([key, value]) => {
+            const node = document.querySelector(`[data-wallet="${key}"]`);
+            if (node) node.textContent = money(value);
+          });
+          document.querySelector("[data-wallet-sync]").textContent = `${new Date().toLocaleString("zh-CN", { hour12: false })} 同步`;
+
+          const commissions = await requestJSON("/driver/commissions?page=1&size=5");
+          const items = Array.isArray(commissions) ? commissions : [];
+          const list = document.querySelector("[data-commission-list]");
+          list.innerHTML = items.length
+            ? items
+                .map((item) => {
+                  const orderNo = escapeHTML(item.order_no || `订单 ${item.order_id || "--"}`);
+                  const amount = escapeHTML(money(item.commission_amount));
+                  const status = escapeHTML(item.status || "pending");
+                  const createdAt = escapeHTML(item.created_at || "");
+                  return `<div class="commission-item"><strong>${orderNo} · ${amount}</strong><span>${status} · ${createdAt}</span></div>`;
+                })
+                .join("")
+            : `<div class="commission-item"><strong>暂无佣金记录</strong><span>订单核销后自动计算</span></div>`;
+        } catch (error) {
+          if (token()) showToast(error.message);
+        }
       }
 
       function value(name) {
-        return form.elements[name]?.value.trim() || "";
+        return registerForm.elements[name]?.value.trim() || "";
       }
 
       function maskPhone(phone) {
@@ -635,58 +997,143 @@
 
         if (!value("name")) return "请填写真实姓名";
         if (!/^1[3-9]\d{9}$/.test(phone)) return "请填写正确的11位手机号";
+        if (value("password").length < 6) return "登录密码至少6位";
         if (!/^\d{17}[\dX]$/.test(idCard)) return "请填写正确的18位身份证号码";
         if (!/^[\u4e00-\u9fa5][A-Z][A-Z0-9]{5,6}$/.test(plateNo)) return "请填写正确的车牌号，例如粤C12345";
         if (!value("model")) return "请填写车辆车型";
         if (!value("seats")) return "请选择座位数";
         if (!value("serviceCity")) return "请选择主要服务区域";
-        if (!form.elements.agreement.checked) return "请勾选信息真实性确认";
+        if (!registerForm.elements.agreement.checked) return "请勾选信息真实性确认";
         return "";
       }
 
-      function submitRegister() {
+      async function submitRegister() {
         const error = validateForm();
         if (error) {
           showToast(error);
           return;
         }
 
-        const driverNo = `DR-ZH-${String(Date.now()).slice(-6)}`;
-        document.querySelector("[data-result='driverNo']").textContent = driverNo;
-        document.querySelector("[data-status-card]").classList.add("show");
-        localStorage.setItem(
-          "zhuhai_driver_register_demo",
-          JSON.stringify({
-            driverNo,
-            name: value("name"),
-            phone: value("phone"),
-            idCard: value("idCard").toUpperCase(),
-            plateNo: value("plateNo").toUpperCase(),
-            model: value("model"),
-            seats: value("seats"),
-            serviceCity: value("serviceCity"),
-            status: "pending_review",
-          }),
-        );
-        showToast("注册申请已提交，等待后台审核");
-        document.querySelector("[data-status-card]").scrollIntoView({ behavior: "smooth", block: "center" });
+        const submit = document.querySelector("[data-submit-proxy]");
+        submit.disabled = true;
+        submit.textContent = "提交中...";
+        try {
+          const data = await requestJSON(
+            "/driver/register",
+            {
+              method: "POST",
+              body: JSON.stringify({
+                name: value("name"),
+                phone: value("phone"),
+                password: value("password"),
+                id_card_no: value("idCard").toUpperCase(),
+                plate_no: value("plateNo").toUpperCase(),
+                model: value("model"),
+                seats: Number(value("seats")),
+                service_city: value("serviceCity"),
+              }),
+            },
+            false,
+          );
+          document.querySelector("[data-result='driverNo']").textContent = data.driver_no || "待生成";
+          document.querySelector("[data-status-card]").classList.add("show");
+          showToast(data.message || "注册申请已提交，等待后台审核");
+          document.querySelector("[data-status-card]").scrollIntoView({ behavior: "smooth", block: "center" });
+        } catch (error) {
+          showToast(error.message);
+        } finally {
+          submit.disabled = false;
+          submit.textContent = "提交注册";
+        }
       }
 
-      form.id = "driver-register-form";
-      form.addEventListener("input", (event) => {
+      loginForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const phone = loginForm.elements.phone.value.trim();
+        const password = loginForm.elements.password.value;
+        if (!/^1[3-9]\d{9}$/.test(phone)) {
+          showToast("请填写正确的11位手机号");
+          return;
+        }
+        if (!password) {
+          showToast("请输入登录密码");
+          return;
+        }
+
+        const submit = loginForm.querySelector("button[type='submit']");
+        submit.disabled = true;
+        submit.textContent = "登录中...";
+        try {
+          const data = await requestJSON("/driver/login", { method: "POST", body: JSON.stringify({ phone, password }) }, false);
+          saveDriverSession(data);
+          loginForm.reset();
+          showToast("登录成功");
+          loadDriverDashboard();
+        } catch (error) {
+          clearDriverSession();
+          showToast(error.message);
+        } finally {
+          submit.disabled = false;
+          submit.textContent = "登录司机端";
+        }
+      });
+
+      withdrawForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const amount = Number(withdrawForm.elements.amount.value);
+        const account = withdrawForm.elements.account.value.trim();
+        const realName = withdrawForm.elements.realName.value.trim();
+        if (!amount || amount <= 0) {
+          showToast("请输入正确的提现金额");
+          return;
+        }
+        if (!account || !realName) {
+          showToast("请填写收款账号和实名姓名");
+          return;
+        }
+
+        const submit = withdrawForm.querySelector("button[type='submit']");
+        submit.disabled = true;
+        submit.textContent = "提交中...";
+        try {
+          await requestJSON("/driver/withdraw", {
+            method: "POST",
+            body: JSON.stringify({ amount, account, real_name: realName, channel: "alipay" }),
+          });
+          withdrawForm.reset();
+          showToast("提现申请已提交");
+          loadDriverDashboard();
+        } catch (error) {
+          showToast(error.message);
+        } finally {
+          submit.disabled = false;
+          submit.textContent = "提交提现";
+        }
+      });
+
+      registerForm.id = "driver-register-form";
+      registerForm.addEventListener("input", (event) => {
         if (event.target.name === "plateNo" || event.target.name === "idCard") {
           event.target.value = event.target.value.toUpperCase();
         }
         updatePreview();
       });
-      form.addEventListener("change", updatePreview);
-      form.addEventListener("submit", (event) => {
+      registerForm.addEventListener("change", updatePreview);
+      registerForm.addEventListener("submit", (event) => {
         event.preventDefault();
         submitRegister();
       });
 
       document.querySelector("[data-submit-proxy]").addEventListener("click", () => {
-        form.requestSubmit();
+        registerForm.requestSubmit();
+      });
+
+      document.querySelector("[data-driver-logout]").addEventListener("click", () => {
+        clearDriverSession("已退出登录");
+      });
+
+      document.querySelectorAll("[data-mode]").forEach((button) => {
+        button.addEventListener("click", () => setMode(button.dataset.mode));
       });
 
       document.querySelectorAll("[data-upload]").forEach((button) => {
@@ -695,7 +1142,16 @@
         });
       });
 
+      const cachedProfile = localStorage.getItem(DRIVER_PROFILE_KEY);
+      if (cachedProfile) {
+        try {
+          renderDriverProfile(JSON.parse(cachedProfile));
+        } catch (error) {
+          localStorage.removeItem(DRIVER_PROFILE_KEY);
+        }
+      }
       updatePreview();
+      validateDriverSession();
     </script>
   </body>
 </html>

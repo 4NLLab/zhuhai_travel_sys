@@ -13,6 +13,13 @@ build/
 .cache/
 .parcel-cache/
 .vite/
+/backend/zhuhai_travel_backend
+
+# Local media placeholders/uploads
+/assets/romantic-zhuhai-cruise.mp4
+
+# Local Codex artifacts
+/.codex
 
 # Logs
 *.log

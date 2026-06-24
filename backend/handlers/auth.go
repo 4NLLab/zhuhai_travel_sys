@@ -56,6 +56,28 @@ func AdminLogin(c *gin.Context) {
 	}))
 }
 
+// AdminProfile 返回当前超级管理员登录态，用于前端刷新后的 token 校验。
+func AdminProfile(c *gin.Context) {
+	adminID := currentActorID(c)
+	var admin models.AdminUser
+	if err := database.DB.Where("id = ? AND status = ?", adminID, "active").First(&admin).Error; err != nil {
+		c.JSON(http.StatusUnauthorized, dto.Fail(401, "管理员账号已停用或不存在"))
+		return
+	}
+	if admin.Role != "super_admin" {
+		c.JSON(http.StatusForbidden, dto.Fail(403, "仅超级管理员可访问"))
+		return
+	}
+
+	c.JSON(http.StatusOK, dto.Success(gin.H{
+		"admin_id":      admin.ID,
+		"username":      admin.Username,
+		"display_name":  admin.DisplayName,
+		"role":          admin.Role,
+		"last_login_at": admin.LastLoginAt,
+	}))
+}
+
 func UserPhoneLogin(c *gin.Context) {
 	var req struct {
 		Phone    string `json:"phone" binding:"required"`

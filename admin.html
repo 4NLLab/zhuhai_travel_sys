@@ -832,6 +832,105 @@
         background: var(--orange);
       }
 
+      .hidden {
+        display: none !important;
+      }
+
+      .login-view {
+        min-height: 100vh;
+        display: grid;
+        align-content: center;
+        gap: 14px;
+        padding: calc(28px + env(safe-area-inset-top, 0)) 18px calc(28px + env(safe-area-inset-bottom, 0));
+        background:
+          linear-gradient(135deg, rgba(8, 109, 137, 0.95), rgba(15, 141, 173, 0.82)),
+          url("assets/preview-admin-dashboard.png") center / cover;
+      }
+
+      .login-brand {
+        color: #fff;
+        text-shadow: 0 8px 24px rgba(5, 35, 46, 0.26);
+      }
+
+      .login-brand h1 {
+        margin: 0;
+        font-size: 30px;
+        line-height: 1.15;
+      }
+
+      .login-brand p {
+        margin: 9px 0 0;
+        color: rgba(255, 255, 255, 0.86);
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      .login-card {
+        padding: 16px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.96);
+        box-shadow: 0 18px 48px rgba(8, 45, 64, 0.22);
+        backdrop-filter: blur(14px);
+      }
+
+      .login-card h2 {
+        margin: 0 0 12px;
+        font-size: 20px;
+      }
+
+      .login-form {
+        display: grid;
+        gap: 10px;
+      }
+
+      .login-field {
+        display: grid;
+        gap: 7px;
+      }
+
+      .login-field label {
+        color: #526671;
+        font-size: 13px;
+        font-weight: 850;
+      }
+
+      .login-field input {
+        width: 100%;
+        height: 46px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 0 12px;
+        outline: 0;
+        color: var(--ink);
+        background: #fbfdfe;
+      }
+
+      .login-field input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(15, 141, 173, 0.1);
+      }
+
+      .login-submit {
+        height: 46px;
+        border-radius: 8px;
+        color: #fff;
+        background: var(--primary-dark);
+        font-size: 16px;
+        font-weight: 900;
+      }
+
+      .login-submit:disabled {
+        cursor: not-allowed;
+        opacity: 0.72;
+      }
+
+      .login-note {
+        margin: 10px 0 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
       .toast {
         position: fixed;
         z-index: 30;
@@ -883,13 +982,36 @@
   </head>
   <body>
     <main class="phone">
-      <header class="top">
+      <section class="login-view" data-auth-view>
+        <div class="login-brand">
+          <h1>超级管理员控制台</h1>
+          <p>请输入超级管理员账号登录，所有后台接口会通过 Bearer Token 和角色权限双重校验。</p>
+        </div>
+        <section class="login-card">
+          <h2>账号登录</h2>
+          <form class="login-form" data-admin-login-form novalidate>
+            <div class="login-field">
+              <label for="admin-username">登录账号</label>
+              <input id="admin-username" name="username" autocomplete="username" placeholder="请输入管理员账号" required />
+            </div>
+            <div class="login-field">
+              <label for="admin-password">登录密码</label>
+              <input id="admin-password" name="password" type="password" autocomplete="current-password" placeholder="请输入登录密码" required />
+            </div>
+            <button class="login-submit" type="submit">登录控制台</button>
+          </form>
+          <p class="login-note">仅 `super_admin` 角色可进入该控制台；登录过期或权限不足会自动退出。</p>
+        </section>
+      </section>
+
+      <header class="top hidden" data-app-view>
         <nav class="nav">
           <button class="icon-btn" type="button" aria-label="返回"><i data-lucide="chevron-left"></i></button>
           <div class="title">超级管理员控制台</div>
           <button class="icon-btn menu-btn" type="button" id="moduleMenuButton" aria-label="打开模块菜单" aria-expanded="false" aria-controls="moduleMenu">
             <i data-lucide="menu"></i>
           </button>
+          <button class="icon-btn" type="button" aria-label="退出登录" data-logout><i data-lucide="log-out"></i></button>
         </nav>
       </header>
 
@@ -928,13 +1050,13 @@
         </div>
       </nav>
 
-      <div class="content">
+      <div class="content hidden" data-app-view>
         <section class="hero">
           <h1>运营管理</h1>
           <p>配置司机推广提成、手机端轮播图、交易监控、订单与自动发放。</p>
           <div class="role-row">
-            <span class="role"><i data-lucide="shield-check"></i>超级管理员</span>
-            <span class="sync-time">今日 14:30 更新</span>
+            <span class="role"><i data-lucide="shield-check"></i><span data-admin-name>超级管理员</span></span>
+            <span class="sync-time" data-sync-time>登录后同步</span>
           </div>
         </section>
 
@@ -1343,18 +1465,25 @@
         window.lucide.createIcons();
       }
 
+      const API_BASE = window.ZHUHAI_API_BASE || "/api/v1";
+      const ADMIN_TOKEN_KEY = "zhuhai_super_admin_token";
+      const ADMIN_PROFILE_KEY = "zhuhai_super_admin_profile";
       const toast = document.querySelector(".toast");
       const moduleMenuButton = document.querySelector("#moduleMenuButton");
       const moduleMenu = document.querySelector("#moduleMenu");
       const moduleScrim = document.querySelector("#moduleScrim");
       const currentModuleLabel = document.querySelector("#currentModuleLabel");
+      const authView = document.querySelector("[data-auth-view]");
+      const appViews = document.querySelectorAll("[data-app-view]");
+      const loginForm = document.querySelector("[data-admin-login-form]");
       let toastTimer;
+      let adminProfile = null;
 
       function showToast(message) {
         toast.textContent = message;
         toast.classList.add("show");
         clearTimeout(toastTimer);
-        toastTimer = setTimeout(() => toast.classList.remove("show"), 1400);
+        toastTimer = setTimeout(() => toast.classList.remove("show"), 1700);
       }
 
       function setModuleMenu(open) {
@@ -1366,6 +1495,10 @@
       }
 
       function switchModule(target, title) {
+        if (!token()) {
+          clearAdminSession("请先登录");
+          return;
+        }
         document.querySelectorAll(".module-link").forEach((item) => {
           item.classList.toggle("active", item.dataset.target === target);
         });
@@ -1393,20 +1526,173 @@
         });
       });
 
+      function unwrap(json) {
+        if (!json || Number(json.code) >= 400) {
+          throw new Error(json?.message || "服务暂时不可用");
+        }
+        return json.data || {};
+      }
+
+      function token() {
+        return localStorage.getItem(ADMIN_TOKEN_KEY) || "";
+      }
+
+      function setProtectedView(visible) {
+        authView.classList.toggle("hidden", visible);
+        appViews.forEach((node) => node.classList.toggle("hidden", !visible));
+      }
+
+      function clearAdminSession(message) {
+        localStorage.removeItem(ADMIN_TOKEN_KEY);
+        localStorage.removeItem(ADMIN_PROFILE_KEY);
+        adminProfile = null;
+        setProtectedView(false);
+        if (message) showToast(message);
+      }
+
+      function saveAdminSession(data) {
+        localStorage.setItem(ADMIN_TOKEN_KEY, data.access_token);
+        adminProfile = {
+          admin_id: data.admin_id,
+          username: data.username,
+          display_name: data.display_name,
+          role: data.role,
+        };
+        localStorage.setItem(ADMIN_PROFILE_KEY, JSON.stringify(adminProfile));
+        renderAdminProfile(adminProfile);
+        setProtectedView(true);
+      }
+
+      function renderAdminProfile(profile) {
+        document.querySelector("[data-admin-name]").textContent = profile?.display_name || profile?.username || "超级管理员";
+        document.querySelector("[data-sync-time]").textContent = `${new Date().toLocaleString("zh-CN", { hour12: false })} 同步`;
+      }
+
+      async function requestJSON(path, options = {}) {
+        const headers = {
+          "Content-Type": "application/json",
+          ...(options.headers || {}),
+        };
+        const currentToken = token();
+        if (currentToken) headers.Authorization = `Bearer ${currentToken}`;
+
+        const response = await fetch(`${API_BASE}${path}`, { ...options, headers });
+        const json = await response.json().catch(() => ({}));
+        if (response.status === 401 || response.status === 403) {
+          clearAdminSession(json.message || "登录已过期，请重新登录");
+          throw new Error(json.message || "登录已过期，请重新登录");
+        }
+        if (!response.ok || Number(json.code) >= 400) {
+          throw new Error(json.message || "请求失败");
+        }
+        return unwrap(json);
+      }
+
+      async function validateAdminSession() {
+        if (!token()) {
+          clearAdminSession();
+          return;
+        }
+        try {
+          const profile = await requestJSON("/admin/me");
+          if (profile.role !== "super_admin") {
+            clearAdminSession("仅超级管理员可进入");
+            return;
+          }
+          adminProfile = profile;
+          localStorage.setItem(ADMIN_PROFILE_KEY, JSON.stringify(profile));
+          renderAdminProfile(profile);
+          setProtectedView(true);
+          loadDashboardSnapshot();
+        } catch (error) {
+          clearAdminSession(error.message);
+        }
+      }
+
+      async function loadDashboardSnapshot() {
+        try {
+          await requestJSON("/admin/dashboard");
+          document.querySelector("[data-sync-time]").textContent = `${new Date().toLocaleString("zh-CN", { hour12: false })} 同步`;
+        } catch (error) {
+          if (token()) showToast(error.message);
+        }
+      }
+
+      loginForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const submit = loginForm.querySelector("button[type='submit']");
+        const username = loginForm.elements.username.value.trim();
+        const password = loginForm.elements.password.value;
+        if (!username || !password) {
+          showToast("请输入账号和密码");
+          return;
+        }
+
+        submit.disabled = true;
+        submit.textContent = "登录中...";
+        try {
+          const response = await fetch(`${API_BASE}/admin/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password }),
+          });
+          const json = await response.json().catch(() => ({}));
+          if (!response.ok || Number(json.code) >= 400) {
+            throw new Error(json.message || "登录失败");
+          }
+          const data = unwrap(json);
+          if (data.role !== "super_admin") {
+            throw new Error("仅超级管理员可进入");
+          }
+          saveAdminSession(data);
+          loginForm.reset();
+          showToast("登录成功");
+          loadDashboardSnapshot();
+        } catch (error) {
+          clearAdminSession();
+          showToast(error.message);
+        } finally {
+          submit.disabled = false;
+          submit.textContent = "登录控制台";
+        }
+      });
+
+      document.querySelector("[data-logout]").addEventListener("click", () => {
+        clearAdminSession("已退出登录");
+      });
+
       document.querySelectorAll(".detail-toggle").forEach((button) => {
         button.addEventListener("click", () => {
+          if (!token()) {
+            clearAdminSession("请先登录");
+            return;
+          }
           const details = button.nextElementSibling;
           details.classList.toggle("open");
           button.textContent = details.classList.contains("open") ? "收起明细" : "查看明细";
         });
       });
 
-      document.querySelectorAll("button:not(.module-link):not(.menu-btn):not(.detail-toggle)").forEach((button) => {
+      document.querySelectorAll("button:not(.module-link):not(.menu-btn):not(.detail-toggle):not(.login-submit):not([data-logout])").forEach((button) => {
         button.addEventListener("click", () => {
+          if (!token()) {
+            clearAdminSession("请先登录");
+            return;
+          }
           const text = button.textContent.trim() || button.getAttribute("aria-label") || "操作";
           showToast(`${text}功能预留`);
         });
       });
+
+      const cachedProfile = localStorage.getItem(ADMIN_PROFILE_KEY);
+      if (cachedProfile) {
+        try {
+          renderAdminProfile(JSON.parse(cachedProfile));
+        } catch (error) {
+          localStorage.removeItem(ADMIN_PROFILE_KEY);
+        }
+      }
+      validateAdminSession();
     </script>
   </body>
 </html>

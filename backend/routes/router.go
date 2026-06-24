@@ -32,8 +32,22 @@ func SetupRouter() *gin.Engine {
 		api.GET("/categories", handlers.CategoryList)
 		api.GET("/banners", handlers.BannerList)
 		api.GET("/island-cruise/ports", handlers.IslandCruisePorts)
+		api.GET("/island-cruise/cert-types", handlers.IslandCruiseCertTypes)
 		api.GET("/island-cruise/voyages", handlers.IslandCruiseVoyages)
+		api.GET("/island-cruise/voyage-calendar", handlers.IslandCruiseVoyageCalendar)
+		api.GET("/island-cruise/smart-search", handlers.IslandCruiseSmartSearch)
 		api.GET("/island-cruise/price", handlers.IslandCruisePrice)
+		api.GET("/island-cruise/order", handlers.IslandCruiseOrder)
+		api.GET("/island-cruise/refund-fee", handlers.IslandCruiseRefundFee)
+		api.POST("/island-cruise/refund", handlers.IslandCruiseRefund)
+		api.GET("/island-cruise/change-fee", handlers.IslandCruiseChangeFee)
+		api.GET("/island-cruise/change-voyages", handlers.IslandCruiseChangeVoyages)
+		api.POST("/island-cruise/change-lock", handlers.IslandCruiseChangeLock)
+		api.POST("/island-cruise/change-unlock", handlers.IslandCruiseChangeUnlock)
+		api.POST("/island-cruise/verify-notify", handlers.IslandCruiseVerifyNotify)
+		api.POST("/island-cruise/lock", handlers.IslandCruiseLockOrder)
+		api.POST("/island-cruise/sale", handlers.IslandCruiseSaleOrder)
+		api.POST("/island-cruise/unlock", handlers.IslandCruiseUnlockOrder)
 
 		// 支付回调由支付平台调用，使用独立签名校验。
 		api.POST("/payments/callback", handlers.PaymentCallback)
@@ -90,7 +104,9 @@ func SetupRouter() *gin.Engine {
 		// ==================== 司机端（小程序） ====================
 		driverApp := api.Group("/driver")
 		driverApp.Use(middleware.AuthRequired("driver"))
+		driverApp.Use(middleware.DriverStatusRequired("active"))
 		{
+			driverApp.GET("/me", handlers.DriverProfile)
 			driverApp.GET("/wallet", handlers.DriverWallet)
 			driverApp.GET("/commissions", handlers.DriverViewCommissionList)
 			driverApp.POST("/withdraw", handlers.DriverWithdraw)
@@ -100,11 +116,13 @@ func SetupRouter() *gin.Engine {
 		// ==================== 管理端-司机 ====================
 		driver := api.Group("/drivers")
 		driver.Use(middleware.AuthRequired("admin"))
+		driver.Use(middleware.AdminRoleRequired("super_admin"))
 		{
 			driver.GET("", handlers.DriverList)
 		}
 		comm := api.Group("/commissions")
 		comm.Use(middleware.AuthRequired("admin"))
+		comm.Use(middleware.AdminRoleRequired("super_admin"))
 		{
 			comm.GET("", handlers.DriverCommissionList)
 			comm.GET("/summary", handlers.CommissionSummary)
@@ -113,7 +131,10 @@ func SetupRouter() *gin.Engine {
 		// ==================== 管理后台 ====================
 		admin := api.Group("/admin")
 		admin.Use(middleware.AuthRequired("admin"))
+		admin.Use(middleware.AdminRoleRequired("super_admin"))
 		{
+			admin.GET("/me", handlers.AdminProfile)
+
 			// 看板
 			admin.GET("/dashboard", handlers.AdminDashboard)
 			admin.GET("/trend", handlers.AdminTrend)
@@ -139,10 +160,11 @@ func SetupRouter() *gin.Engine {
 
 			// 参数配置
 			admin.GET("/params", handlers.AdminParams)
+			admin.GET("/island-cruise/balance", handlers.IslandCruiseBalance)
 		}
 
 		// 核销属于管理端能力，单独挂在 admin 权限下。
-		api.POST("/tickets/verify", middleware.AuthRequired("admin"), handlers.TicketVerify)
+		api.POST("/tickets/verify", middleware.AuthRequired("admin"), middleware.AdminRoleRequired("super_admin"), handlers.TicketVerify)
 	}
 
 	return r

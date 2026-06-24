@@ -3,7 +3,7 @@
 
 CREATE DATABASE IF NOT EXISTS zhuhai_travel
   DEFAULT CHARACTER SET utf8mb4
-  DEFAULT COLLATE utf8mb4_0900_ai_ci;
+  DEFAULT COLLATE utf8mb4_general_ci;
 
 USE zhuhai_travel;
 
@@ -66,6 +66,7 @@ CREATE TABLE drivers (
   driver_no VARCHAR(40) NOT NULL,
   name VARCHAR(80) NOT NULL,
   phone VARCHAR(32) NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
   id_card_no VARBINARY(255) NULL,
   status VARCHAR(24) NOT NULL DEFAULT 'active',
   commission_rate DECIMAL(6,4) NOT NULL DEFAULT 0.0800,
@@ -458,4 +459,70 @@ CREATE TABLE audit_logs (
   KEY idx_audit_actor (actor_type, actor_id),
   KEY idx_audit_target (target_type, target_id),
   KEY idx_audit_created (created_at)
+) ENGINE=InnoDB;
+
+CREATE TABLE island_cruise_orders (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  local_order_no VARCHAR(64) NOT NULL,
+  third_order_no VARCHAR(64) NOT NULL,
+  supplier_order_no VARCHAR(80) NULL,
+  supplier_ticket_no VARCHAR(80) NULL,
+  supplier_code_content VARCHAR(255) NULL,
+  status VARCHAR(32) NOT NULL DEFAULT 'pending_lock',
+  voyage_id BIGINT NOT NULL,
+  voyage_name VARCHAR(160) NULL,
+  voyage_no VARCHAR(80) NULL,
+  ship_name VARCHAR(120) NULL,
+  up_port_id BIGINT NOT NULL,
+  up_port_name VARCHAR(120) NULL,
+  down_port_id BIGINT NOT NULL,
+  down_port_name VARCHAR(120) NULL,
+  go_time VARCHAR(32) NOT NULL,
+  contact_name VARCHAR(80) NOT NULL,
+  contact_mobile VARCHAR(32) NOT NULL,
+  passenger_count INT NOT NULL,
+  total_amount DECIMAL(10,2) NOT NULL,
+  pay_amount DECIMAL(10,2) NOT NULL DEFAULT 0,
+  pay_type BIGINT NULL,
+  pay_evidence_no VARCHAR(80) NULL,
+  lock_request JSON NULL,
+  lock_response JSON NULL,
+  sale_response JSON NULL,
+  order_response JSON NULL,
+  locked_at DATETIME NULL,
+  lock_expire_at DATETIME NULL,
+  paid_at DATETIME NULL,
+  cancelled_at DATETIME NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_island_orders_local (local_order_no),
+  UNIQUE KEY uk_island_orders_third (third_order_no),
+  KEY idx_island_orders_supplier (supplier_order_no),
+  KEY idx_island_orders_status (status),
+  KEY idx_island_orders_voyage (voyage_id),
+  KEY idx_island_orders_created (created_at)
+) ENGINE=InnoDB;
+
+CREATE TABLE island_cruise_passengers (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  island_cruise_order_id BIGINT UNSIGNED NOT NULL,
+  name VARCHAR(80) NOT NULL,
+  mobile VARCHAR(32) NOT NULL,
+  cert_type_id BIGINT NOT NULL,
+  cert_no VARCHAR(255) NOT NULL,
+  cabin_class_id VARCHAR(80) NOT NULL,
+  cabin_class_name VARCHAR(120) NULL,
+  cabin_type_code VARCHAR(80) NOT NULL,
+  fare_type VARCHAR(80) NOT NULL,
+  fare_type_name VARCHAR(120) NULL,
+  original_price DECIMAL(10,2) NOT NULL DEFAULT 0,
+  price DECIMAL(10,2) NOT NULL,
+  trip INT NOT NULL DEFAULT 0,
+  supplier_ticket_no VARCHAR(80) NULL,
+  supplier_code_content VARCHAR(255) NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_island_passengers_order (island_cruise_order_id),
+  CONSTRAINT fk_island_passengers_order FOREIGN KEY (island_cruise_order_id) REFERENCES island_cruise_orders (id)
 ) ENGINE=InnoDB;
