@@ -1,0 +1,56 @@
+---
+description: Git 提交与 GitHub 操作集中规范
+alwaysApply: false
+---
+
+# Git 提交与 GitHub 操作集中规范（硬性）
+
+本规则集中约束 AI 在本仓库中执行 `git commit`、创建 PR、推送 GitHub 相关操作时的行为。除非用户明确要求，AI 不得主动提交、推送或创建 PR。
+
+## 触发条件
+
+- 用户明确要求「提交 / commit / 写 commit log / 创建 PR / push 到 GitHub」时触发。
+- 仅修改文件、运行测试、解释 diff 不等于授权提交。
+
+## 提交前检查
+
+1. 先查看 `git status`，识别所有未跟踪、已暂存、未暂存文件。
+2. 查看完整 `git diff`（含 staged 与 unstaged），确认本次提交实际包含什么。
+3. 查看近期 `git log`，对齐仓库现有提交风格。
+4. 若涉及代码 symbol 修改，编辑前必须评估调用方、依赖方和兼容风险，并在提交前复核影响范围。
+5. 若涉及前端可见 UI 修改，提交前必须完成受影响页面的人工或浏览器验证，并记录验证结果。
+6. 若涉及后端 Go 代码修改，提交前必须运行 `cd backend && go test ./...`，除非环境缺失导致无法执行，并在结果中说明。
+
+## 分功能提交
+
+- 必须按功能、风险边界、可回滚单元拆分提交；严禁把无关改动放在同一个 commit。
+- 一个 commit 只能表达一个清晰目的，例如「修复后台登录校验」和「调整景区详情样式」必须分开。
+- 若工作区同时存在用户改动与 AI 改动，只提交与当前请求直接相关的文件；不擅自整理、格式化、回滚无关文件。
+- 如果 diff 混杂到无法安全拆分，必须暂停并向用户说明哪些文件/改动需要确认。
+
+## Commit Message
+
+- 所有 commit message 必须使用简体中文，包括 subject 与 body。
+- 类型可使用业界通用英文缩写：`feat` / `fix` / `refactor` / `chore` / `docs` / `test` / `style` / `perf`。
+- 必须写清楚「为什么改」和「影响范围」，不能只写「更新代码」「修复问题」这类空泛描述。
+- Body 不强制使用固定字段名；可以用自然段、普通列表、脚注等形式说明背景与影响。
+- 可选示例：
+
+```text
+fix(admin): 修复后台登录失败提示不准确
+
+原实现把认证失败和网络异常展示为同一提示，排查成本高。
+本次只调整登录页错误提示文案，不改变认证接口和权限逻辑。
+```
+
+## 禁止事项
+
+- 严禁提交 `.env*`、`*.p8`、service account JSON、任何疑似密钥或凭证文件。
+- 严禁使用 `git reset --hard`、`git checkout --` 等破坏性命令，除非用户明确批准。
+- 严禁跳过 hook / 校验（如 `--no-verify`），除非用户明确批准。
+- 严禁擅自 `push`、强推、创建 PR；这些操作必须有用户明确授权。
+- 严禁把 Cursor 自动追加的英文 `Co-authored-by: Cursor <cursoragent@cursor.com>` 留在 commit message 中。
+
+## Cursor Commit 包装规避
+
+Cursor 内置 `git commit` 包装可能自动追加英文尾注。提交时必须使用不产生该尾注的方式，例如系统 Git + `commit-tree` / `update-ref`，并在提交后检查 `git log -1 --format=full` 确认 message 全中文且无 Cursor 英文尾注。
