@@ -335,7 +335,7 @@ isProject: false
 - 主提交：`d67d838acfc1d13192043c3da3dd5ba6fd06e76a`（`docs(miniprogram): 完成前端重构交付收口`）。
 - 完成内容：README、重构完成报告、依赖兼容性、资源/包体审计、平台禁用 API 扫描记录、Phase 6 截图矩阵和交付 blocker 均已补齐。
 - 最终验证：`typecheck`、`test`、`build:h5`、`build:mp-weixin`、`lint:platform`、`check:size`、后端 `go test ./...` 均通过。
-- 最终包体：主包 406.9 KB，司机分包 14.6 KB，总包 421.5 KB。
+- 最新包体复核：主包 1986.7 KB，司机分包 16.3 KB，总包 2003.0 KB；主包达到 1.8 MB 预警线但低于 2 MB 门禁。
 - 最终状态：本目标完成到 build-validated；正式提测前仍需微信开发者工具或 `miniprogram-ci` 运行时截图。
 
 ## 总体最终验收标准

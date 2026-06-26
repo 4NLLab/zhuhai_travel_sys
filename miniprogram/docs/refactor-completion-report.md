@@ -5,7 +5,7 @@
 ## 已交付范围
 
 - 新建 `miniprogram/` uni-app + Vue 3 + TypeScript 工程。
-- 主包页面：首页、我的、订单列表、票券详情、澳门环岛游订票。
+- 主包页面：首页、客服、我的、订单列表、票券详情、澳门环岛游订票。
 - 分包页面：司机端工作台。
 - 平台护栏：request/storage/logger/modal/navigation adapter、敏感信息脱敏、平台禁用 API 扫描、包体检查。
 - 数据层：Mock 场景、local API adapter、后端字段 mapper、adapter 单元测试。
@@ -15,7 +15,8 @@
 
 | 页面 | 状态 |
 |---|---|
-| 首页 | Mock/local 产品与分类展示、搜索入口、目的地、精选商品、底部 tabBar |
+| 首页 | Mock/local 产品与分类展示、三图轮播、搜索入口、目的地、精选商品、底部 tabBar |
+| 客服 | tabBar 客服入口、服务时间、常见问题和售后入口 |
 | 我的 | 用户摘要、订单/票券入口、常用服务、司机入口 |
 | 订单 | 状态筛选、订单卡片、空态、未登录/失败提示 |
 | 票券详情 | 票码脱敏、核销地点、使用须知、不可用状态 |
@@ -72,5 +73,5 @@
 - `build:h5`：通过。
 - `build:mp-weixin`：通过。
 - `lint:platform`：通过。
-- `check:size`：主包 406.9 KB，司机分包 14.6 KB，总包 421.5 KB。
+- `check:size`：主包 1986.7 KB，司机分包 16.3 KB，总包 2003.0 KB；主包达到 1.8 MB 预警线但低于 2 MB 门禁。
 - 后端 `go test ./...`：通过。

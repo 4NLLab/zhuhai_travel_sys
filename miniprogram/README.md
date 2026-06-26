@@ -53,6 +53,14 @@ docker compose up -d mysql backend
 VITE_API_MODE=local VITE_API_BASE_URL=http://127.0.0.1:8080/api/v1 VITE_ALLOW_FALLBACK=true corepack pnpm -C miniprogram dev:h5 -- --host 127.0.0.1 --port 5173
 ```
 
+Docker Compose 部署重构后的 H5 前端：
+
+```bash
+docker compose up -d --build frontend
+```
+
+该命令会使用 `docker/frontend/Dockerfile` 构建 `miniprogram/dist/build/h5`，由 Nginx 在 `http://127.0.0.1:8000` 提供访问，并将浏览器里的 `/api/v1` 请求反向代理到 Compose 内部的 `backend:8080`。
+
 `mp-weixin` local 调试不能使用模拟器里的 `127.0.0.1` 访问宿主机后端，需要改为局域网 IP、代理域名或 HTTPS 测试域名。真机/体验版必须配置 HTTPS 合法域名。
 
 ## 目录
@@ -84,9 +92,16 @@ npx playwright screenshot --browser=firefox --wait-for-timeout=1500 --viewport-s
 
 当前首版资源只包含：
 
+- `src/static/phase2/home-hero-moon-web.jpg`
+- `src/static/phase2/home-hero-sunset-web.jpg`
+- `src/static/phase2/home-hero-watercolor.png`
 - `src/static/phase2/macau-cruise-night-banner-web.jpg`
 - `src/static/phase2/taxi-scan-illustration-web.jpg`
 - `src/static/phase2/ticket-wallet-illustration-web.jpg`
+- `src/static/phase2/zhuhai-bay-home-hero-web.jpg`
+- `src/static/phase3/verify-hero-wide-clean-web.png`
+
+当前主包为 `1986.7 KB`，已接近 2 MB 硬门禁；后续新增首页大图应优先远程化或继续压缩。
 
 ## 依赖兼容性
 

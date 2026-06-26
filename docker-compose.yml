@@ -56,7 +56,14 @@ services:
       retries: 20
 
   frontend:
-    image: nginx:1.27-alpine
+    build:
+      context: .
+      dockerfile: docker/frontend/Dockerfile
+      args:
+        VITE_API_MODE: ${FRONTEND_API_MODE:-local}
+        VITE_API_BASE_URL: ${FRONTEND_API_BASE_URL:-/api/v1}
+        VITE_ALLOW_FALLBACK: ${FRONTEND_ALLOW_FALLBACK:-true}
+        VITE_MOCK_SCENARIO: ${FRONTEND_MOCK_SCENARIO:-phase2-success}
     container_name: zhuhai-travel-frontend
     restart: unless-stopped
     depends_on:
@@ -64,9 +71,6 @@ services:
         condition: service_healthy
     ports:
       - "${FRONTEND_HOST_PORT:-8000}:80"
-    volumes:
-      - ./:/usr/share/nginx/html:ro
-      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
 
 volumes:
   mysql_data:

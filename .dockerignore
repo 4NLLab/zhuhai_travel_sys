@@ -1,0 +1,12 @@
+.git
+.local
+.claude
+**/node_modules
+**/.vite
+**/dist
+*.log
+.env
+.env.*
+backend/server
+backend/tmp
+
