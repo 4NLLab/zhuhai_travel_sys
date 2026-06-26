@@ -22,7 +22,7 @@ todos:
       - phase-3-main-pages-visual-parity
   - id: phase-5-final-visual-gate-and-docs
     content: Phase 5：最终视觉验收、文档与交付收口
-    status: pending
+    status: completed
     depends_on:
       - phase-4-business-flows-visual-parity
 isProject: false
