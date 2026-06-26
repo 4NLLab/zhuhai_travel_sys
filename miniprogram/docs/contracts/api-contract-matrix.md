@@ -73,3 +73,34 @@ Phase 4 当前只接 mock view model。司机端工作台真实接口均需要 `
 | 佣金列表 | `/driver/commissions?page=&size=&status=` | GET | driver_active_token | `order_no/commission_amount/status/created_at` -> `DriverCommissionSummary[]` | `phase4-active|phase4-empty-wallet` | Phase 5 联调 | false | mock | 空列表显示“暂无佣金记录” |
 | 提现申请 | `/driver/withdraw` | POST | driver_active_token | `withdrawal_no/amount/status/message` -> 提现申请结果 | `phase4-insufficient-balance|phase4-withdraw-success` | Phase 5 联调 | false | mock | 余额不足显示可提现余额；成功显示待管理员审核打款 |
 | 提现记录 | `/driver/withdrawals?page=&size=` | GET | driver_active_token | `withdrawal_no/amount/status/account/created_at` -> `DriverWithdrawalSummary[]`，账号必须脱敏 | `phase4-active|phase4-empty-wallet` | Phase 5 联调 | false | mock | 空列表显示“暂无提现记录” |
+
+## Phase 5 本地后端契约联调
+
+Phase 5 直接以 `backend/routes/router.go` 为准。当前前端支持 `VITE_API_MODE=mock|local` 和 `VITE_ALLOW_FALLBACK=true|false`，页面代码不需要因 mock/local 切换而改动。H5 local 使用 `VITE_API_BASE_URL=http://127.0.0.1:8080/api/v1`；`mp-weixin` local 需要改成局域网 IP 或代理域名，真机/体验版必须使用 HTTPS 合法域名。
+
+| 页面动作 | endpoint | 方法 | auth 类型 | token/账号/seed | local 结果（2026-06-26） | allowFallback | dataSource | 错误态 / 后续要求 |
+|---|---|---|---|---|---|---|---|---|
+| 健康检查 | `/health` | GET | public | Docker Compose 后端 | 200 `{"status":"ok"}` | false | local | 只证明进程存活，不替代业务联调 |
+| 首页分类 | `/categories` | GET | public | Phase 5 最小 seed：`船票/ship` | 200，返回 1 条 active 分类 | true | local | 无 seed 时为空数组；页面展示空态或 fallback |
+| 首页商品 | `/products?size=3` | GET | public | Phase 5 最小 seed：`澳门环岛游夜景船票` + SKU + 图片 + 排期 | 200，返回 1 条 active 商品，`sale_price=88` | true | local | 无 seed 时为空数组；adapter 测试覆盖字段映射 |
+| 商品排期 | `/products/schedules/query?product_id=910001&date=2026-07-15` | GET | public | Phase 5 最小排期 seed | 200，返回 1 条 `19:30` 排期 | true | local | 交易下单仍需 user token，不在本阶段闭环 |
+| 环岛游推荐 | `/island-cruise/smart-search?start_date=2026-07-15&days=1&people_num=1` | GET | public wrapper + supplier dependency | 缺 `ISLAND_CRUISE_DISTRIBUTOR_CODE` / `ISLAND_CRUISE_ACCESS_TOKEN` | 200，但 `recommended=null`、各 route `count=0`；后端吞掉供应商错误作为空推荐 | true | local | 页面显示暂无班次；不能判定供应商真实班次联调通过 |
+| 环岛游码头/证件/班次/价格 | `/island-cruise/ports`、`/cert-types`、`/voyages`、`/price` | GET | public wrapper + supplier dependency | 缺环岛游供应商账号 | 502 `环岛游接口账号未配置` | true | fallback | 保留 Mock/fallback；正式接入前必须配置供应商沙箱/正式凭据 |
+| 环岛游锁票 | `/island-cruise/lock` | POST | current_public_but_should_be_hardened | 需航班、乘客、供应商、订单 seed | 空请求 400 `缺少航班或港口参数` | true | fallback | 当前仍公开，应在后续目标中加鉴权/幂等/风控 |
+| 支付回调 | `/payments/callback` | POST | independent_signature | 需支付平台签名头 | 无签名 401 `支付回调签名无效` | false | local | 不是小程序公开接口；继续保持独立签名校验 |
+| 用户订单 | `/orders` | GET | user_token | 缺测试 user token 和订单/票券 seed | 无 token 401 `请先登录` | true | fallback | 前端不得当公开接口；需准备 user、order、ticket seed |
+| 司机工作台 | `/driver/me` | GET | driver_active_token | 缺 active driver token/driver seed | 无 token 401 `请先登录` | true | fallback | 前端可回落 Mock 展示；真实钱包/佣金需 active driver seed |
+| 后台接口 | `/admin/me`、`/drivers`、`/commissions/*`、`/tickets/verify` | GET/POST | admin_super_admin_token | 缺 admin token | 无 token 401 `请先登录` | false | N/A | 不迁入小程序用户端 |
+
+### 最小准备清单
+
+| 缺口 | 最小准备项 | 期望状态 | 验证 endpoint |
+|---|---|---|---|
+| 用户订单/票券 | active user、Bearer token、至少 1 个 paid/valid 订单、1 张 ticket、1 条 verification 可选记录 | `/orders` 200 且订单能映射到 `OrderSummary`；`/tickets/:id` 200 且券码脱敏 | `/orders`、`/tickets/:id` |
+| 司机钱包/佣金 | active driver、登录密码、vehicle、driver_qr_code、pending/settled commission、withdrawal 记录 | `/driver/me`、`/driver/wallet`、`/driver/commissions`、`/driver/withdrawals` 200 | `/driver/login`、`/driver/me`、`/driver/wallet` |
+| 环岛游供应商 | `ISLAND_CRUISE_DISTRIBUTOR_CODE`、`ISLAND_CRUISE_ACCESS_TOKEN`、供应商测试可售航班、可锁/可出票账号余额 | 查询类返回真实 ports/cert/voyages；锁票/出票在受控订单上返回供应商订单号和票号 | `/island-cruise/ports`、`/voyages`、`/lock`、`/sale` |
+| 支付回调 | `PAYMENT_WEBHOOK_SECRET`、测试 payment、合法 timestamp/signature | 无签名 401；合法签名且金额匹配时更新 payment/order | `/payments/callback` |
+
+### Phase 5 本地 seed SQL
+
+本阶段本地 Docker MySQL 使用了最小公开业务 seed，完整 SQL 记录在 `miniprogram/docs/validation/phase-5/minimum-public-seed.sql`。正式测试环境应通过迁移/seed 管道写入等价数据，不应依赖手工容器状态。

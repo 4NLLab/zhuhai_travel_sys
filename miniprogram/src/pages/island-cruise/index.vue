@@ -35,6 +35,12 @@ const selectedFare = computed(() => {
   return voyage.fares.find((fare) => fare.id === draftFareId) ?? voyage.fares[0] ?? null;
 });
 
+const sourceLabel = computed(() => {
+  if (viewModel.value?.dataSource === 'local') return '本地接口';
+  if (viewModel.value?.dataSource === 'fallback') return '本地回落';
+  return 'Mock';
+});
+
 onLoad((query) => {
   const step = normalizeStep(String(query?.step ?? 'detail'));
   activeStep.value = step;
@@ -154,7 +160,7 @@ function money(value: number): string {
         <view class="island-hero">
           <image class="island-hero__image" :src="viewModel.hero.imageUrl" mode="aspectFill" />
           <view class="island-hero__content">
-            <StatusPill text="实时班次 Mock" tone="success" />
+            <StatusPill :text="`实时班次 ${sourceLabel}`" tone="success" />
             <text class="island-hero__title">{{ viewModel.hero.title }}</text>
             <text class="island-hero__summary">{{ viewModel.hero.summary }}</text>
           </view>

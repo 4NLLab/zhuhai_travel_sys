@@ -17,6 +17,12 @@ const canWithdraw = computed(() => {
   return !!wallet && amount > 0 && amount <= wallet.availableAmount;
 });
 
+const sourceLabel = computed(() => {
+  if (viewModel.value?.dataSource === 'local') return '本地接口';
+  if (viewModel.value?.dataSource === 'fallback') return '本地回落';
+  return 'Mock';
+});
+
 onLoad((query) => {
   loadPage(String(query?.scenario ?? ''));
 });
@@ -120,7 +126,7 @@ function logout() {
       <view v-if="viewModel?.wallet" class="card panel-card">
         <view class="section-row">
           <text class="section-title">钱包余额</text>
-          <text class="section-link">Mock 同步</text>
+          <text class="section-link">{{ sourceLabel }} 同步</text>
         </view>
         <view class="wallet-grid">
           <view><text>可提现</text><strong>{{ viewModel.wallet.availableLabel }}</strong></view>
