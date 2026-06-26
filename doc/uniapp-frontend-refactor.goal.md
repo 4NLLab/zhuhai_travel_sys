@@ -12,7 +12,7 @@ todos:
       - phase-1-platform-foundation
   - id: phase-3-island-cruise-slice
     content: Phase 3：迁移环岛游订票纵向切片
-    status: pending
+    status: completed
     depends_on:
       - phase-2-main-shell-orders
   - id: phase-4-driver-slice
