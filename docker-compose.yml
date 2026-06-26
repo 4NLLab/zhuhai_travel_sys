@@ -28,6 +28,8 @@ services:
   backend:
     build:
       context: ./backend
+      args:
+        GOPROXY: ${GOPROXY:-https://goproxy.cn,direct}
     container_name: zhuhai-travel-backend
     restart: unless-stopped
     environment:
