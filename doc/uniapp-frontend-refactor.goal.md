@@ -22,7 +22,7 @@ todos:
       - phase-2-main-shell-orders
   - id: phase-5-local-contract
     content: Phase 5：本地后端契约联调与接口矩阵
-    status: pending
+    status: completed
     depends_on:
       - phase-3-island-cruise-slice
       - phase-4-driver-slice
@@ -293,6 +293,14 @@ isProject: false
 - 浏览器截图验收覆盖 Mock 模式和 local 模式下的关键页面；`mp-weixin` 构建、包体和可用时的小程序运行时证据被记录在 `miniprogram/docs/validation/phase-5/`。
 - 提交前完成五类专项 review；全部 `未发现问题` 后才允许提交。
 - 提交后再次 review 最新 commit；review 无问题后才允许进入 Phase 6。
+
+### Completion Record
+
+- 主提交：`95d1c176c567a5a0edd0d0006c9b20e3cc21cfe8`（`feat(miniprogram): 接入本地后端契约联调`）。
+- 完成内容：`local` 模式已接入公开产品/分类、环岛游 `smart-search` 查询和司机鉴权边界 fallback；接口契约矩阵已更新到 Phase 5。
+- 验证材料：`miniprogram/docs/validation/phase-5/`，包含 Docker 后端 curl 探针、最小公开 seed、mock/local 截图、包体记录、blocker、提交前五类 review 和提交后 review。
+- 真实结论：`/health`、`/products`、`/categories`、`/products/schedules/query` 已在本地 Docker 后端验证；`/orders`、`/driver/me`、`/admin/me` 无 token 返回 401；支付回调无签名返回 401。
+- 保留缺口：环岛游供应商账号未配置，ports/cert-types/voyages/price 返回 502；用户订单/票券和司机钱包/佣金/提现缺 token 与 seed，继续保留 Mock/fallback。
 
 ## Phase 6：跨端质量、包体治理、文档与交付收口
 
