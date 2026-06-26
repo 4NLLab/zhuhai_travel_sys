@@ -416,7 +416,7 @@ function money(value: number): string {
 }
 
 .step-panel {
-  padding-bottom: 88px;
+  padding-bottom: 144px;
 }
 
 .island-hero {
@@ -632,7 +632,7 @@ function money(value: number): string {
   box-sizing: border-box;
   padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
   border-top: 1px solid var(--zt-color-border);
-  background: rgba(255, 255, 255, 0.96);
+  background: #ffffff;
 }
 
 .bottom-action--two {
