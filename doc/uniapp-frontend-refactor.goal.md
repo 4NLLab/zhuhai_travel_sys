@@ -17,7 +17,7 @@ todos:
       - phase-2-main-shell-orders
   - id: phase-4-driver-slice
     content: Phase 4：迁移司机端纵向切片
-    status: pending
+    status: completed
     depends_on:
       - phase-2-main-shell-orders
   - id: phase-5-local-contract
