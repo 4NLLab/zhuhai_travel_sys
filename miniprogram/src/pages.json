@@ -10,19 +10,22 @@
     {
       "path": "pages/orders/index",
       "style": {
-        "navigationBarTitleText": "订单"
+        "navigationBarTitleText": "订单",
+        "navigationStyle": "custom"
       }
     },
     {
       "path": "pages/profile/index",
       "style": {
-        "navigationBarTitleText": "我的"
+        "navigationBarTitleText": "我的",
+        "navigationStyle": "custom"
       }
     },
     {
       "path": "pages/ticket/index",
       "style": {
-        "navigationBarTitleText": "票券详情"
+        "navigationBarTitleText": "票券详情",
+        "navigationStyle": "custom"
       }
     },
     {

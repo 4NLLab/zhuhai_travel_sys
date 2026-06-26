@@ -92,20 +92,20 @@ const userSummary: UserSummary = {
 const backendOrders: BackendOrderRecord[] = [
   {
     id: 'order-island-1',
-    product_name: '澳门环岛游夜景船票',
-    order_no: 'ZH20260715001028',
+    product_name: '九洲港至蛇口船票',
+    order_no: 'ZH0608-1028',
     status: 'pending_use',
     source_type: 'island_cruise',
-    travel_date: '2026-07-15',
-    quantity_text: '成人票 x1',
-    paid_amount_text: '¥88',
-    usage_hint: '凭电子票码到湾仔旅游码头核销',
+    travel_date: '2026-06-22',
+    quantity_text: '2 张成人票',
+    paid_amount_text: '¥176',
+    usage_hint: '凭电子票码到码头核销',
     ticket_id: 'ticket-island-1'
   },
   {
     id: 'order-hotel-1',
     product_name: '横琴酒店双人套餐',
-    order_no: 'ZH20260624000995',
+    order_no: 'ZH0608-0995',
     status: 'reserved',
     source_type: 'hotel',
     travel_date: '2026-06-24',
@@ -116,7 +116,7 @@ const backendOrders: BackendOrderRecord[] = [
   {
     id: 'order-car-1',
     product_name: '珠港澳口岸接送租车',
-    order_no: 'ZH20260626001001',
+    order_no: 'ZH0608-1001',
     status: 'pending_pay',
     source_type: 'generic',
     travel_date: '2026-06-26',
@@ -127,7 +127,7 @@ const backendOrders: BackendOrderRecord[] = [
   {
     id: 'order-tour-1',
     product_name: '香港澳门一日游路线',
-    order_no: 'ZH20260618000842',
+    order_no: 'ZH0607-0842',
     status: 'completed',
     source_type: 'generic',
     travel_date: '2026-06-18',
@@ -138,7 +138,7 @@ const backendOrders: BackendOrderRecord[] = [
   {
     id: 'order-play-1',
     product_name: '长隆门票与石景山缆车',
-    order_no: 'ZH20260619000711',
+    order_no: 'ZH0607-0711',
     status: 'refunded',
     source_type: 'play',
     travel_date: '2026-06-19',
