@@ -8,6 +8,15 @@ If these repository guidelines conflict with `CLAUDE.md`, prefer `CLAUDE.md` unl
 
 Additional repository rule files live in `.claude/rules/`. These `.mdc` files are rule sources, not reference notes, and must be read when their frontmatter or trigger conditions match the current task. In particular, read `.claude/rules/git-submit.mdc` before any user-authorized `git commit`, commit-message writing, PR creation, GitHub push, or related GitHub operation.
 
+Codex does not automatically discover Claude-specific `.claude/rules/` or `.claude/skills/` content. Treat the routing table below as mandatory manual discovery instructions:
+
+| Trigger | Required file to read first | How to apply |
+|---|---|---|
+| Any user-authorized commit, commit-message writing, PR creation, GitHub push, or GitHub operation | `.claude/rules/git-submit.mdc` | Follow it as a hard rule source. It overrides the generic commit guidance below when they conflict. |
+| Creating or updating a phased `/goal` Markdown roadmap, splitting work into phases and acceptance criteria, defining strict stage gates, requiring pre-commit multi-review loops, post-commit review loops, or browser screenshot validation gates | `.claude/skills/phased-goal-roadmap/SKILL.md` | Read the whole skill before drafting or editing the roadmap, then follow its required format and gates unless the user explicitly narrows the task. |
+| User explicitly names a local `.claude/skills/<name>` skill or asks to use a project skill | `.claude/skills/<name>/SKILL.md` | Read the whole skill before taking task actions. If the skill references additional files, read only the directly relevant referenced files. |
+| Future `.claude/rules/*.mdc` files whose frontmatter or text describes the current task | Matching `.claude/rules/*.mdc` file | Read the matching rule before acting and treat it as a repository rule source. |
+
 For architecture questions, backend module relationships, API surface analysis, or architecture-impacting changes, consult `backend/docs/ARCHITECTURE.md` as the project architecture reference before answering or editing code.
 
 ## Project Structure & Module Organization
@@ -33,7 +42,7 @@ There is currently no dedicated test suite. Add Go tests as `*_test.go` files ne
 
 ## Commit & Pull Request Guidelines
 
-Recent commits use short, imperative English subjects such as `Add island cruise booking and operations` and `Update admin module menu navigation`. Follow that pattern: start with a verb, keep the subject concise, and group related changes. Pull requests should include a summary, test results, affected pages or API routes, linked issues when available, and screenshots for UI changes.
+Before any commit or related GitHub operation, follow `.claude/rules/git-submit.mdc`. Current AI-generated commit messages must use Simplified Chinese, even though older repository commits include short English subjects. Keep each commit focused and group only related changes. Pull requests should include a summary, test results, affected pages or API routes, linked issues when available, and screenshots for UI changes.
 
 ## Security & Configuration Tips
 
