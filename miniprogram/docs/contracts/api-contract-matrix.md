@@ -59,3 +59,17 @@ Phase 3 当前只接 mock view model。以下真实 endpoint 均来自 `backend/
 | 查询订单 | `/island-cruise/order?local_order_no=` | GET | current_public_but_should_be_hardened | `status/passengers/ticket_no/code_content/pay_amount/go_time` -> 票券详情与售后状态 | 需已出票测试订单 | Phase 5 需受控 seed | false | mock | 404 显示订单不存在；非 2xx 显示刷新失败 |
 | 退票费用 / 提交退票 | `/island-cruise/refund-fee`、`/island-cruise/refund` | GET/POST | current_public_but_should_be_hardened | Phase 3 只保留入口和说明，不执行真实资金流 | 需已出票且可退 seed | 不在 Phase 3 联调 | false | mock | 页面明确“后续接入”，不宣称退票闭环 |
 | 改签费用 / 班次 / 锁定 / 取消 | `/island-cruise/change-fee`、`/island-cruise/change-voyages`、`/island-cruise/change-lock`、`/island-cruise/change-unlock` | GET/POST | current_public_but_should_be_hardened | Phase 3 只保留入口和说明，不执行供应商改签闭环 | 需已出票且可改签 seed | 不在 Phase 3 联调 | false | mock | 页面明确“后续接入”，不宣称改签闭环 |
+
+## Phase 4 司机端纵向切片
+
+Phase 4 当前只接 mock view model。司机端工作台真实接口均需要 `driver_active_token`；注册/登录是公开入口，但登录后必须由后端中间件校验 driver token 和 active 状态。Phase 5 联调前需要准备 active、pending、余额不足、提现成功等司机 seed。
+
+| 页面动作 | endpoint | 方法 | auth 类型 | 字段映射 | token/账号/seed | 当前能否本地联调 | allowFallback | dataSource | 错误态 |
+|---|---|---|---|---|---|---|---|---|---|
+| 司机注册申请 | `/driver/register` | POST | public | `driver_no/status/message` -> 注册结果与待审核状态 | `phase4-pending-review`；需测试手机号/车辆 seed | Phase 5 联调 | false | mock | 参数错误显示注册提示；成功后显示待审核 |
+| 司机登录 | `/driver/login` | POST | public | `access_token/driver_id/driver_no/name/status/commission_rate` -> driver session/profile | `phase4-active|phase4-login-failed` | Phase 5 联调 | false | mock | 账号密码错误显示登录失败；非 active 后续接口不可进入 |
+| 司机资料刷新 | `/driver/me` | GET | driver_active_token | `driver_no/name/phone/status/car_plate_no/vehicle_type/commission_rate/qr_code` -> `DriverProfileSummary` | 缺 active driver token/seed | Phase 5 联调 | false | mock | 401/403 显示未登录或待审核 |
+| 钱包余额 | `/driver/wallet` | GET | driver_active_token | `available/pending_total/settled_total/withdrawn_total` -> `DriverWalletSummary` | `phase4-active|phase4-empty-wallet` | Phase 5 联调 | false | mock | 空钱包显示 0；非 2xx 显示服务失败 |
+| 佣金列表 | `/driver/commissions?page=&size=&status=` | GET | driver_active_token | `order_no/commission_amount/status/created_at` -> `DriverCommissionSummary[]` | `phase4-active|phase4-empty-wallet` | Phase 5 联调 | false | mock | 空列表显示“暂无佣金记录” |
+| 提现申请 | `/driver/withdraw` | POST | driver_active_token | `withdrawal_no/amount/status/message` -> 提现申请结果 | `phase4-insufficient-balance|phase4-withdraw-success` | Phase 5 联调 | false | mock | 余额不足显示可提现余额；成功显示待管理员审核打款 |
+| 提现记录 | `/driver/withdrawals?page=&size=` | GET | driver_active_token | `withdrawal_no/amount/status/account/created_at` -> `DriverWithdrawalSummary[]`，账号必须脱敏 | `phase4-active|phase4-empty-wallet` | Phase 5 联调 | false | mock | 空列表显示“暂无提现记录” |

@@ -26,6 +26,10 @@ function clearSession() {
 function openOrders() {
   navigationAdapter.switchTab('/pages/orders/index');
 }
+
+function openDriver() {
+  navigationAdapter.navigateTo('/subpackages/driver/pages/home/index');
+}
 </script>
 
 <template>
@@ -95,9 +99,9 @@ function openOrders() {
           <text>客服与协议</text>
           <text class="service-item__body">售后进度、服务条款</text>
         </view>
-        <view class="card service-item">
+        <view class="card service-item" @click="openDriver">
           <text>司机入口</text>
-          <text class="service-item__body">小程序新增信息架构入口，完整流程在 Phase 4</text>
+          <text class="service-item__body">登录、钱包、佣金、提现和推广码</text>
         </view>
       </view>
     </view>
