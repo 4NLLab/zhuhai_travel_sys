@@ -29,3 +29,16 @@
 | 用户 Bearer token | `/users/profile`、`/travelers`、`/orders`、`/tickets/*` | Phase 2/5 补齐 |
 | 司机 active token | `/driver/me`、`/driver/wallet`、`/driver/commissions`、`/driver/withdraw`、`/driver/withdrawals` | Phase 4/5 补齐 |
 | 后台 super_admin token | `/admin/*`、`/drivers`、`/commissions/*`、`/tickets/verify` | 不迁入小程序用户端 |
+
+## Phase 2 主包首页 / 我的 / 订单 / 票券基础壳
+
+Phase 2 只迁移主包展示壳与通用 view model。当前实现默认 `VITE_API_MODE=mock`，真实接口仅记录为 Phase 5 联调候选；禁止在 local/test/prod 静默回退到 mock。
+
+| 页面动作 | endpoint | 方法 | auth 类型 | 字段映射 | token/账号/seed | 当前能否本地联调 | allowFallback | dataSource | 错误态 |
+|---|---|---|---|---|---|---|---|---|---|
+| 首页 Banner / 分类入口 | `/banners`、`/categories` | GET | public | `Banner.image_url/title/link`、`ProductCategory.name/type` -> `DestinationEntry` / 首页头图；Phase 2 以 `index.html` 静态切片和压缩图片占位 | 无 | 可联调但尚未接入小程序请求层 | false | mock | 接口失败时显示首页错误提示，不回退到伪数据 |
+| 首页精选商品 | `/products?keyword=&category_id=&type=&page=&size=` | GET | public | `Product.name/summary/type/min_price/images` -> `ProductEntry.title/subtitle/category/priceLabel/imageUrl` | 无 | 可联调但字段需 Phase 5 校准 | false | mock | 空数组显示“暂无商品”；非 2xx 显示错误态 |
+| 我的用户摘要 | `/users/profile` | GET | user_token | `User.nickname/mobile/realname_status` -> `UserSummary.displayName/maskedMobile/realnameStatus`；订单/票券计数暂由订单票券聚合 | 缺稳定测试用户 token/seed | Phase 5 联调 | false | mock | 401/403 显示未登录；非 2xx 显示场景提示 |
+| 常用出行人入口 | `/travelers` | GET | user_token | `Traveler.name/id_type/id_no/phone/is_default` -> 常用服务入口后续列表；Phase 2 只放入口 | 缺稳定测试用户 token/seed | Phase 5 联调 | false | mock | 401/403 显示未登录；空列表不阻断“我的”页 |
+| 订单列表 | `/orders?status=&page=&size=` | GET | user_token | `Order.id/order_no/status/product_name/travel_date/quantity/paid_amount` -> `OrderSummary`；覆盖 `pending_use/pending_pay/reserved/completed/refunded/refunding` | `VITE_MOCK_SCENARIO=phase2-success|phase2-empty|phase2-unauthorized|phase2-failure` | Phase 5 联调 | false | mock | 空态显示“暂无订单”；401/403 显示未登录；非 2xx 显示订单服务不可用 |
+| 票券详情 | `/tickets/:id` | GET | user_token | `Ticket.id/status/product_name/valid_date/valid_time/code/verify_location/notices/order_no` -> `TicketSummary`；券码必须通过 `maskSensitive` 脱敏展示 | `VITE_MOCK_SCENARIO=phase2-success` 含 `available/unavailable` | Phase 5 联调 | false | mock | 404 显示“暂无票券”；401/403 显示未登录；非 2xx 显示读取失败 |

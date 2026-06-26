@@ -17,6 +17,12 @@
       "style": {
         "navigationBarTitleText": "我的"
       }
+    },
+    {
+      "path": "pages/ticket/index",
+      "style": {
+        "navigationBarTitleText": "票券详情"
+      }
     }
   ],
   "subPackages": [
