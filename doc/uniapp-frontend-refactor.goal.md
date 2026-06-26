@@ -7,7 +7,7 @@ todos:
     status: completed
   - id: phase-2-main-shell-orders
     content: Phase 2：迁移主包首页、我的、订单/票券基础切片
-    status: pending
+    status: completed
     depends_on:
       - phase-1-platform-foundation
   - id: phase-3-island-cruise-slice
