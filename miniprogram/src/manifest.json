@@ -1,0 +1,31 @@
+{
+  "name": "珠海文旅",
+  "appid": "__UNI__ZH_TRAVEL_DEV",
+  "description": "珠海文旅平台小程序前端重构工程",
+  "versionName": "0.1.0",
+  "versionCode": "100",
+  "transformPx": false,
+  "h5": {
+    "router": {
+      "mode": "hash"
+    },
+    "devServer": {
+      "port": 5173,
+      "proxy": {
+        "/api": {
+          "target": "http://127.0.0.1:8080",
+          "changeOrigin": true
+        }
+      }
+    }
+  },
+  "mp-weixin": {
+    "appid": "wx0000000000000000",
+    "setting": {
+      "urlCheck": false,
+      "es6": true,
+      "minified": true
+    },
+    "usingComponents": true
+  }
+}
