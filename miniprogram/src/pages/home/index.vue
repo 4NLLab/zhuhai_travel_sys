@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import EmptyState from '@/components/EmptyState.vue';
 import { loadMainShellViewModel } from '@/api/main-shell';
 import { navigationAdapter } from '@/adapters/navigation';
@@ -9,6 +9,8 @@ const viewModel = ref<MainShellViewModel | null>(null);
 const isLoading = ref(true);
 const errorMessage = ref('');
 const activeCategory = ref<ProductCategory | 'all'>('all');
+const activeHeroSlideIndex = ref(0);
+let heroSlideTimer: ReturnType<typeof setInterval> | null = null;
 
 const categoryTabs: Array<{ id: ProductCategory | 'all'; label: string }> = [
   { id: 'all', label: '推荐' },
@@ -30,6 +32,24 @@ const destinationIconMap: Record<string, string> = {
   car: '⌁'
 };
 
+const heroSlides = [
+  {
+    imageUrl: '/static/phase2/home-hero-watercolor.png',
+    title: '珠海湾区漫游',
+    subtitle: '一屏看海岛、桥影与城市烟火'
+  },
+  {
+    imageUrl: '/static/phase2/home-hero-moon-web.jpg',
+    title: '日月贝夜色',
+    subtitle: '城市灯火与海湾夜航同框'
+  },
+  {
+    imageUrl: '/static/phase2/home-hero-sunset-web.jpg',
+    title: '情侣路日落',
+    subtitle: '椰影海风，慢逛海滨黄昏'
+  }
+];
+
 loadMainShellViewModel()
   .then((result) => {
     viewModel.value = result.data;
@@ -48,16 +68,60 @@ const filteredProducts = computed(() => {
   return products.filter((product) => product.category === activeCategory.value);
 });
 
+const activeHeroTitle = computed(() => heroSlides[activeHeroSlideIndex.value]?.title ?? '珠海湾区漫游');
+const activeHeroSubtitle = computed(() => heroSlides[activeHeroSlideIndex.value]?.subtitle ?? '一屏看海岛、桥影与城市烟火');
+
 function openRoute(route?: string) {
   if (!route) return;
   navigationAdapter.navigateTo(route);
 }
+
+function switchTab(route: string) {
+  navigationAdapter.switchTab(route);
+}
+
+function showHeroSlide(index: number) {
+  activeHeroSlideIndex.value = (index + heroSlides.length) % heroSlides.length;
+}
+
+function restartHeroCarousel() {
+  if (heroSlideTimer) {
+    clearInterval(heroSlideTimer);
+  }
+  heroSlideTimer = setInterval(() => {
+    showHeroSlide(activeHeroSlideIndex.value + 1);
+  }, 4200);
+}
+
+function selectHeroSlide(index: number) {
+  showHeroSlide(index);
+  restartHeroCarousel();
+}
+
+onMounted(() => {
+  restartHeroCarousel();
+});
+
+onBeforeUnmount(() => {
+  if (heroSlideTimer) {
+    clearInterval(heroSlideTimer);
+  }
+});
 </script>
 
 <template>
   <view class="home-page">
     <view class="home-hero" aria-label="九洲港至蛇口船票">
-      <image class="home-hero__image" src="/static/phase2/home-hero-watercolor.png" mode="aspectFill" />
+      <view class="hero-slider" aria-hidden="true">
+        <image
+          v-for="(slide, index) in heroSlides"
+          :key="slide.title"
+          class="home-hero__image"
+          :class="{ 'home-hero__image--active': activeHeroSlideIndex === index }"
+          :src="slide.imageUrl"
+          mode="aspectFill"
+        />
+      </view>
       <view class="home-hero__shade" />
       <view class="home-hero__top">
         <view class="brand-lockup" aria-label="珠海湾游">
@@ -82,12 +146,17 @@ function openRoute(route?: string) {
         <text class="hero-greeting__city">珠海！</text>
       </view>
       <view class="hero-carousel-copy" aria-label="首页轮播推荐">
-        <text class="hero-carousel-copy__title">珠海湾区漫游</text>
-        <text class="hero-carousel-copy__subtitle">一屏看海岛、桥影与城市烟火</text>
+        <text class="hero-carousel-copy__title">{{ activeHeroTitle }}</text>
+        <text class="hero-carousel-copy__subtitle">{{ activeHeroSubtitle }}</text>
         <view class="hero-dots" aria-label="切换首页轮播">
-          <text class="hero-dots__item hero-dots__item--active" />
-          <text class="hero-dots__item" />
-          <text class="hero-dots__item" />
+          <button
+            v-for="(slide, index) in heroSlides"
+            :key="slide.title"
+            class="hero-dots__item"
+            :class="{ 'hero-dots__item--active': activeHeroSlideIndex === index }"
+            :aria-label="`第 ${index + 1} 张轮播图`"
+            @click="selectHeroSlide(index)"
+          />
         </view>
       </view>
     </view>
@@ -184,15 +253,15 @@ function openRoute(route?: string) {
     </view>
 
     <view class="visual-bottom-nav" aria-label="底部导航">
-      <view class="visual-bottom-nav__item visual-bottom-nav__item--active">
+      <view class="visual-bottom-nav__item visual-bottom-nav__item--active" @click="switchTab('/pages/home/index')">
         <text class="visual-bottom-nav__icon">⌂</text>
         <text>首页</text>
       </view>
-      <view class="visual-bottom-nav__item">
+      <view class="visual-bottom-nav__item" @click="switchTab('/pages/service/index')">
         <text class="visual-bottom-nav__icon">♬</text>
         <text>客服</text>
       </view>
-      <view class="visual-bottom-nav__item" @click="openRoute('/pages/profile/index')">
+      <view class="visual-bottom-nav__item" @click="switchTab('/pages/profile/index')">
         <text class="visual-bottom-nav__icon">♙</text>
         <text>我的</text>
       </view>
@@ -224,12 +293,22 @@ function openRoute(route?: string) {
   background: #126c91;
 }
 
+.hero-slider,
 .home-hero__image,
 .home-hero__shade {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
+}
+
+.home-hero__image {
+  opacity: 0;
+  transition: opacity 580ms ease;
+}
+
+.home-hero__image--active {
+  opacity: 1;
 }
 
 .home-hero__shade {
@@ -412,7 +491,6 @@ function openRoute(route?: string) {
   display: grid;
   gap: 6px;
   text-shadow: 0 4px 18px rgba(5, 27, 38, 0.38);
-  pointer-events: none;
 }
 
 .hero-carousel-copy__title {
@@ -435,8 +513,15 @@ function openRoute(route?: string) {
 .hero-dots__item {
   width: 5px;
   height: 5px;
+  margin: 0;
+  padding: 0;
+  border: 0;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.56);
+}
+
+.hero-dots__item::after {
+  display: none;
 }
 
 .hero-dots__item--active {

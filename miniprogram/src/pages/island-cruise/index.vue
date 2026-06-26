@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import EmptyState from '@/components/EmptyState.vue';
+import { navigationAdapter } from '@/adapters/navigation';
 import { loadIslandCruiseFlow, lockIslandCruiseOrder, saleIslandCruiseOrder } from '@/api/island-cruise';
 import { minFareLabel, totalStock } from '@/utils/island-cruise-mappers';
 import type { IslandCruiseStep, IslandCruiseViewModel, IslandLockedOrder, IslandTicketResult } from '@/types/island-cruise';
@@ -76,6 +77,10 @@ function goStep(step: IslandCruiseStep) {
   activeStep.value = step;
 }
 
+function openHome() {
+  navigationAdapter.switchTab('/pages/home/index');
+}
+
 function validateDraft(): boolean {
   const draft = viewModel.value?.draft;
   if (!selectedVoyage.value || !selectedFare.value) {
@@ -146,7 +151,7 @@ function money(value: number): string {
         <view class="detail-hero">
           <image class="media-image" src="/static/phase2/macau-cruise-night-banner-web.jpg" mode="aspectFill" />
           <view class="detail-top">
-            <button class="nav-chip" aria-label="返回首页">‹ 首页</button>
+            <button class="nav-chip" aria-label="返回首页" @click="openHome">‹ 首页</button>
             <button class="nav-chip">▱ 海上夜游</button>
           </view>
           <view class="media-control"><text>◌</text><text>0:00</text><text>⋮</text></view>

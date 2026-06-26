@@ -55,6 +55,10 @@ function openProfile() {
 function openHome() {
   navigationAdapter.switchTab('/pages/home/index');
 }
+
+function openService() {
+  navigationAdapter.switchTab('/pages/service/index');
+}
 </script>
 
 <template>
@@ -119,7 +123,7 @@ function openHome() {
         <text class="visual-bottom-nav__icon">⌂</text>
         <text>首页</text>
       </view>
-      <view class="visual-bottom-nav__item">
+      <view class="visual-bottom-nav__item" @click="openService">
         <text class="visual-bottom-nav__icon">♬</text>
         <text>客服</text>
       </view>

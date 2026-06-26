@@ -15,6 +15,13 @@
       }
     },
     {
+      "path": "pages/service/index",
+      "style": {
+        "navigationBarTitleText": "客服",
+        "navigationStyle": "custom"
+      }
+    },
+    {
       "path": "pages/profile/index",
       "style": {
         "navigationBarTitleText": "我的",
@@ -67,7 +74,7 @@
         "text": "首页"
       },
       {
-        "pagePath": "pages/orders/index",
+        "pagePath": "pages/service/index",
         "text": "客服"
       },
       {
