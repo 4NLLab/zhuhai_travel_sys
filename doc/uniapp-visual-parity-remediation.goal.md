@@ -7,7 +7,7 @@ todos:
     status: completed
   - id: phase-2-home-visual-parity
     content: Phase 2：首页首屏与首页主体视觉还原
-    status: pending
+    status: completed
     depends_on:
       - phase-1-baseline-visual-contract
   - id: phase-3-main-pages-visual-parity
