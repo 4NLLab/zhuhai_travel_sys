@@ -28,7 +28,7 @@ todos:
       - phase-4-driver-slice
   - id: phase-6-cross-platform-hardening
     content: Phase 6：跨端质量、包体治理、文档与交付收口
-    status: pending
+    status: completed
     depends_on:
       - phase-5-local-contract
 isProject: false
@@ -329,6 +329,14 @@ isProject: false
 - 浏览器截图验收覆盖 Phase 2-5 页面/场景矩阵中的所有首版主路径和至少一个失败/空态场景；`mp-weixin` 构建/模拟器验证证据被记录在 `miniprogram/docs/validation/phase-6/`。
 - 提交前完成五类专项 review；全部 `未发现问题` 后才允许提交。
 - 提交后再次 review 最新 commit；review 无问题后才允许把整个 goal 标记为完成。
+
+### Completion Record
+
+- 主提交：`d67d838acfc1d13192043c3da3dd5ba6fd06e76a`（`docs(miniprogram): 完成前端重构交付收口`）。
+- 完成内容：README、重构完成报告、依赖兼容性、资源/包体审计、平台禁用 API 扫描记录、Phase 6 截图矩阵和交付 blocker 均已补齐。
+- 最终验证：`typecheck`、`test`、`build:h5`、`build:mp-weixin`、`lint:platform`、`check:size`、后端 `go test ./...` 均通过。
+- 最终包体：主包 406.9 KB，司机分包 14.6 KB，总包 421.5 KB。
+- 最终状态：本目标完成到 build-validated；正式提测前仍需微信开发者工具或 `miniprogram-ci` 运行时截图。
 
 ## 总体最终验收标准
 
