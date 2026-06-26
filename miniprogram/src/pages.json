@@ -31,7 +31,8 @@
     {
       "path": "pages/island-cruise/index",
       "style": {
-        "navigationBarTitleText": "澳门环岛游"
+        "navigationBarTitleText": "澳门环岛游",
+        "navigationStyle": "custom"
       }
     }
   ],
@@ -42,7 +43,8 @@
         {
           "path": "pages/home/index",
           "style": {
-            "navigationBarTitleText": "司机端"
+            "navigationBarTitleText": "司机端",
+            "navigationStyle": "custom"
           }
         }
       ]

@@ -2,7 +2,6 @@
 import { computed, ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import EmptyState from '@/components/EmptyState.vue';
-import StatusPill from '@/components/StatusPill.vue';
 import { loadIslandCruiseFlow, lockIslandCruiseOrder, saleIslandCruiseOrder } from '@/api/island-cruise';
 import { minFareLabel, totalStock } from '@/utils/island-cruise-mappers';
 import type { IslandCruiseStep, IslandCruiseViewModel, IslandLockedOrder, IslandTicketResult } from '@/types/island-cruise';
@@ -16,7 +15,7 @@ const ticket = ref<IslandTicketResult | null>(null);
 const validationMessage = ref('');
 
 const steps: Array<{ id: IslandCruiseStep; label: string }> = [
-  { id: 'detail', label: '选班次' },
+  { id: 'detail', label: '详情' },
   { id: 'traveler', label: '实名' },
   { id: 'pay', label: '支付' },
   { id: 'ticket', label: '票券' }
@@ -35,15 +34,14 @@ const selectedFare = computed(() => {
   return voyage.fares.find((fare) => fare.id === draftFareId) ?? voyage.fares[0] ?? null;
 });
 
-const sourceLabel = computed(() => {
-  if (viewModel.value?.dataSource === 'local') return '本地接口';
-  if (viewModel.value?.dataSource === 'fallback') return '本地回落';
-  return 'Mock';
+const bottomPrice = computed(() => {
+  if (activeStep.value === 'traveler') return money(viewModel.value?.draft.totalAmount ?? 0);
+  if (activeStep.value === 'pay') return lockedOrder.value ? money(lockedOrder.value.amount) : '¥--';
+  return selectedFare.value ? money(selectedFare.value.price) : '¥--';
 });
 
 onLoad((query) => {
-  const step = normalizeStep(String(query?.step ?? 'detail'));
-  activeStep.value = step;
+  activeStep.value = normalizeStep(String(query?.step ?? 'detail'));
   loadPage(String(query?.scenario ?? ''));
 });
 
@@ -141,473 +139,558 @@ function money(value: number): string {
 </script>
 
 <template>
-  <view class="page-shell island-page">
-    <view class="step-tabs">
-      <button
-        v-for="step in steps"
-        :key="step.id"
-        class="step-tabs__item"
-        :class="{ 'step-tabs__item--active': activeStep === step.id }"
-        @click="goStep(step.id)"
-      >
-        {{ step.label }}
-      </button>
-    </view>
-
+  <view class="island-page">
     <EmptyState v-if="errorMessage" title="环岛游服务暂不可用" :description="errorMessage" />
     <template v-else-if="viewModel">
-      <view v-if="activeStep === 'detail'" class="step-panel">
-        <view class="island-hero">
-          <image class="island-hero__image" :src="viewModel.hero.imageUrl" mode="aspectFill" />
-          <view class="island-hero__content">
-            <StatusPill :text="`实时班次 ${sourceLabel}`" tone="success" />
-            <text class="island-hero__title">{{ viewModel.hero.title }}</text>
-            <text class="island-hero__summary">{{ viewModel.hero.summary }}</text>
+      <view v-if="activeStep === 'detail'" class="detail-screen">
+        <view class="detail-hero">
+          <image class="media-image" src="/static/phase2/macau-cruise-night-banner-web.jpg" mode="aspectFill" />
+          <view class="detail-top">
+            <button class="nav-chip" aria-label="返回首页">‹ 首页</button>
+            <button class="nav-chip">▱ 海上夜游</button>
+          </view>
+          <view class="media-control"><text>◌</text><text>0:00</text><text>⋮</text></view>
+        </view>
+
+        <view class="detail-copy card-dark">
+          <text class="eyebrow">珠海湾仔出发 · 海上看澳门</text>
+          <text class="detail-title">{{ viewModel.hero.title }}</text>
+          <text class="detail-body">{{ viewModel.hero.summary }}</text>
+          <view class="hero-tags">
+            <text>湾仔码头登船</text>
+            <text>电子票验票</text>
+            <text>夜景体验</text>
+            <text>实时班次</text>
           </view>
         </view>
 
-        <view class="card route-card">
-          <view>
-            <text class="muted-label">上船码头</text>
-            <text class="route-card__name">{{ viewModel.ports.up.name }}</text>
+        <view class="action-card">
+          <view class="action-head">
+            <view>
+              <text class="action-title">选择你的海上时段</text>
+              <text class="action-body">可先咨询航线与天气，也可直接进入购票</text>
+            </view>
+            <text class="status-pill">在线可订</text>
           </view>
-          <text class="route-card__arrow">→</text>
-          <view>
-            <text class="muted-label">航线体验</text>
-            <text class="route-card__name">{{ viewModel.ports.down.name }}</text>
+          <view class="route-box">
+            <view class="route-node"><text>上船码头</text><strong>{{ viewModel.ports.up.name }}</strong></view>
+            <text class="route-arrow">→</text>
+            <view class="route-node"><text>航线体验</text><strong>{{ viewModel.ports.down.name }}</strong></view>
+          </view>
+          <view class="action-buttons">
+            <button class="ghost-button">咨询客服</button>
+            <button class="gold-button" @click="goStep('traveler')">立即购票</button>
           </view>
         </view>
 
-        <view class="section card recommend-card">
-          <view class="section-row">
-            <text class="section-title">近期推荐</text>
-            <text class="section-link">{{ viewModel.recommended ? viewModel.recommended.date : '暂无可订' }}</text>
+        <view class="card-dark">
+          <view class="section-head"><text>体验亮点</text><text>环岛游推荐</text></view>
+          <view class="story-grid">
+            <view><strong>海上看澳门</strong><span>沿湾仔水道近距离欣赏澳门天际线。</span></view>
+            <view><strong>电子票核销</strong><span>购票后凭码检票，减少排队等待。</span></view>
           </view>
-          <view v-if="viewModel.recommended">
-            <text class="recommend-card__title">{{ viewModel.recommended.label }}</text>
-            <text class="recommend-card__body">
-              {{ viewModel.recommended.firstTime }} 开航 · {{ viewModel.recommended.count }} 个班次 · {{ viewModel.recommended.minPriceLabel }}
-            </text>
-          </view>
-          <EmptyState v-else title="暂无推荐班次" description="当前日期或航线暂无可售班次，可切换日期后重试。" />
+        </view>
+      </view>
+
+      <view v-else class="booking-screen">
+        <view class="booking-top">
+          <button class="icon-button" @click="goStep('detail')">‹</button>
+          <text>澳门环岛游</text>
+          <button class="icon-button">⌯</button>
         </view>
 
-        <view class="section">
-          <view class="section-row">
-            <text class="section-title">可售班次</text>
-            <text class="section-link">{{ viewModel.voyages.length }} 个班次</text>
+        <view class="video-card">
+          <image class="media-image" src="/static/phase2/macau-cruise-night-banner-web.jpg" mode="aspectFill" />
+          <view class="media-control"><text>◌</text><text>0:00</text><text>⋮</text></view>
+        </view>
+
+        <view class="hero-copy card-dark">
+          <text class="detail-title">澳门环岛游</text>
+          <text class="detail-body">湾仔码头登船，从海上看澳门天际线、城市灯影与珠澳湾区夜色。</text>
+          <view class="hero-tags"><text>约 90 分钟</text><text>电子票</text><text>实时班次</text></view>
+        </view>
+
+        <view class="quick-metrics">
+          <view><text>默认上船</text><strong>{{ viewModel.ports.up.name }}</strong></view>
+          <view><text>推荐体验</text><strong>环岛/夜游</strong></view>
+          <view><text>购票方式</text><strong>在线出票</strong></view>
+        </view>
+
+        <view class="step-tabs">
+          <button
+            v-for="step in steps"
+            :key="step.id"
+            class="step-tabs__item"
+            :class="{ 'step-tabs__item--active': activeStep === step.id }"
+            @click="goStep(step.id)"
+          >
+            {{ step.label }}
+          </button>
+        </view>
+
+        <view v-if="activeStep === 'traveler'" class="card-dark form-card">
+          <view class="section-head"><text>实名信息</text><text>{{ selectedVoyage ? selectedVoyage.departureTime : '待选班次' }}</text></view>
+          <view class="field-grid">
+            <view class="field-box"><text>联系人</text><input v-model="viewModel.draft.contactName" placeholder="请填写联系人姓名" /></view>
+            <view class="field-box"><text>手机号</text><input v-model="viewModel.draft.contactMobile" type="number" placeholder="接收出票短信" /></view>
           </view>
-          <view v-if="viewModel.voyages.length === 0" class="list-stack">
+          <view v-for="(passenger, index) in viewModel.draft.passengers" :key="index" class="passenger-card">
+            <text class="passenger-title">乘客 {{ index + 1 }} · {{ passenger.certTypeName }}</text>
+            <view class="field-grid">
+              <view class="field-box"><text>姓名</text><input v-model="passenger.name" placeholder="真实姓名" /></view>
+              <view class="field-box"><text>手机号</text><input v-model="passenger.mobile" type="number" placeholder="乘客手机号" /></view>
+              <view class="field-box field-box--wide"><text>证件号码</text><input v-model="passenger.certNo" placeholder="用于实名核验" /></view>
+            </view>
+          </view>
+        </view>
+
+        <view v-if="activeStep === 'pay'" class="card-dark form-card">
+          <view class="section-head"><text>支付订单</text><text>{{ lockedOrder?.status === 'expired' ? '已超时' : '待支付' }}</text></view>
+          <text class="pay-amount">{{ lockedOrder ? money(lockedOrder.amount) : '¥--' }}</text>
+          <view class="summary-row"><text>订单号</text><text>{{ lockedOrder?.localOrderNo ?? '请先确认订单' }}</text></view>
+          <view class="summary-row"><text>票号</text><text>{{ lockedOrder?.ticketNo ?? '--' }}</text></view>
+          <view class="summary-row"><text>支付截止</text><text>{{ lockedOrder?.expireTimeLabel ?? '--' }}</text></view>
+        </view>
+
+        <view v-if="activeStep === 'ticket'" class="card-dark island-ticket">
+          <view class="section-head"><text>{{ ticket?.status === 'sale_failed' ? '出票失败' : '待使用' }}</text><text>电子票</text></view>
+          <view class="ticket-qr"><text></text></view>
+          <text class="ticket-code">核销码 {{ ticket?.maskedCode ?? '0105****3806' }}</text>
+          <view class="summary-row"><text>航班</text><text>{{ ticket?.voyageLabel ?? selectedVoyage?.name }}</text></view>
+          <view class="summary-row"><text>乘客</text><text>{{ ticket?.passengerLabel ?? '珠海游客' }}</text></view>
+        </view>
+
+        <view class="card-dark">
+          <view class="section-head"><text>可售班次</text><text>{{ viewModel.voyages.length }} 个班次</text></view>
+          <view v-if="viewModel.voyages.length === 0">
             <EmptyState title="暂无班次" description="当前日期暂无可售班次，请更换日期或航线。" />
           </view>
-          <view v-else class="list-stack">
+          <view v-else class="voyage-list">
             <button
               v-for="voyage in viewModel.voyages"
               :key="voyage.id"
-              class="card voyage-card"
+              class="voyage-card"
               :class="{ 'voyage-card--active': selectedVoyage?.id === voyage.id }"
               @click="selectVoyage(voyage.id)"
             >
-              <view class="voyage-card__top">
-                <view>
-                  <text class="voyage-card__time">{{ voyage.departureTime }} 开航</text>
-                  <text class="voyage-card__name">{{ voyage.name }} · {{ voyage.shipName }}</text>
-                </view>
-                <view class="voyage-card__price">
-                  <text>{{ minFareLabel(voyage) }}</text>
-                  <text>余 {{ totalStock(voyage) }}</text>
-                </view>
+              <view>
+                <strong>{{ voyage.departureTime }} · {{ voyage.name }}</strong>
+                <span>{{ voyage.shipName }} · 航班号 {{ voyage.voyageNo }}</span>
               </view>
-              <view class="fare-grid">
-                <view v-for="fare in voyage.fares" :key="fare.id" class="fare-chip">
-                  <text>{{ fare.cabinClassName }} {{ fare.name }}</text>
-                  <text>{{ money(fare.price) }} · 余{{ fare.stock }}</text>
-                </view>
-              </view>
+              <text>{{ minFareLabel(voyage) }} · 余 {{ totalStock(voyage) }}</text>
             </button>
           </view>
         </view>
 
-        <view class="section card note-card">
-          <text class="section-title">预订须知</text>
-          <text v-for="note in viewModel.serviceNotes" :key="note" class="note-card__item">{{ note }}</text>
-        </view>
-
-        <view class="bottom-action">
-          <view>
-            <text class="muted-label">所选票价</text>
-            <text class="bottom-action__price">{{ selectedFare ? money(selectedFare.price) : '¥--' }}</text>
-          </view>
-          <button class="primary-button bottom-action__button" :disabled="!selectedVoyage" @click="goStep('traveler')">立即预订</button>
-        </view>
-      </view>
-
-      <view v-if="activeStep === 'traveler'" class="step-panel">
-        <view class="section page-head">
-          <text class="page-title">填写出行人</text>
-          <text class="page-subtitle">{{ selectedVoyage ? `${selectedVoyage.departureTime} · ${selectedVoyage.name}` : '未选择班次' }}</text>
-        </view>
-
-        <view class="card form-card">
-          <text class="section-title">票种人数</text>
-          <view class="summary-row">
-            <text>{{ selectedFare ? `${selectedFare.cabinClassName} ${selectedFare.name}` : '未选择票种' }}</text>
-            <text>{{ viewModel.draft.quantity }} 人 · {{ money(viewModel.draft.totalAmount) }}</text>
-          </view>
-        </view>
-
-        <view class="card form-card">
-          <text class="section-title">联系人信息</text>
-          <view class="field-grid">
-            <view class="field-box">
-              <text>联系人</text>
-              <input v-model="viewModel.draft.contactName" placeholder="请填写联系人姓名" />
-            </view>
-            <view class="field-box">
-              <text>手机号</text>
-              <input v-model="viewModel.draft.contactMobile" type="number" placeholder="接收出票短信" />
-            </view>
-          </view>
-        </view>
-
-        <view class="card form-card">
-          <text class="section-title">出行人实名</text>
-          <view v-if="viewModel.draft.passengers.length === 0">
-            <EmptyState title="实名信息不完整" description="当前 Mock 场景模拟乘客校验失败，请补齐乘客后再提交。" />
-          </view>
-          <view v-for="(passenger, index) in viewModel.draft.passengers" :key="index" class="passenger-card">
-            <text class="passenger-card__title">乘客 {{ index + 1 }} · {{ passenger.certTypeName }}</text>
-            <view class="field-grid">
-              <view class="field-box">
-                <text>姓名</text>
-                <input v-model="passenger.name" placeholder="真实姓名" />
-              </view>
-              <view class="field-box">
-                <text>手机号</text>
-                <input v-model="passenger.mobile" type="number" placeholder="乘客手机号" />
-              </view>
-              <view class="field-box field-box--wide">
-                <text>证件号码</text>
-                <input v-model="passenger.certNo" placeholder="用于实名核验" />
-              </view>
-            </view>
-          </view>
-        </view>
-
-        <EmptyState v-if="validationMessage" title="请检查订单信息" :description="validationMessage" />
-
-        <view class="bottom-action">
-          <view>
-            <text class="muted-label">合计</text>
-            <text class="bottom-action__price">{{ money(viewModel.draft.totalAmount) }}</text>
-          </view>
-          <button class="primary-button bottom-action__button" :disabled="isSubmitting" @click="confirmOrder">
-            {{ isSubmitting ? '正在保留' : '确认订单' }}
-          </button>
-        </view>
-      </view>
-
-      <view v-if="activeStep === 'pay'" class="step-panel">
-        <view class="section page-head">
-          <text class="page-title">支付订单</text>
-          <text class="page-subtitle">开发期仅模拟支付和出票，不触发真实微信支付。</text>
-        </view>
-
-        <view v-if="lockedOrder" class="card pay-card">
-          <view class="section-row">
-            <text class="section-title">座位已保留</text>
-            <StatusPill :text="lockedOrder.status === 'expired' ? '已超时' : '待支付'" :tone="lockedOrder.status === 'expired' ? 'warning' : 'success'" />
-          </view>
-          <text class="pay-card__amount">{{ money(lockedOrder.amount) }}</text>
-          <view class="summary-row">
-            <text>订单号</text>
-            <text>{{ lockedOrder.localOrderNo }}</text>
-          </view>
-          <view class="summary-row">
-            <text>票号</text>
-            <text>{{ lockedOrder.ticketNo }}</text>
-          </view>
-          <view class="summary-row">
-            <text>支付截止</text>
-            <text>{{ lockedOrder.expireTimeLabel }}</text>
-          </view>
-        </view>
-        <EmptyState v-else title="暂无锁座订单" description="请先返回实名页确认订单。" />
-
-        <view class="card flow-card">
-          <text class="section-title">购票进度</text>
-          <view class="flow-step"><text>1</text><view><strong>选择班次</strong><span>已确认可售时间、舱位和票价。</span></view></view>
-          <view class="flow-step"><text>2</text><view><strong>保留座位</strong><span>当前订单已生成，请在截止时间前支付。</span></view></view>
-          <view class="flow-step"><text>3</text><view><strong>支付出票</strong><span>支付成功后生成电子票，可凭票检票登船。</span></view></view>
-        </view>
-
-        <EmptyState v-if="validationMessage" title="支付提示" :description="validationMessage" />
-
-        <view class="bottom-action bottom-action--two">
-          <button class="secondary-button bottom-action__button" @click="cancelLock">取消订单</button>
-          <button class="primary-button bottom-action__button" :disabled="isSubmitting" @click="payAndIssueTicket">
-            {{ isSubmitting ? '正在出票' : '立即支付并出票' }}
-          </button>
-        </view>
-      </view>
-
-      <view v-if="activeStep === 'ticket'" class="step-panel">
-        <view class="ticket-state">
-          <text class="ticket-state__title">{{ ticket?.status === 'sale_failed' ? '出票失败' : '待使用' }}</text>
-          <text class="ticket-state__body">
-            {{ ticket?.failureMessage ?? '请按所选开航时间到湾仔旅游码头检票登船。' }}
-          </text>
-        </view>
-
-        <view v-if="ticket" class="card island-ticket">
-          <view class="ticket-qr"><text></text></view>
-          <text class="ticket-code">核销码 {{ ticket.maskedCode }}</text>
-          <view class="summary">
-            <view class="summary-row"><text>订单号</text><text>{{ ticket.localOrderNo }}</text></view>
-            <view class="summary-row"><text>票号</text><text>{{ ticket.ticketNo }}</text></view>
-            <view class="summary-row"><text>航班</text><text>{{ ticket.voyageLabel }}</text></view>
-            <view class="summary-row"><text>乘客</text><text>{{ ticket.passengerLabel }}</text></view>
-            <view class="summary-row"><text>付款时间</text><text>{{ ticket.paidAtLabel }}</text></view>
-          </view>
-        </view>
-        <EmptyState v-else title="暂无电子票" description="出票后会在这里展示电子票核销信息。" />
-
-        <view class="card service-card">
-          <text class="section-title">售后服务</text>
-          <text class="service-card__body">退票、改签入口已保留；真实费用试算、库存回滚和供应商退改签闭环留到后续接入。</text>
-          <view class="service-actions">
-            <button class="secondary-button">申请退票</button>
-            <button class="secondary-button">申请改签</button>
-          </view>
-        </view>
+        <EmptyState v-if="validationMessage" title="流程提示" :description="validationMessage" />
       </view>
     </template>
+
+    <view class="bottom-bar" :class="{ 'bottom-bar--two': activeStep === 'pay' }">
+      <view>
+        <text>{{ activeStep === 'detail' ? '选择班次后显示票价' : '合计' }}</text>
+        <strong>{{ bottomPrice }}</strong>
+      </view>
+      <button v-if="activeStep === 'detail'" class="cyan-button" @click="goStep('traveler')">立即预订</button>
+      <button v-else-if="activeStep === 'traveler'" class="cyan-button" :disabled="isSubmitting" @click="confirmOrder">{{ isSubmitting ? '正在保留' : '确认订单' }}</button>
+      <button v-else-if="activeStep === 'pay'" class="dark-button" @click="cancelLock">取消订单</button>
+      <button v-if="activeStep === 'pay'" class="cyan-button" :disabled="isSubmitting" @click="payAndIssueTicket">{{ isSubmitting ? '正在出票' : '立即支付' }}</button>
+      <button v-else-if="activeStep === 'ticket'" class="cyan-button">查看票券</button>
+    </view>
   </view>
 </template>
 
 <style scoped>
 .island-page {
-  padding-top: 12px;
+  width: min(100vw, 430px);
+  min-height: 100vh;
+  margin: clamp(0px, calc((100vw - 430px) * 100), 28px) auto;
+  padding-bottom: calc(100px + env(safe-area-inset-bottom));
+  overflow-x: hidden;
+  border-radius: clamp(0px, calc((100vw - 430px) * 100), 26px);
+  background:
+    radial-gradient(circle at 50% -10%, rgba(60, 198, 216, 0.22), transparent 32%),
+    linear-gradient(180deg, #02070d 0%, #06131d 48%, #0a1821 100%);
+  color: #f4fbff;
+  box-shadow: 0 0 0 1px rgba(132, 189, 211, 0.1), 0 24px 80px rgba(0, 0, 0, 0.42);
 }
 
-.step-tabs {
-  position: sticky;
-  top: 0;
-  z-index: 3;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8px;
-  padding: 8px 0 12px;
-  background: var(--zt-color-bg);
-}
-
-.step-tabs__item {
-  height: 34px;
+button {
   margin: 0;
-  border-radius: 8px;
-  background: var(--zt-color-surface);
-  color: var(--zt-color-text-muted);
-  font-size: 13px;
 }
 
-.step-tabs__item--active {
-  background: var(--zt-color-primary);
-  color: #ffffff;
+button::after {
+  display: none;
 }
 
-.step-panel {
-  padding-bottom: 144px;
-}
-
-.island-hero {
+.detail-hero,
+.video-card {
   position: relative;
-  min-height: 260px;
   overflow: hidden;
-  border-radius: 8px;
-  background: #0f766e;
+  background: #02070d;
 }
 
-.island-hero__image {
-  position: absolute;
-  inset: 0;
+.detail-hero {
+  height: 282px;
+  border-radius: 0 0 18px 18px;
+}
+
+.video-card {
+  height: 264px;
+  border-radius: 0 0 18px 18px;
+}
+
+.media-image {
   width: 100%;
   height: 100%;
+  display: block;
 }
 
-.island-hero__content {
-  position: relative;
+.detail-top {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  top: 14px;
+  z-index: 2;
   display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  gap: 12px;
-  min-height: 260px;
-  box-sizing: border-box;
-  padding: 24px;
-  color: #ffffff;
-  background: linear-gradient(180deg, rgba(15, 28, 46, 0.12), rgba(15, 28, 46, 0.74));
+  justify-content: space-between;
 }
 
-.island-hero__title {
-  font-size: 30px;
+.nav-chip,
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0 11px;
+  border-radius: 999px;
+  color: #ffffff;
+  background: rgba(2, 8, 13, 0.54);
+  backdrop-filter: blur(12px);
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.media-control {
+  position: absolute;
+  left: 28px;
+  right: 18px;
+  bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #ffffff;
   font-weight: 900;
 }
 
-.island-hero__summary,
-.page-subtitle,
-.recommend-card__body,
-.note-card__item,
-.service-card__body {
-  color: var(--zt-color-text-muted);
-  font-size: 14px;
-  line-height: 22px;
+.card-dark,
+.action-card {
+  margin: 0 14px 10px;
+  padding: 14px;
+  border: 1px solid rgba(151, 190, 205, 0.2);
+  border-radius: 8px;
+  background: rgba(12, 31, 44, 0.9);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.26);
 }
 
-.route-card,
-.recommend-card,
-.note-card,
-.form-card,
-.pay-card,
-.flow-card,
-.island-ticket,
-.service-card {
-  padding: 16px;
+.detail-copy {
+  position: relative;
+  z-index: 2;
+  margin-top: -18px;
+  padding: 18px 16px;
+  background: linear-gradient(135deg, rgba(20, 48, 66, 0.98), rgba(9, 23, 35, 0.96));
 }
 
-.route-card {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 32px minmax(0, 1fr);
-  align-items: center;
-  gap: 10px;
+.eyebrow {
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  color: #fff1c9;
+  background: rgba(234, 192, 110, 0.16);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.detail-title,
+.detail-body,
+.action-title,
+.action-body,
+.route-node text,
+.route-node strong,
+.section-head text,
+.quick-metrics text,
+.quick-metrics strong,
+.story-grid strong,
+.story-grid span,
+.field-box text,
+.passenger-title,
+.summary-row text,
+.ticket-code {
+  display: block;
+}
+
+.detail-title {
+  font-size: 32px;
+  font-weight: 900;
+  line-height: 1.08;
+}
+
+.detail-body {
+  max-width: 320px;
+  margin-top: 10px;
+  color: rgba(228, 244, 250, 0.86);
+  font-size: 13px;
+  line-height: 1.58;
+}
+
+.hero-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
   margin-top: 14px;
 }
 
-.route-card__name,
-.recommend-card__title,
-.page-title,
-.ticket-state__title {
-  display: block;
-  color: var(--zt-color-text);
-  font-weight: 900;
+.hero-tags text {
+  padding: 6px 9px;
+  border: 1px solid rgba(75, 208, 226, 0.22);
+  border-radius: 999px;
+  color: #d8f9ff;
+  background: rgba(75, 208, 226, 0.12);
+  font-size: 11px;
+  font-weight: 850;
 }
 
-.route-card__name {
-  margin-top: 4px;
-  font-size: 17px;
+.action-card {
+  padding: 0;
+  overflow: hidden;
 }
 
-.route-card__arrow {
-  color: var(--zt-color-primary);
-  font-size: 22px;
-  font-weight: 900;
-  text-align: center;
-}
-
-.muted-label,
-.section-link {
-  color: var(--zt-color-text-muted);
-  font-size: 13px;
-}
-
-.section-row,
-.summary-row {
+.action-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
+  padding: 14px;
+  color: #07121a;
+  background: linear-gradient(135deg, #eac06e, #f1d99d);
 }
 
-.recommend-card__title {
-  font-size: 18px;
-}
-
-.list-stack {
-  display: grid;
-  gap: 12px;
-}
-
-.voyage-card {
-  width: 100%;
-  margin: 0;
-  padding: 16px;
-  text-align: left;
-}
-
-.voyage-card--active {
-  border-color: var(--zt-color-primary);
-}
-
-.voyage-card__top {
-  display: flex;
-  justify-content: space-between;
-  gap: 14px;
-}
-
-.voyage-card__time,
-.voyage-card__name,
-.voyage-card__price text,
-.fare-chip text,
-.note-card__item,
-.page-title,
-.page-subtitle,
-.passenger-card__title,
-.ticket-code,
-.service-card__body {
-  display: block;
-}
-
-.voyage-card__time {
-  font-size: 18px;
+.action-title {
+  font-size: 17px;
   font-weight: 900;
 }
 
-.voyage-card__name,
-.voyage-card__price text:last-child,
-.fare-chip text:last-child {
-  margin-top: 4px;
-  color: var(--zt-color-text-muted);
-  font-size: 13px;
+.action-body,
+.route-node text,
+.section-head text:last-child,
+.quick-metrics text,
+.story-grid span,
+.voyage-card span {
+  color: #9fb2bf;
+  font-size: 12px;
+  line-height: 1.42;
 }
 
-.voyage-card__price {
+.status-pill {
   flex: 0 0 auto;
-  text-align: right;
+  padding: 6px 9px;
+  border-radius: 999px;
+  color: #082331;
+  background: rgba(255, 255, 255, 0.74);
+  font-size: 12px;
+  font-weight: 900;
 }
 
-.voyage-card__price text:first-child {
-  color: var(--zt-color-accent);
+.route-box {
+  display: grid;
+  grid-template-columns: 1fr 38px 1fr;
+  gap: 8px;
+  align-items: center;
+  padding: 14px;
+}
+
+.route-node {
+  min-height: 64px;
+  padding: 10px;
+  border: 1px solid rgba(151, 190, 205, 0.2);
+  border-radius: 8px;
+  background: rgba(7, 21, 31, 0.68);
+}
+
+.route-node strong {
+  margin-top: 5px;
+  font-size: 17px;
+}
+
+.route-arrow {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: #bff6ff;
+  background: rgba(75, 208, 226, 0.18);
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.action-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 0 14px 14px;
+}
+
+.ghost-button,
+.gold-button,
+.cyan-button,
+.dark-button {
+  display: grid;
+  place-items: center;
+  min-height: 44px;
+  border-radius: 999px;
   font-size: 16px;
   font-weight: 900;
 }
 
-.fare-grid,
-.field-grid,
-.service-actions {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+.ghost-button {
+  color: #dffbff;
+  background: rgba(75, 208, 226, 0.14);
+  border: 1px solid rgba(75, 208, 226, 0.24);
+}
+
+.gold-button {
+  color: #07121a;
+  background: linear-gradient(135deg, #f3d78c, #eac06e);
+}
+
+.cyan-button {
+  color: #ffffff;
+  background: #27afc4;
+}
+
+.dark-button {
+  color: #e6f7fb;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(151, 190, 205, 0.2);
+}
+
+.section-head,
+.summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 10px;
+}
+
+.section-head {
+  margin-bottom: 12px;
+  font-weight: 900;
+}
+
+.story-grid,
+.quick-metrics,
+.field-grid,
+.voyage-list {
+  display: grid;
+  gap: 8px;
+}
+
+.story-grid {
+  grid-template-columns: 1fr 1fr;
+}
+
+.story-grid view,
+.quick-metrics view,
+.recommend-card,
+.field-box,
+.passenger-card,
+.voyage-card {
+  padding: 12px;
+  border: 1px solid rgba(151, 190, 205, 0.2);
+  border-radius: 8px;
+  background: rgba(7, 21, 31, 0.72);
+}
+
+.booking-top {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 42px;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(5, 15, 23, 0.82);
+  backdrop-filter: blur(14px);
+}
+
+.booking-top text {
+  text-align: center;
+  font-size: 17px;
+  font-weight: 900;
+}
+
+.icon-button {
+  width: 38px;
+  min-height: 38px;
+  padding: 0;
+}
+
+.hero-copy {
   margin-top: 12px;
 }
 
-.fare-chip,
-.field-box {
-  padding: 12px;
+.quick-metrics {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0 14px 10px;
+}
+
+.quick-metrics view {
+  min-height: 78px;
+}
+
+.quick-metrics strong {
+  margin-top: 7px;
+  font-size: 16px;
+}
+
+.step-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0 14px 10px;
+}
+
+.step-tabs__item {
+  min-height: 34px;
   border-radius: 8px;
-  background: var(--zt-color-surface-muted);
+  color: #9fb2bf;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 13px;
 }
 
-.fare-chip text:first-child,
-.field-box text,
-.summary-row text:last-child {
-  font-weight: 800;
+.step-tabs__item--active {
+  color: #06131d;
+  background: #3cc6d8;
+  font-weight: 900;
 }
 
-.page-title {
-  font-size: 28px;
+.field-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .field-box input {
+  width: 100%;
+  height: 42px;
   margin-top: 8px;
-  font-size: 15px;
+  padding: 0 10px;
+  box-sizing: border-box;
+  border-radius: 8px;
+  color: #f4fbff;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 14px;
 }
 
 .field-box--wide {
@@ -615,152 +698,109 @@ function money(value: number): string {
 }
 
 .passenger-card {
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid var(--zt-color-border);
+  margin-top: 10px;
 }
 
-.bottom-action {
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 5;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(140px, 220px);
-  gap: 12px;
-  box-sizing: border-box;
-  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
-  border-top: 1px solid var(--zt-color-border);
-  background: #ffffff;
-}
-
-.bottom-action--two {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.bottom-action__price,
-.pay-card__amount {
-  display: block;
-  color: var(--zt-color-accent);
-  font-size: 24px;
+.passenger-title {
+  margin-bottom: 10px;
   font-weight: 900;
 }
 
-.bottom-action__button {
-  width: 100%;
-}
-
-.pay-card__amount {
-  margin: 14px 0;
+.pay-amount {
+  display: block;
+  margin-bottom: 12px;
+  color: #f0c978;
   font-size: 34px;
-}
-
-.flow-step {
-  display: grid;
-  grid-template-columns: 32px minmax(0, 1fr);
-  gap: 10px;
-  padding: 10px 0;
-}
-
-.flow-step text {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  background: var(--zt-color-primary-weak);
-  color: var(--zt-color-primary);
   font-weight: 900;
 }
 
-.flow-step strong,
-.flow-step span {
-  display: block;
-}
-
-.flow-step span {
-  margin-top: 4px;
-  color: var(--zt-color-text-muted);
+.summary-row {
+  padding: 10px 0;
+  border-top: 1px solid rgba(151, 190, 205, 0.2);
+  color: #9fb2bf;
   font-size: 13px;
 }
 
-.ticket-state {
-  padding: 18px 2px 8px;
-}
-
-.ticket-state__title {
-  font-size: 32px;
-}
-
-.ticket-state__body {
-  display: block;
-  margin-top: 8px;
-  color: var(--zt-color-text-muted);
-  font-size: 14px;
-  line-height: 22px;
+.summary-row text:last-child {
+  color: #f4fbff;
+  font-weight: 900;
+  text-align: right;
 }
 
 .ticket-qr {
-  width: 132px;
-  height: 132px;
-  margin: 0 auto 12px;
-  border: 8px solid #152238;
-  border-radius: 8px;
+  width: 150px;
+  height: 150px;
+  margin: 8px auto 14px;
+  border: 10px solid #ffffff;
   background:
-    linear-gradient(90deg, #152238 18px, transparent 18px 30px, #152238 30px 48px, transparent 48px),
-    linear-gradient(#152238 18px, transparent 18px 30px, #152238 30px 48px, transparent 48px),
+    linear-gradient(90deg, #000 14px, transparent 14px 26px, #000 26px 40px, transparent 40px) 0 0 / 58px 58px,
+    linear-gradient(#000 14px, transparent 14px 26px, #000 26px 40px, transparent 40px) 0 0 / 58px 58px,
     #ffffff;
 }
 
 .ticket-code {
   text-align: center;
+  font-size: 18px;
   font-weight: 900;
 }
 
-.summary {
-  margin-top: 14px;
-}
-
-.summary-row {
-  padding: 10px 0;
-  border-top: 1px solid var(--zt-color-border);
-  color: var(--zt-color-text-muted);
-  font-size: 14px;
-}
-
-.summary-row text:last-child {
-  color: var(--zt-color-text);
-  text-align: right;
-}
-
-.service-actions button {
+.voyage-card {
   width: 100%;
+  margin: 0;
+  text-align: left;
 }
 
-@media (max-width: 640px) {
-  .field-grid,
-  .fare-grid,
-  .service-actions,
-  .bottom-action,
-  .bottom-action--two {
-    grid-template-columns: 1fr;
-  }
-
-  .route-card {
-    grid-template-columns: 1fr;
-  }
-
-  .route-card__arrow {
-    text-align: left;
-  }
+.voyage-card--active {
+  border-color: #3cc6d8;
 }
 
-@media (min-width: 900px) {
-  .bottom-action {
-    position: static;
-    margin-top: 16px;
-  }
+.voyage-card strong {
+  display: block;
+  font-size: 15px;
+}
+
+.voyage-card > text {
+  display: block;
+  margin-top: 8px;
+  color: #f0c978;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.bottom-bar {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  z-index: 30;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 150px;
+  gap: 12px;
+  align-items: center;
+  width: min(100vw, 430px);
+  transform: translateX(-50%);
+  padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  background: rgba(3, 12, 19, 0.96);
+  border-top: 1px solid rgba(151, 190, 205, 0.18);
+}
+
+.bottom-bar--two {
+  grid-template-columns: minmax(0, 1fr) 104px 130px;
+}
+
+.bottom-bar text,
+.bottom-bar strong {
+  display: block;
+}
+
+.bottom-bar text {
+  color: #9fb2bf;
+  font-size: 12px;
+}
+
+.bottom-bar strong {
+  margin-top: 4px;
+  color: #f0c978;
+  font-size: 22px;
 }
 </style>

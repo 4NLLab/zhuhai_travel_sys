@@ -8,7 +8,7 @@ import { loadDriverViewModel } from '@/api/driver';
 import type { DriverViewModel } from '@/types/driver';
 
 const viewModel = ref<DriverViewModel | null>(null);
-const activeTab = ref<'login' | 'register' | 'console'>('console');
+const activeTab = ref<'login' | 'register' | 'console'>('login');
 const withdrawMessage = ref('');
 
 const canWithdraw = computed(() => {
@@ -30,8 +30,23 @@ onLoad((query) => {
 function loadPage(scenarioOverride?: string) {
   loadDriverViewModel(scenarioOverride).then((result) => {
     viewModel.value = result.data;
-    activeTab.value = result.data.profile ? 'console' : 'login';
     withdrawMessage.value = result.data.statusMessage ?? '';
+  });
+}
+
+function loginAsDriver() {
+  loadDriverViewModel('phase4-active').then((result) => {
+    viewModel.value = result.data;
+    withdrawMessage.value = result.data.statusMessage ?? '';
+    activeTab.value = 'console';
+  });
+}
+
+function submitRegister() {
+  loadDriverViewModel('phase4-pending-review').then((result) => {
+    viewModel.value = result.data;
+    withdrawMessage.value = result.data.statusMessage ?? '注册申请已提交，请等待管理员审核。';
+    activeTab.value = 'console';
   });
 }
 
@@ -54,221 +69,320 @@ function logout() {
 </script>
 
 <template>
-  <view class="page-shell driver-page">
-    <view class="driver-hero">
-      <text class="driver-hero__title">司机端</text>
-      <text class="driver-hero__body">审核通过的司机可查看钱包、佣金、提现记录和车座推广码。</text>
-      <view class="driver-hero__metrics">
-        <view><strong>3</strong><text>步骤入驻</text></view>
-        <view><strong>12%</strong><text>示例提成</text></view>
-        <view><strong>分包</strong><text>低频入口</text></view>
+  <view class="driver-page">
+    <view class="hero">
+      <image class="hero-bg" src="/static/phase2/taxi-scan-illustration-web.jpg" mode="aspectFill" />
+      <view class="top-line">
+        <button class="back-link">‹ 返回首页</button>
+        <button class="help-chip">◉ 司机入驻</button>
+      </view>
+      <view class="hero-copy">
+        <text class="hero-title">司机登录与注册</text>
+        <text class="hero-body">审核通过的司机可登录查看钱包、佣金和提现记录；新司机先提交身份与车辆信息等待后台审核。</text>
+      </view>
+      <view class="hero-card">
+        <view class="metric"><strong>1</strong><text>提交身份信息</text></view>
+        <view class="metric"><strong>2</strong><text>绑定车辆车牌</text></view>
+        <view class="metric"><strong>3</strong><text>审核后生成二维码</text></view>
       </view>
     </view>
 
-    <view class="mode-tabs">
-      <button class="mode-tabs__item" :class="{ 'mode-tabs__item--active': activeTab === 'login' }" @click="activeTab = 'login'">登录</button>
-      <button class="mode-tabs__item" :class="{ 'mode-tabs__item--active': activeTab === 'register' }" @click="activeTab = 'register'">注册</button>
-      <button class="mode-tabs__item" :class="{ 'mode-tabs__item--active': activeTab === 'console' }" @click="activeTab = 'console'">工作台</button>
-    </view>
-
-    <EmptyState v-if="viewModel?.errorMessage" title="司机端提示" :description="viewModel.errorMessage" />
-
-    <view v-if="activeTab === 'login'" class="card panel-card">
-      <view class="section-row">
-        <text class="section-title">司机登录</text>
-        <StatusPill text="active drivers" tone="success" />
+    <view class="content">
+      <view class="mode-tabs">
+        <button class="mode-tab" :class="{ active: activeTab === 'login' }" @click="activeTab = 'login'">司机登录</button>
+        <button class="mode-tab" :class="{ active: activeTab === 'register' }" @click="activeTab = 'register'">司机注册</button>
       </view>
-      <view class="field-box"><text>手机号</text><input value="13800138000" placeholder="请输入已审核司机手机号" /></view>
-      <view class="field-box"><text>登录密码</text><input password value="******" placeholder="请输入登录密码" /></view>
-      <button class="primary-button panel-button" @click="loadPage('phase4-active')">登录司机端</button>
-    </view>
 
-    <view v-if="activeTab === 'register'" class="card panel-card">
-      <view class="section-row">
-        <text class="section-title">司机注册</text>
-        <StatusPill text="等待审核" tone="warning" />
-      </view>
-      <view class="field-grid">
-        <view class="field-box"><text>真实姓名</text><input value="陈师傅" /></view>
-        <view class="field-box"><text>手机号</text><input value="13800138000" /></view>
-        <view class="field-box"><text>身份证号</text><input value="440402********2345" /></view>
-        <view class="field-box"><text>车牌号</text><input value="粤C·D4208" /></view>
-      </view>
-      <button class="primary-button panel-button" @click="loadPage('phase4-pending-review')">提交注册申请</button>
-    </view>
+      <EmptyState v-if="viewModel?.errorMessage" title="司机端提示" :description="viewModel.errorMessage" />
 
-    <view v-if="activeTab === 'console'">
-      <view v-if="viewModel?.profile" class="card panel-card">
-        <view class="driver-profile">
-          <view>
-            <text class="driver-profile__name">{{ viewModel.profile.name }}</text>
-            <text class="driver-profile__meta">{{ viewModel.profile.driverNo }} · {{ viewModel.profile.commissionRateLabel }}</text>
-            <text class="driver-profile__meta">{{ viewModel.profile.maskedPhone }} · {{ viewModel.profile.vehicleLabel }}</text>
+      <view v-if="activeTab === 'login'" class="card form-card">
+        <view class="section-head">
+          <text>司机登录</text>
+          <text>active drivers</text>
+        </view>
+        <view class="form-grid">
+          <view class="field"><text>手机号</text><input value="13800138000" placeholder="请输入已审核司机手机号" /></view>
+          <view class="field"><text>登录密码</text><input password value="******" placeholder="请输入登录密码" /></view>
+        </view>
+        <button class="primary-button" @click="loginAsDriver">登录司机端</button>
+      </view>
+
+      <view v-if="activeTab === 'register'" class="card form-card">
+        <view class="section-head">
+          <text>司机注册</text>
+          <text>drivers / vehicles</text>
+        </view>
+        <view class="step-row">
+          <view class="step active">身份信息</view>
+          <view class="step">车辆信息</view>
+          <view class="step">提交审核</view>
+        </view>
+        <view class="form-grid">
+          <view class="field"><text>真实姓名</text><input value="陈师傅" placeholder="请输入与身份证一致的姓名" /></view>
+          <view class="field"><text>手机号</text><input value="13800138000" placeholder="用于登录和接收审核通知" /></view>
+          <view class="field"><text>身份证号</text><input value="440402********2345" placeholder="请输入18位身份证号码" /></view>
+          <view class="field"><text>车牌号</text><input value="粤C·D4208" placeholder="请输入车辆号牌" /></view>
+        </view>
+        <button class="primary-button" @click="submitRegister">提交注册申请</button>
+      </view>
+
+      <view v-if="activeTab === 'console'" class="console">
+        <view v-if="viewModel?.profile" class="card profile-card">
+          <view class="driver-profile">
+            <view>
+              <text class="driver-name">{{ viewModel.profile.name }}</text>
+              <text class="driver-meta">{{ viewModel.profile.driverNo }} · {{ viewModel.profile.commissionRateLabel }}</text>
+              <text class="driver-meta">{{ viewModel.profile.maskedPhone }} · {{ viewModel.profile.vehicleLabel }}</text>
+            </view>
+            <StatusPill :text="viewModel.profile.status === 'active' ? '已审核' : '待审核'" :tone="viewModel.profile.status === 'active' ? 'success' : 'warning'" />
           </view>
-          <StatusPill :text="viewModel.profile.status === 'active' ? '已审核' : '待审核'" :tone="viewModel.profile.status === 'active' ? 'success' : 'warning'" />
-        </view>
 
-        <view class="qr-panel">
-          <view class="qr-box"><text></text></view>
-          <view>
-            <text class="qr-panel__title">车座推广码</text>
-            <text class="qr-panel__body">{{ viewModel.profile.qrCodeText }}</text>
-          </view>
-        </view>
-      </view>
-      <EmptyState v-else title="未登录" description="请先登录司机端或提交注册申请。" />
-
-      <view v-if="viewModel?.profile?.status === 'pending_review'" class="card panel-card">
-        <text class="section-title">审核状态</text>
-        <text class="panel-copy">{{ viewModel.statusMessage }}</text>
-      </view>
-
-      <view v-if="viewModel?.wallet" class="card panel-card">
-        <view class="section-row">
-          <text class="section-title">钱包余额</text>
-          <text class="section-link">{{ sourceLabel }} 同步</text>
-        </view>
-        <view class="wallet-grid">
-          <view><text>可提现</text><strong>{{ viewModel.wallet.availableLabel }}</strong></view>
-          <view><text>待结算</text><strong>{{ viewModel.wallet.pendingLabel }}</strong></view>
-          <view><text>已结算</text><strong>{{ viewModel.wallet.settledLabel }}</strong></view>
-          <view><text>已提现</text><strong>{{ viewModel.wallet.withdrawnLabel }}</strong></view>
-        </view>
-      </view>
-
-      <view v-if="viewModel?.wallet" class="card panel-card">
-        <text class="section-title">最近佣金</text>
-        <view v-if="viewModel.commissions.length === 0">
-          <EmptyState title="暂无佣金记录" description="订单核销后自动计算佣金。" />
-        </view>
-        <view v-else class="record-list">
-          <view v-for="item in viewModel.commissions" :key="item.id" class="record-item">
-            <text>{{ item.orderNo }} · {{ item.amountLabel }}</text>
-            <text>{{ item.statusLabel }} · {{ item.createdAtLabel }}</text>
+          <view class="qr-panel">
+            <view class="qr-box"><text></text></view>
+            <view>
+              <text class="qr-title">车座推广码</text>
+              <text class="qr-body">{{ viewModel.profile.qrCodeText }}</text>
+            </view>
           </view>
         </view>
-      </view>
+        <EmptyState v-else title="未登录" description="请先登录司机端或提交注册申请。" />
 
-      <view v-if="viewModel?.wallet" class="card panel-card">
-        <text class="section-title">申请提现</text>
-        <view class="field-grid">
-          <view class="field-box"><text>提现金额</text><input v-model.number="viewModel.withdrawDraft.amount" type="digit" /></view>
-          <view class="field-box"><text>收款账号</text><input v-model="viewModel.withdrawDraft.account" /></view>
-          <view class="field-box"><text>实名姓名</text><input v-model="viewModel.withdrawDraft.realName" /></view>
+        <view v-if="viewModel?.profile?.status === 'pending_review'" class="card panel-card">
+          <text class="section-title">审核状态</text>
+          <text class="panel-copy">{{ viewModel.statusMessage }}</text>
         </view>
-        <button class="primary-button panel-button" @click="submitWithdraw">提交提现</button>
-        <text v-if="withdrawMessage" class="panel-copy">{{ withdrawMessage }}</text>
-      </view>
 
-      <view v-if="viewModel?.wallet" class="card panel-card">
-        <text class="section-title">提现记录</text>
-        <view v-if="viewModel.withdrawals.length === 0">
-          <EmptyState title="暂无提现记录" description="提交提现申请后会在这里展示审核状态。" />
-        </view>
-        <view v-else class="record-list">
-          <view v-for="item in viewModel.withdrawals" :key="item.id" class="record-item">
-            <text>{{ item.withdrawalNo }} · {{ item.amountLabel }}</text>
-            <text>{{ item.statusLabel }} · {{ item.accountLabel }} · {{ item.createdAtLabel }}</text>
+        <view v-if="viewModel?.wallet" class="card panel-card">
+          <view class="section-head">
+            <text>钱包余额</text>
+            <text>{{ sourceLabel }} 同步</text>
+          </view>
+          <view class="wallet-grid">
+            <view><text>可提现</text><strong>{{ viewModel.wallet.availableLabel }}</strong></view>
+            <view><text>待结算</text><strong>{{ viewModel.wallet.pendingLabel }}</strong></view>
+            <view><text>已结算</text><strong>{{ viewModel.wallet.settledLabel }}</strong></view>
+            <view><text>已提现</text><strong>{{ viewModel.wallet.withdrawnLabel }}</strong></view>
           </view>
         </view>
-      </view>
 
-      <button class="secondary-button panel-button" @click="logout">退出司机端</button>
+        <view v-if="viewModel?.wallet" class="card panel-card">
+          <text class="section-title">最近佣金</text>
+          <view v-if="viewModel.commissions.length === 0">
+            <EmptyState title="暂无佣金记录" description="订单核销后自动计算佣金。" />
+          </view>
+          <view v-else class="record-list">
+            <view v-for="item in viewModel.commissions" :key="item.id" class="record-item">
+              <text>{{ item.orderNo }} · {{ item.amountLabel }}</text>
+              <text>{{ item.statusLabel }} · {{ item.createdAtLabel }}</text>
+            </view>
+          </view>
+        </view>
+
+        <view v-if="viewModel?.wallet" class="card panel-card">
+          <text class="section-title">申请提现</text>
+          <view class="form-grid">
+            <view class="field"><text>提现金额</text><input v-model.number="viewModel.withdrawDraft.amount" type="digit" /></view>
+            <view class="field"><text>收款账号</text><input v-model="viewModel.withdrawDraft.account" /></view>
+            <view class="field"><text>实名姓名</text><input v-model="viewModel.withdrawDraft.realName" /></view>
+          </view>
+          <button class="primary-button" @click="submitWithdraw">提交提现</button>
+          <text v-if="withdrawMessage" class="panel-copy">{{ withdrawMessage }}</text>
+        </view>
+
+        <button class="logout-button" @click="logout">退出司机端</button>
+      </view>
     </view>
   </view>
 </template>
 
 <style scoped>
 .driver-page {
-  padding-top: 16px;
+  width: min(100vw, 430px);
+  min-height: 100vh;
+  margin: clamp(0px, calc((100vw - 430px) * 100), 28px) auto;
+  overflow-x: hidden;
+  border-radius: clamp(0px, calc((100vw - 430px) * 100), 26px);
+  background:
+    radial-gradient(circle at 20% 0%, rgba(15, 141, 173, 0.18), transparent 34%),
+    linear-gradient(180deg, #f7fbfc, #dfeff2);
+  color: #15242d;
+  box-shadow: 0 0 0 1px rgba(20, 35, 45, 0.05), 0 24px 80px rgba(8, 45, 64, 0.18);
 }
 
-.driver-hero {
-  padding: 22px;
-  border-radius: 8px;
+button {
+  margin: 0;
+}
+
+button::after {
+  display: none;
+}
+
+.hero {
+  position: relative;
+  min-height: 238px;
+  padding: 18px 16px;
+  overflow: hidden;
   color: #ffffff;
-  background: linear-gradient(135deg, #0f766e, #264653);
+  background: #0f8dad;
 }
 
-.driver-hero__title,
-.driver-hero__body,
-.driver-profile__name,
-.driver-profile__meta,
-.qr-panel__title,
-.qr-panel__body,
+.hero::before,
+.hero::after {
+  content: "";
+  position: absolute;
+}
+
+.hero::before {
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(135deg, rgba(8, 109, 137, 0.96), rgba(15, 141, 173, 0.82));
+}
+
+.hero::after {
+  inset: auto -54px -86px 36%;
+  z-index: 2;
+  height: 190px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  transform: rotate(-12deg);
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.top-line,
+.hero-copy,
+.hero-card {
+  position: relative;
+  z-index: 3;
+}
+
+.top-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.back-link,
+.help-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 10px;
+  border-radius: 999px;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(8px);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.hero-copy {
+  margin-top: 30px;
+}
+
+.hero-title,
+.hero-body,
+.metric strong,
+.metric text,
+.section-head text,
+.field text,
+.driver-name,
+.driver-meta,
+.qr-title,
+.qr-body,
 .panel-copy,
-.record-item text {
+.record-item text,
+.section-title {
   display: block;
 }
 
-.driver-hero__title {
+.hero-title {
   font-size: 30px;
   font-weight: 900;
+  line-height: 1.12;
 }
 
-.driver-hero__body {
-  margin-top: 8px;
-  font-size: 14px;
-  line-height: 22px;
+.hero-body {
+  max-width: 300px;
+  margin-top: 10px;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 13px;
+  line-height: 1.5;
 }
 
-.driver-hero__metrics,
-.wallet-grid,
-.field-grid {
+.hero-card {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  margin-top: 16px;
+  gap: 8px;
+  margin-top: 20px;
 }
 
-.driver-hero__metrics view,
-.wallet-grid view,
-.field-box {
-  padding: 12px;
+.metric {
+  min-height: 72px;
+  padding: 11px 9px;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(10px);
 }
 
-.driver-hero__metrics strong,
-.driver-hero__metrics text {
-  display: block;
+.metric strong {
+  font-size: 18px;
 }
 
-.driver-hero__metrics strong {
-  font-size: 20px;
+.metric text {
+  margin-top: 5px;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 11px;
+  line-height: 1.35;
 }
 
-.driver-hero__metrics text {
-  margin-top: 4px;
-  font-size: 12px;
+.content {
+  padding: 12px 14px calc(36px + env(safe-area-inset-bottom));
 }
 
 .mode-tabs {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
-  margin: 14px 0;
+  margin-bottom: 118px;
 }
 
-.mode-tabs__item {
-  height: 36px;
-  margin: 0;
+.console .mode-tabs {
+  margin-bottom: 12px;
+}
+
+.mode-tab {
+  height: 42px;
+  border: 1px solid #d8e6eb;
   border-radius: 8px;
-  background: var(--zt-color-surface);
-  color: var(--zt-color-text-muted);
+  color: #465a64;
+  background: #ffffff;
+  font-size: 17px;
+  font-weight: 900;
 }
 
-.mode-tabs__item--active {
-  background: var(--zt-color-primary);
+.mode-tab.active {
   color: #ffffff;
+  background: #0f8dad;
+  border-color: #0f8dad;
 }
 
-.panel-card {
-  margin-top: 14px;
-  padding: 16px;
+.card {
+  margin-bottom: 10px;
+  padding: 14px;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 14px 34px rgba(8, 45, 64, 0.12);
 }
 
-.section-row,
+.section-head,
 .driver-profile,
 .qr-panel {
   display: flex;
@@ -277,42 +391,102 @@ function logout() {
   gap: 12px;
 }
 
-.section-link,
-.driver-profile__meta,
-.qr-panel__body,
+.section-head {
+  margin-bottom: 12px;
+}
+
+.section-head text:first-child,
+.section-title {
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.section-head text:last-child,
+.driver-meta,
+.qr-body,
 .panel-copy,
 .record-item text:last-child {
-  color: var(--zt-color-text-muted);
+  color: #6c7a84;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.step-row,
+.form-grid,
+.wallet-grid,
+.record-list {
+  display: grid;
+  gap: 10px;
+}
+
+.step-row {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 12px;
+}
+
+.step {
+  padding: 9px 8px;
+  border-radius: 8px;
+  color: #56707a;
+  background: #f2f8fa;
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.step.active {
+  color: #086d89;
+  background: #e8f7fb;
+}
+
+.field {
+  display: grid;
+  gap: 7px;
+}
+
+.field text {
+  color: #4c5f69;
   font-size: 13px;
-  line-height: 20px;
-}
-
-.field-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.field-box {
-  background: var(--zt-color-surface-muted);
-}
-
-.field-box text,
-.wallet-grid text,
-.wallet-grid strong,
-.record-item text:first-child {
-  display: block;
   font-weight: 800;
 }
 
-.field-box input {
-  margin-top: 8px;
-}
-
-.panel-button {
+.field input {
   width: 100%;
-  margin-top: 14px;
+  height: 46px;
+  padding: 0 12px;
+  box-sizing: border-box;
+  border: 1px solid #e4edf1;
+  border-radius: 8px;
+  color: #15242d;
+  background: #fbfdfe;
+  font-size: 15px;
 }
 
-.driver-profile__name {
+.primary-button,
+.logout-button {
+  width: 100%;
+  min-height: 46px;
+  margin-top: 14px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.primary-button {
+  color: #ffffff;
+  background: #0f8dad;
+}
+
+.logout-button {
+  color: #6c7a84;
+  background: #ffffff;
+}
+
+.console {
+  margin-top: -96px;
+}
+
+.driver-name {
   font-size: 20px;
   font-weight: 900;
 }
@@ -322,7 +496,7 @@ function logout() {
   margin-top: 14px;
   padding: 12px;
   border-radius: 8px;
-  background: var(--zt-color-surface-muted);
+  background: #edf5f7;
 }
 
 .qr-box {
@@ -336,48 +510,40 @@ function logout() {
     #ffffff;
 }
 
-.qr-panel__title {
+.qr-title {
   font-size: 16px;
   font-weight: 900;
 }
 
 .wallet-grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.wallet-grid view {
-  background: var(--zt-color-surface-muted);
+.wallet-grid view,
+.record-item {
+  padding: 12px;
+  border-radius: 8px;
+  background: #edf5f7;
+}
+
+.wallet-grid text,
+.wallet-grid strong,
+.record-item text:first-child {
+  display: block;
+}
+
+.wallet-grid text {
+  color: #6c7a84;
+  font-size: 12px;
 }
 
 .wallet-grid strong {
   margin-top: 6px;
-  color: var(--zt-color-accent);
+  color: #f15a2b;
   font-size: 20px;
 }
 
-.record-list {
-  display: grid;
-  gap: 10px;
+.panel-copy {
   margin-top: 10px;
-}
-
-.record-item {
-  padding: 12px;
-  border-radius: 8px;
-  background: var(--zt-color-surface-muted);
-}
-
-@media (max-width: 640px) {
-  .driver-hero__metrics,
-  .field-grid,
-  .wallet-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .driver-profile,
-  .qr-panel,
-  .section-row {
-    align-items: flex-start;
-  }
 }
 </style>
