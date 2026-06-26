@@ -3,7 +3,8 @@
     {
       "path": "pages/home/index",
       "style": {
-        "navigationBarTitleText": "珠海文旅"
+        "navigationBarTitleText": "珠海文旅",
+        "navigationStyle": "custom"
       }
     },
     {
@@ -62,7 +63,7 @@
       },
       {
         "pagePath": "pages/orders/index",
-        "text": "订单"
+        "text": "客服"
       },
       {
         "pagePath": "pages/profile/index",

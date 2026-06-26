@@ -20,4 +20,15 @@ page {
   color: var(--zt-color-text);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
+
+/* #ifdef H5 */
+uni-tabbar,
+.uni-tabbar {
+  display: none !important;
+}
+
+.uni-app--showtabbar {
+  padding-bottom: 0 !important;
+}
+/* #endif */
 </style>

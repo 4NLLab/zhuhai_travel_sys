@@ -11,6 +11,8 @@ import { mapBackendOrder, mapBackendTicket } from '@/utils/main-shell-mappers';
 
 const sharedDestinations: DestinationEntry[] = [
   { id: 'island-cruise', title: '澳门环岛游', subtitle: '海上观光', category: 'ship', route: '/pages/island-cruise/index' },
+  { id: 'shekou-ferry', title: '深圳香港船票', subtitle: '九洲蛇口', category: 'ship' },
+  { id: 'private-tour', title: '私人旅游订制', subtitle: '专属路线', category: 'tour' },
   { id: 'bridge', title: '港珠澳大桥游', subtitle: '湾区观光', category: 'tour' },
   { id: 'chimelong', title: '珠海长隆', subtitle: '亲子度假', category: 'play' },
   { id: 'macau', title: '澳门游', subtitle: '轻松过关', category: 'tour' },
@@ -21,23 +23,45 @@ const sharedDestinations: DestinationEntry[] = [
 const sharedProducts: ProductEntry[] = [
   {
     id: 'island-cruise-night',
-    title: '澳门环岛游夜景船票',
-    subtitle: '湾仔旅游码头出发，凭电子票码检票登船',
+    title: '九洲港至蛇口船票',
+    subtitle: '对接九洲港分销接口，真实航班、票价和锁票链路',
     category: 'ship',
-    priceLabel: '¥128 起',
-    tag: '电子票',
+    priceLabel: '¥140 起',
+    tag: '热卖',
     imageUrl: '/static/phase2/macau-cruise-night-banner-web.jpg',
-    actionText: '立即预订',
+    actionText: '预订',
     route: '/pages/island-cruise/index',
-    sourceNote: '来源参考 ticket.html 与首页环岛游入口'
+    sourceNote: '来源参考 index.html 首页船票推荐'
   },
   {
     id: 'hotel-package',
-    title: '横琴酒店双人套餐',
+    title: '珠海横琴酒店双人套餐',
     subtitle: '近长隆与口岸，含早餐，可加购接送服务',
     category: 'hotel',
     priceLabel: '¥399 起',
     tag: '套餐',
+    imageUrl: '/static/phase2/zhuhai-bay-home-hero-web.jpg',
+    actionText: '预订',
+    sourceNote: '非首版交易路径占位'
+  },
+  {
+    id: 'hk-macau-route',
+    title: '香港澳门一日游路线',
+    subtitle: '口岸集合，可选导游、用车、门票与酒店组合',
+    category: 'tour',
+    priceLabel: '¥268 起',
+    tag: '路线',
+    imageUrl: '/static/phase2/taxi-scan-illustration-web.jpg',
+    actionText: '咨询',
+    sourceNote: '非首版交易路径占位'
+  },
+  {
+    id: 'chimelong-ticket',
+    title: '长隆门票与石景山缆车',
+    subtitle: '亲子玩乐组合，支持单品或套票售卖',
+    category: 'play',
+    priceLabel: '¥128 起',
+    tag: '电子票',
     imageUrl: '/static/phase2/ticket-wallet-illustration-web.jpg',
     actionText: '预订',
     sourceNote: '非首版交易路径占位'
