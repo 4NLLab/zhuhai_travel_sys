@@ -4,7 +4,7 @@ overview: 修正 uni-app 小程序迁移前端的视觉偏差，以原静态 HTM
 todos:
   - id: phase-1-baseline-visual-contract
     content: Phase 1：建立原版视觉基线与逐页差异清单
-    status: pending
+    status: completed
   - id: phase-2-home-visual-parity
     content: Phase 2：首页首屏与首页主体视觉还原
     status: pending
