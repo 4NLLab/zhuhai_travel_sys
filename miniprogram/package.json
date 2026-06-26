@@ -25,6 +25,7 @@
     "@dcloudio/vite-plugin-uni": "3.0.0-alpha-5010420260626001",
     "@vitejs/plugin-vue": "5.2.4",
     "@vue/tsconfig": "0.8.1",
+    "playwright": "1.61.1",
     "typescript": "5.9.2",
     "vite": "5.2.8",
     "vitest": "2.1.9",
