@@ -10,7 +10,7 @@ import type {
 import { mapBackendOrder, mapBackendTicket } from '@/utils/main-shell-mappers';
 
 const sharedDestinations: DestinationEntry[] = [
-  { id: 'island-cruise', title: '澳门环岛游', subtitle: '海上观光', category: 'ship', route: '/pages/ticket/index' },
+  { id: 'island-cruise', title: '澳门环岛游', subtitle: '海上观光', category: 'ship', route: '/pages/island-cruise/index' },
   { id: 'bridge', title: '港珠澳大桥游', subtitle: '湾区观光', category: 'tour' },
   { id: 'chimelong', title: '珠海长隆', subtitle: '亲子度假', category: 'play' },
   { id: 'macau', title: '澳门游', subtitle: '轻松过关', category: 'tour' },
@@ -27,8 +27,8 @@ const sharedProducts: ProductEntry[] = [
     priceLabel: '¥128 起',
     tag: '电子票',
     imageUrl: '/static/phase2/macau-cruise-night-banner-web.jpg',
-    actionText: '查看票券',
-    route: '/pages/ticket/index',
+    actionText: '立即预订',
+    route: '/pages/island-cruise/index',
     sourceNote: '来源参考 ticket.html 与首页环岛游入口'
   },
   {

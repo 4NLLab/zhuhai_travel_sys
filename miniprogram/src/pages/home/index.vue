@@ -88,12 +88,12 @@ function openRoute(route?: string) {
       </view>
     </view>
 
-    <view class="section island-entry" @click="openRoute('/pages/ticket/index')">
+    <view class="section island-entry" @click="openRoute('/pages/island-cruise/index')">
       <view>
         <text class="island-entry__title">澳门环岛游</text>
-        <text class="island-entry__body">Phase 3 会迁移完整订票链路；当前先保留入口和票券基础视觉。</text>
+        <text class="island-entry__body">进入环岛游订票切片，选择班次、实名购票并模拟出票。</text>
       </view>
-      <text class="island-entry__action">查看票券</text>
+      <text class="island-entry__action">立即预订</text>
     </view>
 
     <view class="section">

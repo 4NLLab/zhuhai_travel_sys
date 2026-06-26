@@ -23,6 +23,12 @@
       "style": {
         "navigationBarTitleText": "票券详情"
       }
+    },
+    {
+      "path": "pages/island-cruise/index",
+      "style": {
+        "navigationBarTitleText": "澳门环岛游"
+      }
     }
   ],
   "subPackages": [

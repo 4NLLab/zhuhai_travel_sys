@@ -42,3 +42,20 @@ Phase 2 只迁移主包展示壳与通用 view model。当前实现默认 `VITE_
 | 常用出行人入口 | `/travelers` | GET | user_token | `Traveler.name/id_type/id_no/phone/is_default` -> 常用服务入口后续列表；Phase 2 只放入口 | 缺稳定测试用户 token/seed | Phase 5 联调 | false | mock | 401/403 显示未登录；空列表不阻断“我的”页 |
 | 订单列表 | `/orders?status=&page=&size=` | GET | user_token | `Order.id/order_no/status/product_name/travel_date/quantity/paid_amount` -> `OrderSummary`；覆盖 `pending_use/pending_pay/reserved/completed/refunded/refunding` | `VITE_MOCK_SCENARIO=phase2-success|phase2-empty|phase2-unauthorized|phase2-failure` | Phase 5 联调 | false | mock | 空态显示“暂无订单”；401/403 显示未登录；非 2xx 显示订单服务不可用 |
 | 票券详情 | `/tickets/:id` | GET | user_token | `Ticket.id/status/product_name/valid_date/valid_time/code/verify_location/notices/order_no` -> `TicketSummary`；券码必须通过 `maskSensitive` 脱敏展示 | `VITE_MOCK_SCENARIO=phase2-success` 含 `available/unavailable` | Phase 5 联调 | false | mock | 404 显示“暂无票券”；401/403 显示未登录；非 2xx 显示读取失败 |
+
+## Phase 3 环岛游订票纵向切片
+
+Phase 3 当前只接 mock view model。以下真实 endpoint 均来自 `backend/routes/router.go`，其中锁票、出票、退票、改签、核销通知当前虽挂公开路由，但涉及库存/资金/供应商状态，前端契约中标注为 `current_public_but_should_be_hardened`，Phase 5 只能按受控测试环境联调，不能在生产语义下视为普通公开接口。
+
+| 页面动作 | endpoint | 方法 | auth 类型 | 字段映射 | token/账号/seed | 当前能否本地联调 | allowFallback | dataSource | 错误态 |
+|---|---|---|---|---|---|---|---|---|---|
+| 码头与证件类型 | `/island-cruise/ports`、`/island-cruise/cert-types` | GET | public | `portId/portName` -> `IslandPort`；`certTypeId/certTypeName` -> cert option | 无 | Phase 5 联调 | false | mock | 失败时使用页面错误态，不静默伪造 local 成功 |
+| 近期推荐 | `/island-cruise/smart-search?start_date=&days=&people_num=` | GET | public | `recommended.date/first_time/count/min_price` -> `recommended` | 无 | Phase 5 联调 | false | mock | 无推荐显示“暂无推荐班次”；非 2xx 显示服务失败 |
+| 班次日历 | `/island-cruise/voyage-calendar?start_date=&days=&up_port_id=&down_port_id=&people_num=` | GET | public | `days[].date/count` -> 日期/班次数提示 | 无 | Phase 5 联调 | false | mock | 查询失败保留手动日期选择和错误提示 |
+| 可售班次 | `/island-cruise/voyages?departure_date=&up_port_id=&down_port_id=&people_num=` | GET | public | `voyageId/voyageName/voyageNo/shipName/departureTime/cabinPriceList[].fareTypeList[]` -> `IslandVoyage`/`IslandFare` | `phase3-success|phase3-no-voyage|phase3-failure|phase3-insufficient-stock` | Phase 5 联调 | false | mock | 无班次、库存不足、接口失败均有可解释状态 |
+| 保留座位 | `/island-cruise/lock` | POST | current_public_but_should_be_hardened | `local_order_no/orderNo/ticketNo/lock_expire_at` -> `IslandLockedOrder`；请求体由 `IslandOrderDraft` 生成 | `phase3-lock-expired|phase3-passenger-invalid` | Phase 5 需受控 seed | false | mock | 乘客缺失、库存不足、锁票失败、锁过期提示用户重新选择 |
+| 取消保留 | `/island-cruise/unlock` | POST | current_public_but_should_be_hardened | `local_order_no/status` -> 取消结果 | 需可取消测试订单 | Phase 5 需受控 seed | false | mock | 已出票不可取消；失败保留当前订单状态 |
+| 模拟支付出票 | `/island-cruise/sale` | POST | current_public_but_should_be_hardened | `ticketNo/codeContent/paid_at` -> `IslandTicketResult`；`codeContent` 必须专用脱敏 | `phase3-sale-failed` | Phase 5 需受控 seed | false | mock | 出票失败显示待处理，不展示完整核销码 |
+| 查询订单 | `/island-cruise/order?local_order_no=` | GET | current_public_but_should_be_hardened | `status/passengers/ticket_no/code_content/pay_amount/go_time` -> 票券详情与售后状态 | 需已出票测试订单 | Phase 5 需受控 seed | false | mock | 404 显示订单不存在；非 2xx 显示刷新失败 |
+| 退票费用 / 提交退票 | `/island-cruise/refund-fee`、`/island-cruise/refund` | GET/POST | current_public_but_should_be_hardened | Phase 3 只保留入口和说明，不执行真实资金流 | 需已出票且可退 seed | 不在 Phase 3 联调 | false | mock | 页面明确“后续接入”，不宣称退票闭环 |
+| 改签费用 / 班次 / 锁定 / 取消 | `/island-cruise/change-fee`、`/island-cruise/change-voyages`、`/island-cruise/change-lock`、`/island-cruise/change-unlock` | GET/POST | current_public_but_should_be_hardened | Phase 3 只保留入口和说明，不执行供应商改签闭环 | 需已出票且可改签 seed | 不在 Phase 3 联调 | false | mock | 页面明确“后续接入”，不宣称改签闭环 |
