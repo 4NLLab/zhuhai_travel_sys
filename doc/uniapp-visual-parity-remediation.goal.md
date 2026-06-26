@@ -17,7 +17,7 @@ todos:
       - phase-2-home-visual-parity
   - id: phase-4-business-flows-visual-parity
     content: Phase 4：环岛游订票与司机端视觉还原
-    status: pending
+    status: completed
     depends_on:
       - phase-3-main-pages-visual-parity
   - id: phase-5-final-visual-gate-and-docs
