@@ -17,6 +17,7 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
       - ./database/001_schema.sql:/docker-entrypoint-initdb.d/001_schema.sql:ro
+      - ./database/002_island_cruise.sql:/docker-entrypoint-initdb.d/002_island_cruise.sql:ro
       - ./database/003_island_cruise_operations.sql:/docker-entrypoint-initdb.d/003_island_cruise_operations.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
