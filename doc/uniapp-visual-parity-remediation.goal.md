@@ -12,7 +12,7 @@ todos:
       - phase-1-baseline-visual-contract
   - id: phase-3-main-pages-visual-parity
     content: Phase 3：我的、订单、票券基础页视觉还原
-    status: pending
+    status: completed
     depends_on:
       - phase-2-home-visual-parity
   - id: phase-4-business-flows-visual-parity
